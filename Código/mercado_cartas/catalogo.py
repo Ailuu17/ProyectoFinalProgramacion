@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Dict, List, Optional
 
-from .principales import Evento, PlantillaCriatura, TipoSobre
+from .principales import Evento, Moneda, PlantillaCriatura, TasaCambio, TipoSobre
 
 
 @dataclass
@@ -28,7 +28,13 @@ class Mercado:
     ofertas: Dict[str, int] = field(default_factory=dict)
     sobres: List[TipoSobre] = field(default_factory=list)
     eventos: List[Evento] = field(default_factory=list)
-    tasa_cambio: int = 1
+    tasa_cambio: TasaCambio = field(
+        default_factory=lambda: TasaCambio(
+            moneda_origen=Moneda("Común", "gris", "base"),
+            moneda_destino=Moneda("Evento", "amarillo", "evento"),
+            factor=5,
+        )
+    )
 
     def precio_de(self, codigo: str) -> int:
         if codigo not in self.ofertas:

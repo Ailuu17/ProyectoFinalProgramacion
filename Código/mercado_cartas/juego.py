@@ -5,12 +5,8 @@ from datetime import date
 from typing import Callable, Dict, List, Optional, Sequence
 
 from .catalogo import Catalogo, Mercado
-from .principales import Actividad, Carta, Moneda, TipoSobre
+from .principales import Actividad, Carta, TipoSobre
 from .jugador import Jugador
-
-
-_MONEDA_COMUN = Moneda("Común", "gris", "base")
-_MONEDA_EVENTO = Moneda("Evento", "amarillo", "evento")
 
 
 @dataclass
@@ -53,9 +49,10 @@ class Juego:
             raise ValueError("El jugador no existe.")
         jugador = self._jugadores[jugador_id]
         precio = self.mercado.precio_de(codigo)
-        if jugador.billetera.saldo(_MONEDA_COMUN) < precio:
+        moneda = self.mercado.tasa_cambio.moneda_origen
+        if jugador.billetera.saldo(moneda) < precio:
             raise ValueError("El jugador no tiene saldo suficiente para comprar la carta.")
-        jugador.billetera.retirar(_MONEDA_COMUN, precio)
+        jugador.billetera.retirar(moneda, precio)
         jugador.agregar_carta(codigo)
         self._historial.append({"tipo": "comprar_carta", "jugador": jugador_id, "codigo": codigo})
         return codigo
@@ -87,10 +84,12 @@ class Juego:
         if cantidad_comunes < 0:
             raise ValueError("La cantidad no puede ser negativa.")
         jugador = self._jugadores[jugador_id]
-        if jugador.billetera.saldo(_MONEDA_COMUN) < cantidad_comunes:
+        tasa = self.mercado.tasa_cambio
+        if jugador.billetera.saldo(tasa.moneda_origen) < cantidad_comunes:
             raise ValueError("No hay suficientes monedas comunes.")
-        jugador.billetera.retirar(_MONEDA_COMUN, cantidad_comunes)
-        jugador.billetera.depositar(_MONEDA_EVENTO, cantidad_comunes)
+        cantidad_convertida = tasa.convertir(cantidad_comunes)
+        jugador.billetera.retirar(tasa.moneda_origen, cantidad_comunes)
+        jugador.billetera.depositar(tasa.moneda_destino, cantidad_convertida)
         self._historial.append({"tipo": "convertir_moneda", "jugador": jugador_id, "cantidad": cantidad_comunes, "fecha": fecha})
 
     def completar_actividad(self, jugador_id: str, actividad: Actividad) -> None:
@@ -101,7 +100,7 @@ class Juego:
         if not actividad.esta_cumplida(jugador, cartas):
             raise ValueError("La actividad aún no se cumple.")
         jugador._actividades_completadas.append(actividad.nombre)
-        jugador.billetera.depositar(_MONEDA_COMUN, actividad.recompensa)
+        jugador.billetera.depositar(self.mercado.tasa_cambio.moneda_origen, actividad.recompensa)
         self._historial.append({"tipo": "completar_actividad", "jugador": jugador_id, "actividad": actividad.nombre})
 
     def registrar_victoria(self, jugador_id: str, fecha: date) -> None:
