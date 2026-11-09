@@ -1,28 +1,22 @@
 """Compat layer: re-exporta los modelos desde los módulos nuevos."""
 
-from .azar import Azar, AzarConSemilla, AzarFalso
 from .catalogo import Catalogo, Mercado
-from .principales import Actividad, Carta, Evento, Moneda, PlantillaCriatura, TipoSobre
-from .funciones import FuncionesPuras
-from .juego import Juego, MONEDA_COMUN, MONEDA_EVENTO
+from .principales import Actividad, Carta, Desafio, Evento, Moneda, Mision, PlantillaCriatura, TipoSobre
+from .juego import Juego
 from .jugador import Billetera, Jugador
 
 __all__ = [
     "Actividad",
-    "Azar",
-    "AzarConSemilla",
-    "AzarFalso",
     "Billetera",
     "Carta",
     "Catalogo",
+    "Desafio",
     "Evento",
-    "FuncionesPuras",
     "Juego",
     "Jugador",
-    "MONEDA_COMUN",
-    "MONEDA_EVENTO",
     "Mercado",
     "Moneda",
+    "Mision",
     "PlantillaCriatura",
     "TipoSobre",
 ]

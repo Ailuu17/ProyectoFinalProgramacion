@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence
 
-from Código.mercado_cartas.catalogo import Catalogo
-from Código.mercado_cartas.jugador import Jugador
+if TYPE_CHECKING:
+    from .catalogo import Catalogo
+    from .jugador import Jugador
 
 
 @dataclass(frozen=True)
@@ -70,7 +71,7 @@ class Evento:
     fecha_fin: date
     moneda: Moneda
     sobre: TipoSobre
-    pesos_cartas: Dict[str, int]
+    pesos_cartas: Dict[PlantillaCriatura, int]
 
     def carta_para(self, numero: int) -> PlantillaCriatura:
         if not self.pesos_cartas:
@@ -78,10 +79,10 @@ class Evento:
         total = sum(self.pesos_cartas.values())
         valor = numero % total
         acumulado = 0
-        for codigo, peso in self.pesos_cartas.items():
+        for plantilla, peso in self.pesos_cartas.items():
             acumulado += peso
             if valor < acumulado:
-                return self.sobre.probabilidades and codigo in self.sobre.probabilidades and self.sobre.probabilidades and codigo or codigo
+                return plantilla
         return next(iter(self.pesos_cartas.keys()))
 
 
@@ -93,3 +94,13 @@ class Actividad:
 
     def esta_cumplida(self, jugador: "Jugador", cartas: Sequence[Carta]) -> bool:
         return bool(self.condicion(jugador, cartas))
+
+
+@dataclass(frozen=True)
+class Mision(Actividad):
+    pass
+
+
+@dataclass(frozen=True)
+class Desafio(Actividad):
+    pass
