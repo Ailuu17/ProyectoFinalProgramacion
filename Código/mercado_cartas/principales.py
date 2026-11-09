@@ -9,14 +9,36 @@ if TYPE_CHECKING:
     from .jugador import Jugador
 
 
-@dataclass(frozen=True)
+@dataclass
 class Moneda:
     nombre: str
     color: str
     diseno: str
 
+    def __hash__(self) -> int:
+        # A stable hash preserves value equality while currency fields are mutable.
+        return hash(type(self))
 
-@dataclass(frozen=True)
+
+@dataclass
+class TasaCambio:
+    moneda_origen: Moneda
+    moneda_destino: Moneda
+    factor: float
+
+    def __post_init__(self) -> None:
+        if self.factor <= 0:
+            raise ValueError("El factor de conversión debe ser positivo.")
+
+    def convertir(self, cantidad: int) -> int:
+        if cantidad < 0:
+            raise ValueError("La cantidad no puede ser negativa.")
+        if self.factor <= 0:
+            raise ValueError("El factor de conversión debe ser positivo.")
+        return int(cantidad * self.factor)
+
+
+@dataclass
 class PlantillaCriatura:
     codigo: str
     nombre: str
@@ -28,14 +50,18 @@ class PlantillaCriatura:
     habilidad: str
     descripcion_habilidad: str
 
+    def __hash__(self) -> int:
+        # Template fields are mutable, but templates are also used as dictionary keys.
+        return hash(type(self))
 
-@dataclass(frozen=True)
+
+@dataclass
 class Carta:
     id: str
     plantilla: PlantillaCriatura
 
 
-@dataclass(frozen=True)
+@dataclass
 class TipoSobre:
     nombre: str
     cantidad_cartas: int
@@ -64,7 +90,7 @@ class TipoSobre:
         return cartas
 
 
-@dataclass(frozen=True)
+@dataclass
 class Evento:
     nombre: str
     fecha_inicio: date
@@ -86,7 +112,7 @@ class Evento:
         return next(iter(self.pesos_cartas.keys()))
 
 
-@dataclass(frozen=True)
+@dataclass
 class Actividad:
     nombre: str
     recompensa: int
@@ -96,11 +122,11 @@ class Actividad:
         return bool(self.condicion(jugador, cartas))
 
 
-@dataclass(frozen=True)
+@dataclass
 class Mision(Actividad):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass
 class Desafio(Actividad):
     pass
