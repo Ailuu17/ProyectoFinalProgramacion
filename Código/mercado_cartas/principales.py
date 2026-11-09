@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Callable, Dict, List, Optional, Sequence
 
+from Código.mercado_cartas.catalogo import Catalogo
+from Código.mercado_cartas.jugador import Jugador
+
 
 @dataclass(frozen=True)
 class Moneda:

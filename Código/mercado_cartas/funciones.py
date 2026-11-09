@@ -4,7 +4,7 @@ from datetime import date
 from typing import Iterable, List, Optional, Sequence
 
 from .azar import Azar
-from .catalogo import Catalogo
+from .catalogo import Catalogo, Mercado
 from .principales import Actividad, Carta, Evento, TipoSobre
 from .jugador import Jugador
 
