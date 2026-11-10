@@ -14,6 +14,11 @@ from .principales import (
     TasaCambio,
     TipoSobre,
 )
+from .criaturas import (
+    CRIATURAS,
+    PLANTILLAS_CRIATURAS,
+    crear_catalogo_completo,
+)
 from .juego import Juego
 from .jugador import Billetera, Jugador
 
@@ -22,6 +27,7 @@ __all__ = [
     "Billetera",
     "Carta",
     "Catalogo",
+    "CRIATURAS",
     "Desafio",
     "Evento",
     "Juego",
@@ -30,8 +36,10 @@ __all__ = [
     "Mision",
     "Moneda",
     "PlantillaCriatura",
+    "PLANTILLAS_CRIATURAS",
     "SobreEstable",
     "SobreVariable",
     "TasaCambio",
     "TipoSobre",
+    "crear_catalogo_completo",
 ]
