@@ -4,12 +4,16 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Dict, List
 
-from .principales import Carta, Moneda
+from .principales import Moneda
 
 
 @dataclass
 class Billetera:
     _saldos: Dict[Moneda, int] = field(default_factory=dict)
+
+    @property
+    def saldos(self) -> Dict[Moneda, int]:
+        return dict(self._saldos)
 
     def saldo(self, moneda: Moneda) -> int:
         return self._saldos.get(moneda, 0)
@@ -37,10 +41,27 @@ class Jugador:
     _sobres_comprados: Dict[str, int] = field(default_factory=dict)
     _victorias_por_dia: Dict[date, int] = field(default_factory=dict)
 
+    @property
+    def cartas(self) -> List[str]:
+        return list(self._cartas)
+
+    @property
+    def actividades_completadas(self) -> List[str]:
+        return list(self._actividades_completadas)
+
+    @property
+    def sobres_comprados(self) -> Dict[str, int]:
+        return dict(self._sobres_comprados)
+
+    @property
+    def victorias_por_dia(self) -> Dict[date, int]:
+        return dict(self._victorias_por_dia)
+
     def agregar_carta(self, carta_id: str) -> None:
-        if carta_id not in self._cartas:
-            self._cartas.append(carta_id)
+        self._cartas.append(carta_id)
 
     def quitar_carta(self, carta_id: str) -> None:
         if carta_id in self._cartas:
             self._cartas.remove(carta_id)
+        else:
+            raise ValueError(f"El jugador no posee la carta {carta_id}.")
