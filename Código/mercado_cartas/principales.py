@@ -54,16 +54,49 @@ def _tirar_opcion(
 @dataclass
 class Moneda:
     nombre: str
-    color: str
-    diseno: str
+    evento: str = ""
+    color: str = ""
+    diseno: str = ""
+
+    def __init__(
+        self,
+        nombre: str,
+        evento_o_color: str = "",
+        diseno: str = "",
+        *,
+        evento: Optional[str] = None,
+        color: Optional[str] = None,
+    ) -> None:
+        self.nombre = nombre
+        if evento is not None:
+            self.evento = evento
+            self.color = color or ""
+            self.diseno = diseno
+        elif color is not None:
+            self.color = color
+            self.evento = evento_o_color
+            self.diseno = diseno
+        elif diseno:
+            self.color = evento_o_color
+            self.diseno = diseno
+            self.evento = ""
+        else:
+            self.evento = evento_o_color
+            self.color = ""
+            self.diseno = ""
 
     def __hash__(self) -> int:
-        return hash((self.nombre, self.color, self.diseno))
+        return hash((self.nombre, self.evento, self.color, self.diseno))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Moneda):
             return False
-        return (self.nombre, self.color, self.diseno) == (other.nombre, other.color, other.diseno)
+        return (self.nombre, self.evento, self.color, self.diseno) == (
+            other.nombre,
+            other.evento,
+            other.color,
+            other.diseno,
+        )
 
 
 @dataclass
@@ -90,7 +123,7 @@ class PlantillaCriatura:
 
     def crear_carta(self) -> Carta:
         self._contador += 1
-        return Carta(id=f"{self.codigo}-{self._contador}", plantilla=self)
+        return Carta(id=f"{self.codigo}-{self._contador}", plantilla=self, _contador=self._contador)
 
     def __hash__(self) -> int:
         return hash(self.codigo)
@@ -105,6 +138,11 @@ class PlantillaCriatura:
 class Carta:
     id: str
     plantilla: PlantillaCriatura
+    _contador: int = 0
+
+    @property
+    def contador(self) -> int:
+        return self._contador
 
     def __hash__(self) -> int:
         return hash(self.id)
@@ -121,6 +159,57 @@ class TipoSobre:
     cantidad_cartas: int
     precio: int
     moneda: Moneda
+    azar_rareza: Dict[str, float] = field(default_factory=dict)
+    azar_criatura_c: Dict[Any, float] = field(default_factory=dict)
+    azar_criatura_r: Dict[Any, float] = field(default_factory=dict)
+    azar_criatura_sr: Dict[Any, float] = field(default_factory=dict)
+
+    def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
+        r = rareza.strip().lower()
+        if r in ("c", "comun", "común"):
+            return self.azar_criatura_c
+        elif r in ("r", "rara", "raro"):
+            return self.azar_criatura_r
+        elif r in ("sr", "super rara", "súper rara", "super_rara"):
+            return self.azar_criatura_sr
+        return {}
+
+    def obtener_carta(
+        self,
+        catalogo: "Catalogo",
+        evento: Optional["Evento"] = None,
+        tirar: Optional[Callable] = None,
+    ) -> Carta:
+        if self.azar_rareza:
+            opciones_r = list(self.azar_rareza.keys())
+            pesos_r = list(self.azar_rareza.values())
+            rareza = _tirar_opcion(tirar, opciones_r, pesos_r)
+        else:
+            rareza = "Común"
+
+        dict_criaturas = self._dict_para_rareza(str(rareza))
+        if dict_criaturas:
+            opciones_c = list(dict_criaturas.keys())
+            pesos_c = list(dict_criaturas.values())
+            elegido = _tirar_opcion(tirar, opciones_c, pesos_c)
+        elif evento is not None and evento.pesos_cartas:
+            opciones_ev = list(evento.pesos_cartas.keys())
+            pesos_ev = list(evento.pesos_cartas.values())
+            elegido = _tirar_opcion(tirar, opciones_ev, pesos_ev)
+        else:
+            plantillas = catalogo.de_rareza(str(rareza))
+            if not plantillas:
+                plantillas = list(catalogo.plantillas.values())
+            if not plantillas:
+                raise ValueError(f"No hay cartas disponibles en el catálogo para la rareza {rareza}.")
+            elegido = _tirar_opcion(tirar, plantillas)
+
+        if isinstance(elegido, PlantillaCriatura):
+            plantilla = elegido
+        else:
+            plantilla = catalogo.buscar(str(elegido))
+
+        return plantilla.crear_carta()
 
     def abrir(
         self,
@@ -128,133 +217,26 @@ class TipoSobre:
         evento: Optional["Evento"] = None,
         tirar: Optional[Callable] = None,
     ) -> List[Carta]:
-        cartas: List[Carta] = []
-        opciones = list(catalogo.plantillas.keys())
-        if not opciones:
-            return cartas
-        for _ in range(self.cantidad_cartas):
-            codigo = _tirar_opcion(tirar, opciones)
-            plantilla = catalogo.buscar(codigo) if isinstance(codigo, str) else codigo
-            cartas.append(plantilla.crear_carta())
-        return cartas
+        return [self.obtener_carta(catalogo, evento, tirar) for _ in range(self.cantidad_cartas)]
 
 
 @dataclass
 class SobreEstable(TipoSobre):
-    azar_rareza: Dict[str, float] = field(default_factory=dict)
-    azar_criatura_c: Dict[Any, float] = field(default_factory=dict)
-    azar_criatura_r: Dict[Any, float] = field(default_factory=dict)
-    azar_criatura_sr: Dict[Any, float] = field(default_factory=dict)
     azar_criatura_ssr: Dict[Any, float] = field(default_factory=dict)
     azar_criatura_l: Dict[Any, float] = field(default_factory=dict)
 
     def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
         r = rareza.strip().lower()
-        if r in ("c", "comun", "común"):
-            return self.azar_criatura_c
-        elif r in ("r", "rara", "raro"):
-            return self.azar_criatura_r
-        elif r in ("sr", "super rara", "súper rara", "super_rara"):
-            return self.azar_criatura_sr
-        elif r in ("ssr", "super super rara", "súper súper rara", "super_super_rara"):
+        if r in ("ssr", "super super rara", "súper súper rara", "super_super_rara"):
             return self.azar_criatura_ssr
         elif r in ("l", "legendaria", "legendario"):
             return self.azar_criatura_l
-        return {}
-
-    def abrir(
-        self,
-        catalogo: "Catalogo",
-        evento: Optional["Evento"] = None,
-        tirar: Optional[Callable] = None,
-    ) -> List[Carta]:
-        cartas: List[Carta] = []
-        for _ in range(self.cantidad_cartas):
-            if self.azar_rareza:
-                opciones_r = list(self.azar_rareza.keys())
-                pesos_r = list(self.azar_rareza.values())
-                rareza = _tirar_opcion(tirar, opciones_r, pesos_r)
-            else:
-                rareza = "Común"
-
-            dict_criaturas = self._dict_para_rareza(str(rareza))
-            if dict_criaturas:
-                opciones_c = list(dict_criaturas.keys())
-                pesos_c = list(dict_criaturas.values())
-                elegido = _tirar_opcion(tirar, opciones_c, pesos_c)
-            else:
-                plantillas = catalogo.de_rareza(str(rareza))
-                if not plantillas:
-                    plantillas = list(catalogo.plantillas.values())
-                if not plantillas:
-                    raise ValueError(f"No hay cartas disponibles en el catálogo para la rareza {rareza}.")
-                elegido = _tirar_opcion(tirar, plantillas)
-
-            if isinstance(elegido, PlantillaCriatura):
-                plantilla = elegido
-            else:
-                plantilla = catalogo.buscar(str(elegido))
-
-            cartas.append(plantilla.crear_carta())
-        return cartas
+        return super()._dict_para_rareza(rareza)
 
 
 @dataclass
 class SobreVariable(TipoSobre):
-    azar_rareza: Dict[str, float] = field(default_factory=dict)
-    azar_criatura_c: Dict[Any, float] = field(default_factory=dict)
-    azar_criatura_r: Dict[Any, float] = field(default_factory=dict)
-    azar_criatura_sr: Dict[Any, float] = field(default_factory=dict)
-
-    def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
-        r = rareza.strip().lower()
-        if r in ("c", "comun", "común"):
-            return self.azar_criatura_c
-        elif r in ("r", "rara", "raro"):
-            return self.azar_criatura_r
-        elif r in ("sr", "super rara", "súper rara", "super_rara"):
-            return self.azar_criatura_sr
-        return {}
-
-    def abrir(
-        self,
-        catalogo: "Catalogo",
-        evento: Optional["Evento"] = None,
-        tirar: Optional[Callable] = None,
-    ) -> List[Carta]:
-        cartas: List[Carta] = []
-        for _ in range(self.cantidad_cartas):
-            if self.azar_rareza:
-                opciones_r = list(self.azar_rareza.keys())
-                pesos_r = list(self.azar_rareza.values())
-                rareza = _tirar_opcion(tirar, opciones_r, pesos_r)
-            else:
-                rareza = "Común"
-
-            dict_criaturas = self._dict_para_rareza(str(rareza))
-            if dict_criaturas:
-                opciones_c = list(dict_criaturas.keys())
-                pesos_c = list(dict_criaturas.values())
-                elegido = _tirar_opcion(tirar, opciones_c, pesos_c)
-            elif evento is not None and evento.pesos_cartas:
-                opciones_ev = list(evento.pesos_cartas.keys())
-                pesos_ev = list(evento.pesos_cartas.values())
-                elegido = _tirar_opcion(tirar, opciones_ev, pesos_ev)
-            else:
-                plantillas = catalogo.de_rareza(str(rareza))
-                if not plantillas:
-                    plantillas = list(catalogo.plantillas.values())
-                if not plantillas:
-                    raise ValueError(f"No hay cartas disponibles en el catálogo para la rareza {rareza}.")
-                elegido = _tirar_opcion(tirar, plantillas)
-
-            if isinstance(elegido, PlantillaCriatura):
-                plantilla = elegido
-            else:
-                plantilla = catalogo.buscar(str(elegido))
-
-            cartas.append(plantilla.crear_carta())
-        return cartas
+    pass
 
 
 @dataclass
@@ -282,11 +264,56 @@ class Evento:
 @dataclass
 class Actividad:
     nombre: str
-    recompensa: int
-    condicion: Callable[["Jugador", Sequence["Carta"]], bool]
+    recompensa: int = 0
+    condicion: Any = None
+    tipo: str = "Actividad"
+
+    def __init__(
+        self,
+        nombre: str,
+        *args: Any,
+        tipo: Optional[str] = None,
+        recompensa: Optional[int] = None,
+        condicion: Any = None,
+        **kwargs: Any,
+    ) -> None:
+        self.nombre = nombre
+        if len(args) == 3:
+            if isinstance(args[0], str) and not isinstance(args[1], str):
+                self.tipo = args[0]
+                self.recompensa = int(args[1])
+                self.condicion = args[2]
+            else:
+                self.recompensa = int(args[0])
+                self.condicion = args[1]
+                self.tipo = str(args[2])
+        elif len(args) == 2:
+            if isinstance(args[0], (int, float)):
+                self.recompensa = int(args[0])
+                self.condicion = args[1]
+                self.tipo = tipo or self.__class__.__name__
+            else:
+                self.tipo = str(args[0])
+                self.recompensa = int(args[1])
+                self.condicion = condicion
+        elif len(args) == 1:
+            if isinstance(args[0], (int, float)):
+                self.recompensa = int(args[0])
+                self.tipo = tipo or self.__class__.__name__
+                self.condicion = condicion
+            else:
+                self.tipo = str(args[0])
+                self.recompensa = recompensa if recompensa is not None else 0
+                self.condicion = condicion
+        else:
+            self.tipo = tipo or self.__class__.__name__
+            self.recompensa = recompensa if recompensa is not None else 0
+            self.condicion = condicion
 
     def esta_cumplida(self, jugador: "Jugador", cartas: Sequence[Carta]) -> bool:
-        return bool(self.condicion(jugador, cartas))
+        if callable(self.condicion):
+            return bool(self.condicion(jugador, cartas))
+        return False
 
 
 @dataclass
