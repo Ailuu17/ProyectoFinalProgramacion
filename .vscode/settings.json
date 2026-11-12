@@ -1,0 +1,11 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/Código",
+        "./Código"
+    ],
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/Código",
+        "./Código"
+    ]
+}
+

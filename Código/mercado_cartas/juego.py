@@ -43,7 +43,7 @@ class Juego:
         for sobre in self.mercado.sobres:
             if sobre.moneda:
                 return sobre.moneda
-        return Moneda("Común", "gris", "base")
+        return Moneda("Común")
 
     def comprar_sobre(self, jugador_id: str, sobre: TipoSobre, fecha: date) -> List[Carta]:
         jugador = self._obtener_jugador(jugador_id)

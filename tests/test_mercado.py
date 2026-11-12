@@ -3,39 +3,67 @@ from datetime import date
 from pathlib import Path
 import unittest
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "Código"))
+root_dir = Path(__file__).resolve().parent.parent
+codigo_dir = root_dir / "Código"
+for p in (str(codigo_dir), str(root_dir)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
-from mercado_cartas import (
-    Actividad,
-    Billetera,
-    Carta,
-    Catalogo,
-    CRIATURAS,
-    Desafio,
-    Evento,
-    Juego,
-    Jugador,
-    Mercado,
-    Mision,
-    Moneda,
-    PlantillaCriatura,
-    PLANTILLAS_CRIATURAS,
-    SobreEstable,
-    SobreVariable,
-    TipoSobre,
-    crear_catalogo_completo,
-)
-from mercado_cartas.criaturas import dragonzuelo, apep, sirena
+try:
+    from mercado_cartas import (
+        Actividad,
+        Billetera,
+        Carta,
+        Catalogo,
+        CRIATURAS,
+        Desafio,
+        Evento,
+        Juego,
+        Jugador,
+        Mercado,
+        Mision,
+        Moneda,
+        PlantillaCriatura,
+        PLANTILLAS_CRIATURAS,
+        SobreEstable,
+        SobreVariable,
+        TipoSobre,
+        crear_catalogo_completo,
+    )
+    from mercado_cartas.criaturas import dragonzuelo, apep, sirena
+except ImportError:
+    from Código.mercado_cartas import (
+        Actividad,
+        Billetera,
+        Carta,
+        Catalogo,
+        CRIATURAS,
+        Desafio,
+        Evento,
+        Juego,
+        Jugador,
+        Mercado,
+        Mision,
+        Moneda,
+        PlantillaCriatura,
+        PLANTILLAS_CRIATURAS,
+        SobreEstable,
+        SobreVariable,
+        TipoSobre,
+        crear_catalogo_completo,
+    )
+    from Código.mercado_cartas.criaturas import dragonzuelo, apep, sirena
 
 
 class TestMercadoCartasUML(unittest.TestCase):
     def setUp(self):
-        dragonzuelo._contador = 0
-        sirena._contador = 0
-        apep._contador = 0
+        Carta.limpiar_registro()
+        dragonzuelo.contador = 0
+        sirena.contador = 0
+        apep.contador = 0
 
-        self.moneda_comun = Moneda("Común", "gris", "base")
-        self.moneda_evento = Moneda("Evento Lunar", "amarillo", "luna")
+        self.moneda_comun = Moneda("Común")
+        self.moneda_evento = Moneda("Evento Lunar", "Festival de Luna")
 
         self.catalogo = crear_catalogo_completo()
 
@@ -251,26 +279,42 @@ class TestMercadoCartasUML(unittest.TestCase):
 
     def test_coincidencia_con_uml(self):
         """Verifica que las clases, métodos y atributos coincidan con el diagrama UML."""
-        # 1. Moneda: atributos nombre y evento (además de soporte para color y diseno)
+        # 1. Moneda: únicamente atributos nombre y evento (sin color ni diseno)
         m = Moneda(nombre="Oro", evento="Festival Lunar")
         self.assertEqual(m.nombre, "Oro")
         self.assertEqual(m.evento, "Festival Lunar")
+        self.assertFalse(hasattr(m, "color"))
+        self.assertFalse(hasattr(m, "diseno"))
 
-        # 2. PlantillaCriatura y Carta: relación, ID y contador
-        carta = dragonzuelo.crear_carta()
-        self.assertIsInstance(carta, Carta)
-        self.assertEqual(carta.plantilla, dragonzuelo)
-        self.assertTrue(hasattr(carta, "contador"))
-        self.assertGreaterEqual(carta.contador, 1)
+        # 2. PlantillaCriatura y Carta: relación, ID y contador generado dinámicamente
+        c1 = dragonzuelo.crear_carta()
+        self.assertIsInstance(c1, Carta)
+        self.assertEqual(c1.plantilla, dragonzuelo)
+        self.assertEqual(c1.id, "CDRA-1")
+        self.assertEqual(c1.contador, 1)
 
-        # 3. TipoSobre: método obtener_carta y herencia
+        # La siguiente carta creada busca el contador más alto existente (1) y suma 1
+        c2 = dragonzuelo.crear_carta()
+        self.assertEqual(c2.id, "CDRA-2")
+        self.assertEqual(c2.contador, 2)
+        self.assertEqual(dragonzuelo.contador, 2)
+
+        # 3. TipoSobre: atributos base y método obtener_carta
         carta_individual = self.sobre_estable.obtener_carta(self.catalogo)
         self.assertIsInstance(carta_individual, Carta)
+        self.assertTrue(hasattr(self.sobre_estable, "azar_rareza"))
+        self.assertTrue(hasattr(self.sobre_estable, "azar_criatura_c"))
+        self.assertTrue(hasattr(self.sobre_estable, "azar_criatura_r"))
+        self.assertTrue(hasattr(self.sobre_estable, "azar_criatura_sr"))
         self.assertTrue(hasattr(self.sobre_estable, "azar_criatura_ssr"))
         self.assertTrue(hasattr(self.sobre_estable, "azar_criatura_l"))
 
-        # 4. SobreVariable: hereda de TipoSobre
+        # 4. SobreVariable: hereda atributos base de TipoSobre
         self.assertTrue(issubclass(SobreVariable, TipoSobre))
+        self.assertTrue(hasattr(self.sobre_variable, "azar_rareza"))
+        self.assertTrue(hasattr(self.sobre_variable, "azar_criatura_c"))
+        self.assertTrue(hasattr(self.sobre_variable, "azar_criatura_r"))
+        self.assertTrue(hasattr(self.sobre_variable, "azar_criatura_sr"))
 
         # 5. Actividad: atributos nombre, tipo, recompensa, condicion
         act = Actividad(nombre="Batalla diaria", tipo="Desafío", recompensa=10)

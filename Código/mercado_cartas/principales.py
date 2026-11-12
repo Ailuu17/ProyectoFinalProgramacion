@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Optional, Sequence, Union
 
 if TYPE_CHECKING:
     from .catalogo import Catalogo
@@ -55,48 +55,14 @@ def _tirar_opcion(
 class Moneda:
     nombre: str
     evento: str = ""
-    color: str = ""
-    diseno: str = ""
-
-    def __init__(
-        self,
-        nombre: str,
-        evento_o_color: str = "",
-        diseno: str = "",
-        *,
-        evento: Optional[str] = None,
-        color: Optional[str] = None,
-    ) -> None:
-        self.nombre = nombre
-        if evento is not None:
-            self.evento = evento
-            self.color = color or ""
-            self.diseno = diseno
-        elif color is not None:
-            self.color = color
-            self.evento = evento_o_color
-            self.diseno = diseno
-        elif diseno:
-            self.color = evento_o_color
-            self.diseno = diseno
-            self.evento = ""
-        else:
-            self.evento = evento_o_color
-            self.color = ""
-            self.diseno = ""
 
     def __hash__(self) -> int:
-        return hash((self.nombre, self.evento, self.color, self.diseno))
+        return hash((self.nombre, self.evento))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Moneda):
             return False
-        return (self.nombre, self.evento, self.color, self.diseno) == (
-            other.nombre,
-            other.evento,
-            other.color,
-            other.diseno,
-        )
+        return (self.nombre, self.evento) == (other.nombre, other.evento)
 
 
 @dataclass
@@ -111,19 +77,29 @@ class PlantillaCriatura:
     habilidad: str
     descripcion_habilidad: str
     usos_habilidad: int = 1
-    _contador: int = field(default=0, init=False, repr=False)
 
     @property
     def contador(self) -> int:
-        return self._contador
+        cartas = [c for c in Carta._todas_las_cartas if c.plantilla.codigo == self.codigo]
+        return max((c.contador for c in cartas), default=0)
 
     @contador.setter
     def contador(self, valor: int) -> None:
-        self._contador = valor
+        if valor == 0:
+            Carta._todas_las_cartas = [
+                c for c in Carta._todas_las_cartas if c.plantilla.codigo != self.codigo
+            ]
+
+    @property
+    def _contador(self) -> int:
+        return self.contador
+
+    @_contador.setter
+    def _contador(self, valor: int) -> None:
+        self.contador = valor
 
     def crear_carta(self) -> Carta:
-        self._contador += 1
-        return Carta(id=f"{self.codigo}-{self._contador}", plantilla=self, _contador=self._contador)
+        return Carta(plantilla=self)
 
     def __hash__(self) -> int:
         return hash(self.codigo)
@@ -134,15 +110,54 @@ class PlantillaCriatura:
         return self.codigo == other.codigo
 
 
-@dataclass
 class Carta:
-    id: str
-    plantilla: PlantillaCriatura
-    _contador: int = 0
+    _todas_las_cartas: ClassVar[List["Carta"]] = []
+
+    def __init__(
+        self,
+        id_o_plantilla: Union[str, PlantillaCriatura, None] = None,
+        plantilla: Optional[PlantillaCriatura] = None,
+        id: Optional[str] = None,
+        contador: Optional[int] = None,
+        _contador: Optional[int] = None,
+    ) -> None:
+        if isinstance(id_o_plantilla, PlantillaCriatura):
+            self.plantilla = id_o_plantilla
+            carta_id = id
+        elif isinstance(id_o_plantilla, str):
+            carta_id = id_o_plantilla
+            self.plantilla = plantilla  # type: ignore
+        else:
+            self.plantilla = plantilla  # type: ignore
+            carta_id = id
+
+        if self.plantilla is None:
+            raise ValueError("Se requiere una PlantillaCriatura para la carta.")
+
+        c_val = contador if contador is not None else _contador
+        if c_val is not None and c_val > 0:
+            self._contador = c_val
+        else:
+            cartas_mismo_codigo = [
+                c for c in Carta._todas_las_cartas if c.plantilla.codigo == self.plantilla.codigo
+            ]
+            max_c = max((c.contador for c in cartas_mismo_codigo), default=0)
+            self._contador = max_c + 1
+
+        if carta_id is not None:
+            self.id = carta_id
+        else:
+            self.id = f"{self.plantilla.codigo}-{self._contador}"
+
+        Carta._todas_las_cartas.append(self)
 
     @property
     def contador(self) -> int:
         return self._contador
+
+    @classmethod
+    def limpiar_registro(cls) -> None:
+        cls._todas_las_cartas.clear()
 
     def __hash__(self) -> int:
         return hash(self.id)
@@ -151,6 +166,9 @@ class Carta:
         if not isinstance(other, Carta):
             return False
         return self.id == other.id
+
+    def __repr__(self) -> str:
+        return f"Carta(id={self.id!r}, plantilla={self.plantilla.nombre!r}, contador={self._contador})"
 
 
 @dataclass
