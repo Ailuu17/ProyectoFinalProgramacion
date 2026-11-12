@@ -4,7 +4,10 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Dict, List, Optional, Sequence, Union
 
-from .principales import Evento, PlantillaCriatura, SobreEstable, TipoSobre
+try:
+    from .principales import Evento, PlantillaCriatura, SobreEstable, TipoSobre
+except (ImportError, ValueError):
+    from principales import Evento, PlantillaCriatura, SobreEstable, TipoSobre
 
 
 @dataclass

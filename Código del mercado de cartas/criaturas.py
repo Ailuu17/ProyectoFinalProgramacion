@@ -2,8 +2,12 @@
 from __future__ import annotations
 
 from typing import Dict, List
-from .principales import PlantillaCriatura
-from .catalogo import Catalogo
+try:
+    from .principales import PlantillaCriatura
+    from .catalogo import Catalogo
+except (ImportError, ValueError):
+    from principales import PlantillaCriatura
+    from catalogo import Catalogo
 
 dragonzuelo = PlantillaCriatura(
     codigo="CDRA",

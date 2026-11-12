@@ -4,7 +4,10 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Dict, List
 
-from .principales import Moneda
+try:
+    from .principales import Moneda
+except (ImportError, ValueError):
+    from principales import Moneda
 
 
 @dataclass

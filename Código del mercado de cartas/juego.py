@@ -4,9 +4,14 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Callable, Dict, List, Optional, Sequence
 
-from .catalogo import Catalogo, Mercado
-from .principales import Actividad, Carta, Evento, Moneda, TipoSobre
-from .jugador import Jugador
+try:
+    from .catalogo import Catalogo, Mercado
+    from .principales import Actividad, Carta, Evento, Moneda, TipoSobre
+    from .jugador import Jugador
+except (ImportError, ValueError):
+    from catalogo import Catalogo, Mercado
+    from principales import Actividad, Carta, Evento, Moneda, TipoSobre
+    from jugador import Jugador
 
 
 @dataclass

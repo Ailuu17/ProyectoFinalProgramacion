@@ -1,11 +1,10 @@
 {
     "python.analysis.extraPaths": [
-        "${workspaceFolder}/Código",
-        "./Código"
+        "${workspaceFolder}/Código del mercado de cartas",
+        "./Código del mercado de cartas"
     ],
     "python.autoComplete.extraPaths": [
-        "${workspaceFolder}/Código",
-        "./Código"
+        "${workspaceFolder}/Código del mercado de cartas",
+        "./Código del mercado de cartas"
     ]
 }
-

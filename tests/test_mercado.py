@@ -4,55 +4,33 @@ from pathlib import Path
 import unittest
 
 root_dir = Path(__file__).resolve().parent.parent
-codigo_dir = root_dir / "Código"
-for p in (str(codigo_dir), str(root_dir)):
-    if p not in sys.path:
-        sys.path.insert(0, p)
+codigo_dir = root_dir / "Código del mercado de cartas"
+if str(codigo_dir) not in sys.path:
+    sys.path.insert(0, str(codigo_dir))
 
-try:
-    from mercado_cartas import (
-        Actividad,
-        Billetera,
-        Carta,
-        Catalogo,
-        CRIATURAS,
-        Desafio,
-        Evento,
-        Juego,
-        Jugador,
-        Mercado,
-        Mision,
-        Moneda,
-        PlantillaCriatura,
-        PLANTILLAS_CRIATURAS,
-        SobreEstable,
-        SobreVariable,
-        TipoSobre,
-        crear_catalogo_completo,
-    )
-    from mercado_cartas.criaturas import dragonzuelo, apep, sirena
-except ImportError:
-    from Código.mercado_cartas import (
-        Actividad,
-        Billetera,
-        Carta,
-        Catalogo,
-        CRIATURAS,
-        Desafio,
-        Evento,
-        Juego,
-        Jugador,
-        Mercado,
-        Mision,
-        Moneda,
-        PlantillaCriatura,
-        PLANTILLAS_CRIATURAS,
-        SobreEstable,
-        SobreVariable,
-        TipoSobre,
-        crear_catalogo_completo,
-    )
-    from Código.mercado_cartas.criaturas import dragonzuelo, apep, sirena
+from principales import (
+    Actividad,
+    Carta,
+    Desafio,
+    Evento,
+    Mision,
+    Moneda,
+    PlantillaCriatura,
+    SobreEstable,
+    SobreVariable,
+    TipoSobre,
+)
+from catalogo import Catalogo, Mercado
+from jugador import Billetera, Jugador
+from juego import Juego
+from criaturas import (
+    CRIATURAS,
+    PLANTILLAS_CRIATURAS,
+    crear_catalogo_completo,
+    dragonzuelo,
+    apep,
+    sirena,
+)
 
 
 class TestMercadoCartasUML(unittest.TestCase):

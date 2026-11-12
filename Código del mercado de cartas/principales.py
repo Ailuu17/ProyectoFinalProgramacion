@@ -5,8 +5,12 @@ from datetime import date
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Optional, Sequence, Union
 
 if TYPE_CHECKING:
-    from .catalogo import Catalogo
-    from .jugador import Jugador
+    try:
+        from .catalogo import Catalogo
+        from .jugador import Jugador
+    except (ImportError, ValueError):
+        from catalogo import Catalogo
+        from jugador import Jugador
 
 
 def _tirar_opcion(
