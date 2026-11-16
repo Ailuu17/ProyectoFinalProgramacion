@@ -221,22 +221,33 @@ class TipoSobre:
         else:
             rareza = "Común"
 
-        dict_criaturas = self._dict_para_rareza(str(rareza))
+        rareza_str = str(rareza).strip()
+        dict_criaturas = self._dict_para_rareza(rareza_str)
         if dict_criaturas:
             opciones_c = list(dict_criaturas.keys())
             pesos_c = list(dict_criaturas.values())
             elegido = _tirar_opcion(tirar, opciones_c, pesos_c)
-        elif evento is not None and evento.pesos_cartas:
-            opciones_ev = list(evento.pesos_cartas.keys())
-            pesos_ev = list(evento.pesos_cartas.values())
-            elegido = _tirar_opcion(tirar, opciones_ev, pesos_ev)
+        elif "evento" in rareza_str.lower() or "exclusiv" in rareza_str.lower():
+            if evento is not None and evento.pesos_cartas:
+                opciones_ev = list(evento.pesos_cartas.keys())
+                pesos_ev = list(evento.pesos_cartas.values())
+                elegido = _tirar_opcion(tirar, opciones_ev, pesos_ev)
+            else:
+                elegido = _tirar_opcion(tirar, list(catalogo.plantillas.values()))
         else:
-            plantillas = catalogo.de_rareza(str(rareza))
+            plantillas = catalogo.de_rareza(rareza_str)
             if not plantillas:
-                plantillas = list(catalogo.plantillas.values())
-            if not plantillas:
-                raise ValueError(f"No hay cartas disponibles en el catálogo para la rareza {rareza}.")
-            elegido = _tirar_opcion(tirar, plantillas)
+                if evento is not None and evento.pesos_cartas:
+                    opciones_ev = list(evento.pesos_cartas.keys())
+                    pesos_ev = list(evento.pesos_cartas.values())
+                    elegido = _tirar_opcion(tirar, opciones_ev, pesos_ev)
+                else:
+                    plantillas = list(catalogo.plantillas.values())
+                    if not plantillas:
+                        raise ValueError(f"No hay cartas disponibles en el catálogo para la rareza {rareza}.")
+                    elegido = _tirar_opcion(tirar, plantillas)
+            else:
+                elegido = _tirar_opcion(tirar, plantillas)
 
         if isinstance(elegido, PlantillaCriatura):
             plantilla = elegido

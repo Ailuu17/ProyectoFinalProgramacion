@@ -26,6 +26,29 @@ from mercado_cartas import (
     SobreVariable,
     TipoSobre,
     crear_catalogo_completo,
+    # Economía
+    MONEDA_COMUN,
+    MONEDA_EVENTO,
+    NOMBRE_MONEDA_COMUN,
+    NOMBRE_MONEDA_EVENTO,
+    NOMBRE_SOBRE_EVENTO,
+    NOMBRE_EVENTO_VIGENTE,
+    PRECIO_SOBRE_COMUN,
+    PRECIO_SOBRE_ESPECIAL,
+    PRECIO_SOBRE_LEGENDARIO,
+    PRECIO_SOBRE_EVENTO,
+    PRECIO_CARTA_COMUN,
+    PRECIO_CARTA_RARA,
+    PRECIO_CARTA_SUPER_RARA,
+    TASA_CAMBIO_NORMAL_A_EVENTO,
+    calcular_pesos_cartas_evento,
+    crear_sobres_estandar,
+    crear_sobre_evento,
+    crear_evento_halloween,
+    crear_mercado_estandar,
+    crear_actividades,
+    crear_misiones,
+    crear_desafios,
 )
 from mercado_cartas.criaturas import (
     dragonzuelo,
@@ -401,6 +424,226 @@ class TestMercadoCartasUML(unittest.TestCase):
             self.assertIsInstance(item, dict)
             self.assertIn("codigo", item)
             self.assertIn("cantidad", item)
+
+
+    def test_economia_mercado_estandar_precios_y_sobres(self):
+        """Regla: El mercado estándar tiene exactamente 3 sobres con los precios oficiales."""
+        catalogo = crear_catalogo_completo()
+        moneda = Moneda("Común")
+        mercado = crear_mercado_estandar(catalogo=catalogo, moneda_comun=moneda)
+
+        self.assertIsInstance(mercado, Mercado)
+        self.assertEqual(len(mercado.sobres), 3)
+
+        # Comprobar precios de los sobres
+        precios = {s.nombre: s.precio for s in mercado.sobres}
+        self.assertEqual(precios["Sobre común"], PRECIO_SOBRE_COMUN)          # 20
+        self.assertEqual(precios["Sobre especial"], PRECIO_SOBRE_ESPECIAL)    # 45
+        self.assertEqual(precios["Sobre legendario"], PRECIO_SOBRE_LEGENDARIO)  # 80
+
+        # Comprobar tasa de cambio
+        self.assertEqual(mercado.tasa_cambio, TASA_CAMBIO_NORMAL_A_EVENTO)    # 5
+
+        # Comprobar que las ofertas de cartas contienen solo C, R y SR (no SSR ni L)
+        from mercado_cartas import CRIATURAS
+        RAREZAS_SR = ("Súper Rara", "Super Rara", "SR")
+        for codigo, precio in mercado.ofertas.items():
+            plantilla = next((c for c in CRIATURAS if c.codigo == codigo), None)
+            if plantilla:
+                rareza_norm = plantilla.rareza
+                is_comun = rareza_norm.lower() in ("común", "comun")
+                is_rara = rareza_norm.lower() in ("rara", "raro")
+                is_sr = rareza_norm in RAREZAS_SR or rareza_norm.lower() in ("súper rara", "super rara", "sr")
+                self.assertTrue(is_comun or is_rara or is_sr,
+                                f"El mercado no debería vender {rareza_norm}: {codigo}")
+                if is_comun:
+                    self.assertEqual(precio, PRECIO_CARTA_COMUN)
+                elif is_rara:
+                    self.assertEqual(precio, PRECIO_CARTA_RARA)
+                elif is_sr:
+                    self.assertEqual(precio, PRECIO_CARTA_SUPER_RARA)
+
+    def test_economia_crear_actividades_cantidad_y_tipos(self):
+        """Regla: crear_actividades() devuelve 12 actividades (7 misiones + 5 desafíos)."""
+        actividades = crear_actividades()
+        misiones = crear_misiones()
+        desafios = crear_desafios()
+
+        self.assertEqual(len(actividades), 12)
+        self.assertEqual(len(misiones), 7)
+        self.assertEqual(len(desafios), 5)
+
+        # Verificar que todos son instancias del tipo correcto
+        for m in misiones:
+            self.assertIsInstance(m, Mision)
+            self.assertIsInstance(m, Actividad)
+        for d in desafios:
+            self.assertIsInstance(d, Desafio)
+            self.assertIsInstance(d, Actividad)
+
+        # Verificar que las recompensas son positivas
+        for act in actividades:
+            self.assertGreater(act.recompensa, 0,
+                               f"La actividad '{act.nombre}' tiene recompensa <= 0")
+
+    def test_economia_pesos_cartas_evento(self):
+        """Regla: calcular_pesos_cartas_evento distribuye el 15% proporcionalmente por rareza y rechaza SSR/L."""
+        # Caso vacío
+        self.assertEqual(calcular_pesos_cartas_evento([]), {})
+
+        # Caso 2 Comunes + 1 Rara → según la fórmula: peso C=2, R=1; total_rel = 5
+        # C1: 15*(2/5) = 6.0, C2: 15*(2/5) = 6.0, R: 15*(1/5) = 3.0
+        comun1 = PlantillaCriatura(
+            codigo="TC01", nombre="TestComun1", rareza="Común", tipo="Prueba",
+            vida=10, ataque=1, defensa=1, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
+        )
+        comun2 = PlantillaCriatura(
+            codigo="TC02", nombre="TestComun2", rareza="Común", tipo="Prueba",
+            vida=10, ataque=1, defensa=1, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
+        )
+        rara1 = PlantillaCriatura(
+            codigo="TR01", nombre="TestRara1", rareza="Rara", tipo="Prueba",
+            vida=20, ataque=5, defensa=3, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
+        )
+        pesos = calcular_pesos_cartas_evento([comun1, comun2, rara1])
+        self.assertAlmostEqual(pesos["TC01"], 6.0, places=1)
+        self.assertAlmostEqual(pesos["TC02"], 6.0, places=1)
+        self.assertAlmostEqual(pesos["TR01"], 3.0, places=1)
+        self.assertAlmostEqual(sum(pesos.values()), 15.0, places=1)
+
+        # Regla: El sobre de evento no maneja cartas SSR o Legendarias
+        ssr1 = PlantillaCriatura(
+            codigo="TSSR", nombre="TestSSR", rareza="Súper Súper Rara", tipo="Prueba",
+            vida=30, ataque=10, defensa=8, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
+        )
+        leg1 = PlantillaCriatura(
+            codigo="TLEG", nombre="TestLeg", rareza="Legendaria", tipo="Prueba",
+            vida=50, ataque=20, defensa=15, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
+        )
+        with self.assertRaises(ValueError):
+            calcular_pesos_cartas_evento([comun1, ssr1])
+        with self.assertRaises(ValueError):
+            calcular_pesos_cartas_evento([comun1, leg1])
+
+    def test_economia_nombres_oficiales_evento_y_monedas(self):
+        """Regla: Moneda común es Aureos, moneda evento es Jacks, sobre evento es Noche Eterna (evento Halloween)."""
+        # Verificación de nombres y constantes oficiales
+        self.assertEqual(NOMBRE_MONEDA_COMUN, "Aureos")
+        self.assertEqual(NOMBRE_MONEDA_EVENTO, "Jacks")
+        self.assertEqual(NOMBRE_SOBRE_EVENTO, "Noche Eterna")
+        self.assertEqual(NOMBRE_EVENTO_VIGENTE, "Halloween")
+
+        self.assertEqual(MONEDA_COMUN.nombre, "Aureos")
+        self.assertEqual(MONEDA_EVENTO.nombre, "Jacks")
+        self.assertEqual(MONEDA_EVENTO.evento, "Halloween")
+
+        # Sobre de evento por defecto: nombre 'Noche Eterna', moneda 'Jacks', precio 20 Jacks
+        sobre_evento = crear_sobre_evento()
+        self.assertEqual(sobre_evento.nombre, "Noche Eterna")
+        self.assertEqual(sobre_evento.moneda.nombre, "Jacks")
+        self.assertEqual(sobre_evento.precio, 20)
+
+        # El sobre de evento no tiene SSR ni Legendaria en sus probabilidades
+        self.assertNotIn("Súper Súper Rara", sobre_evento.azar_rareza)
+        self.assertNotIn("SSR", sobre_evento.azar_rareza)
+        self.assertNotIn("Legendaria", sobre_evento.azar_rareza)
+        self.assertNotIn("L", sobre_evento.azar_rareza)
+        self.assertEqual(sobre_evento.azar_rareza.get("Cartas del evento"), 15.0)
+
+        # Crear sobre de evento con SSR o Legendaria debe fallar
+        leg = PlantillaCriatura(
+            codigo="TLEG", nombre="TestLeg", rareza="Legendaria", tipo="Prueba",
+            vida=50, ataque=20, defensa=15, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
+        )
+        with self.assertRaises(ValueError):
+            crear_sobre_evento(cartas_evento=[leg])
+
+        # Evento oficial Halloween
+        c1 = PlantillaCriatura(
+            codigo="TH01", nombre="Jackalope", rareza="Común", tipo="Híbrido",
+            vida=15, ataque=3, defensa=2, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
+        )
+        evento_hw = crear_evento_halloween(cartas_evento=[c1])
+        self.assertEqual(evento_hw.nombre, "Halloween")
+        self.assertEqual(evento_hw.moneda.nombre, "Jacks")
+        self.assertEqual(evento_hw.sobre.nombre, "Noche Eterna")
+        self.assertIn("TH01", evento_hw.pesos_cartas)
+
+    def test_economia_mision_comprar_cartas_mercado(self):
+        """Regla: La misión 'Comprar 5 cartas del mercado' se cumple tras 5 compras."""
+        mision = next(m for m in crear_misiones() if "5 cartas del mercado" in m.nombre)
+
+        moneda = Moneda("Común")
+        jugador = Jugador(id="jtest", nombre="Tester")
+        jugador.billetera.depositar(moneda, 500)
+        self.juego.agregar_jugador(jugador)
+
+        # Sin compras, la condición no se cumple
+        self.assertFalse(mision.esta_cumplida(jugador, []))
+
+        # Comprar 5 cartas del mercado (CDRA cuesta 25 en el mercado de test)
+        for _ in range(5):
+            self.juego.comprar_carta("jtest", "CDRA")
+
+        self.assertTrue(mision.esta_cumplida(jugador, []))
+        self.assertEqual(jugador.cartas_compradas_mercado, 5)
+
+    def test_economia_mision_conseguir_leviatan(self):
+        """Regla: La misión 'Conseguir al Leviatán' se cumple al tener la carta LLEV."""
+        mision = next(m for m in crear_misiones() if "Leviatán" in m.nombre)
+
+        jugador = Jugador(id="jlev", nombre="Coleccionista")
+        self.juego.agregar_jugador(jugador)
+
+        # Sin la carta del Leviatán, no se cumple
+        self.assertFalse(mision.esta_cumplida(jugador, []))
+
+        # Crear carta de Leviatán desde el catálogo
+        leviatan = self.catalogo.buscar("LLEV")
+        self.assertIsNotNone(leviatan, "La criatura LLEV (Leviatán) debe existir en el catálogo")
+        carta_lev = leviatan.crear_carta(juego=self.juego)
+        self.juego.cartas[carta_lev.id] = carta_lev
+        jugador.agregar_carta(carta_lev.id)
+
+        cartas_jugador = [self.juego.cartas[cid] for cid in jugador.cartas if cid in self.juego.cartas]
+        self.assertTrue(mision.esta_cumplida(jugador, cartas_jugador))
+
+    def test_economia_desafio_victorias_consecutivas(self):
+        """Regla: El desafío 'Ganar 3 combates consecutivos' requiere 3 victorias seguidas."""
+        desafio_3 = next(d for d in crear_desafios() if "3 combates consecutivos" in d.nombre)
+
+        jugador = Jugador(id="jvic", nombre="Luchador")
+        self.juego.agregar_jugador(jugador)
+
+        # Sin victorias, no se cumple
+        self.assertFalse(desafio_3.esta_cumplida(jugador, []))
+
+        # Registrar 2 victorias → todavía no
+        self.juego.registrar_victoria("jvic", date(2026, 11, 15))
+        self.juego.registrar_victoria("jvic", date(2026, 11, 15))
+        self.assertFalse(desafio_3.esta_cumplida(jugador, []))
+
+        # Registrar la 3ª victoria → se cumple
+        self.juego.registrar_victoria("jvic", date(2026, 11, 15))
+        self.assertTrue(desafio_3.esta_cumplida(jugador, []))
+        self.assertEqual(jugador.victorias_consecutivas, 3)
+
+    def test_economia_registrar_derrota_reinicia_consecutivas(self):
+        """Regla: Registrar una derrota reinicia el contador de victorias consecutivas a cero."""
+        jugador = Jugador(id="jder", nombre="Aspirante")
+        self.juego.agregar_jugador(jugador)
+
+        self.juego.registrar_victoria("jder", date(2026, 11, 15))
+        self.juego.registrar_victoria("jder", date(2026, 11, 15))
+        self.assertEqual(jugador.victorias_consecutivas, 2)
+
+        # Registrar derrota → se reinicia
+        self.juego.registrar_derrota("jder")
+        self.assertEqual(jugador.victorias_consecutivas, 0)
+
+        # Una nueva victoria empieza desde 1
+        self.juego.registrar_victoria("jder", date(2026, 11, 15))
+        self.assertEqual(jugador.victorias_consecutivas, 1)
 
 
 if __name__ == "__main__":

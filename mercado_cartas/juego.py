@@ -129,7 +129,7 @@ class Juego:
         for sobre in self.mercado.sobres:
             if sobre.moneda:
                 return sobre.moneda
-        return Moneda("Común")
+        return Moneda("Aureos")
 
     def comprar_sobre(self, jugador_id: str, sobre: TipoSobre, fecha: date) -> List[Carta]:
         jugador = self._obtener_jugador(jugador_id)
@@ -184,6 +184,7 @@ class Juego:
 
         # 3. Entregar la carta al jugador
         jugador.agregar_carta(carta_id)
+        jugador._cartas_compradas_mercado += 1
 
         # 4. Cobrar al jugador después de entregar la carta
         jugador.billetera.retirar(moneda, precio)
@@ -289,11 +290,16 @@ class Juego:
     def registrar_victoria(self, jugador_id: str, fecha: date) -> None:
         jugador = self._obtener_jugador(jugador_id)
         jugador._victorias_por_dia[fecha] = jugador._victorias_por_dia.get(fecha, 0) + 1
+        jugador._victorias_consecutivas += 1
         self._historial.append({
             "tipo": "registrar_victoria",
             "jugador": jugador_id,
             "fecha": fecha,
         })
+
+    def registrar_derrota(self, jugador_id: str) -> None:
+        jugador = self._obtener_jugador(jugador_id)
+        jugador._victorias_consecutivas = 0
 
     def cartas_de(self, jugador_id: str, filtro: Optional[Callable[[Carta], bool]] = None) -> List[Carta]:
         jugador = self._obtener_jugador(jugador_id)

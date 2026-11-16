@@ -43,6 +43,8 @@ class Jugador:
     _actividades_completadas: List[str] = field(default_factory=list)
     _sobres_comprados: Dict[str, int] = field(default_factory=dict)
     _victorias_por_dia: Dict[date, int] = field(default_factory=dict)
+    _cartas_compradas_mercado: int = 0
+    _victorias_consecutivas: int = 0
 
     @property
     def cartas(self) -> List[str]:
@@ -59,6 +61,14 @@ class Jugador:
     @property
     def victorias_por_dia(self) -> Dict[date, int]:
         return dict(self._victorias_por_dia)
+
+    @property
+    def cartas_compradas_mercado(self) -> int:
+        return self._cartas_compradas_mercado
+
+    @property
+    def victorias_consecutivas(self) -> int:
+        return self._victorias_consecutivas
 
     def agregar_carta(self, carta_id: str) -> None:
         self._cartas.append(carta_id)

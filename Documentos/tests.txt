@@ -14,7 +14,7 @@ con principios de Programación Funcional para el cálculo puro, desacoplamiento
 de efectos secundarios (azar e inyección de funciones) e invariantes
 transaccionales que impiden la corrupción del mercado interno.
 
-A continuación se detallan las 14 reglas críticas del sistema y el test unitario
+A continuación se detallan las 22 reglas críticas del sistema y el test unitario
 específico (implementado en tests/test_mercado.py) que garantiza y protege cada una.
 
 --------------------------------------------------------------------------------
@@ -403,11 +403,221 @@ REGLA 14: SEÑALIZACIÓN EXPLÍCITA DE FUNCIONALIDADES NO IMPLEMENTADAS
   Ejecución de métodos incompletos que generarían comportamientos erráticos o falsas
   expectativas de funcionalidad en el frontend.
 
-===============================================================================
+--------------------------------------------------------------------------------
+REGLA 15: CORRECTITUD DE PRECIOS Y OFERTA DEL MERCADO ESTÁNDAR
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_mercado_estandar_precios_y_sobres
+
+- Enunciado de la regla / Invariante:
+  El mercado estándar creado por `crear_mercado_estandar()` debe contener exactamente
+  3 sobres (Común a 20, Especial a 45, Legendario a 80 monedas normales), la tasa de
+  cambio debe ser 5 (normales por 1 de evento) y las ofertas de cartas deben incluir
+  únicamente criaturas Comunes (10), Raras (25) y Súper Raras (40); las SSR y Legendarias
+  no se venden directamente en el mercado.
+
+- Justificación de diseño:
+  La economía del juego está definida en `economia.py` como constantes y fábricas centralizadas.
+  Verificar que el mercado se construye correctamente garantiza que el frontend siempre
+  presente los precios oficiales y que no haya sorpresas al integrar el sistema.
+
+- Cómo se prueba:
+  Se construye el mercado estándar, se verifica que contiene 3 sobres cuyos precios
+  coinciden con las constantes `PRECIO_SOBRE_*`, que `tasa_cambio == 5` y que cada
+  oferta de carta corresponde a una criatura de rareza C, R o SR con el precio correcto.
+
+- Consecuencia si fallara:
+  Precios incorrectos expuestos al jugador, venta no permitida de cartas SSR/Legendarias
+  o tasa de cambio errónea al convertir monedas durante un evento.
+
+--------------------------------------------------------------------------------
+REGLA 16: CANTIDAD Y TIPOS DE LAS ACTIVIDADES OFICIALES
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_crear_actividades_cantidad_y_tipos
+
+- Enunciado de la regla / Invariante:
+  El sistema debe contener exactamente 12 actividades oficiales (7 Misiones + 5 Desafíos)
+  extraídas del documento Actividades.docx. Todas deben ser instancias de los tipos
+  correctos y tener recompensas estrictamente positivas.
+
+- Justificación de diseño:
+  Las actividades son el mecanismo principal por el cual los jugadores ganan monedas.
+  Un conteo o clasificación errónea rompería el flujo de progresión del juego y la
+  coherencia con el documento de diseño oficial.
+
+- Cómo se prueba:
+  Se llama a `crear_actividades()`, `crear_misiones()` y `crear_desafios()` y se
+  verifica el conteo (12 = 7 + 5), que cada misión es instancia de `Mision` y cada
+  desafío de `Desafio`, y que todas las recompensas son > 0.
+
+- Consecuencia si fallara:
+  Jugadores sin acceso a todas las misiones, misiones del tipo incorrecto que no se
+  reclamarían bien, o actividades con recompensa nula que no otorgan monedas.
+
+--------------------------------------------------------------------------------
+REGLA 17: DISTRIBUCIÓN PROPORCIONAL EN SOBRES DE EVENTO Y EXCLUSIÓN DE SSR/L
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_pesos_cartas_evento
+
+- Enunciado de la regla / Invariante:
+  La función `calcular_pesos_cartas_evento(cartas_evento)` distribuye el 15% reservado
+  para las cartas exclusivas de evento de forma proporcional según la rareza de cada
+  carta (Comunes pesan 2×, Raras 1×, SR 0.5×). El sobre de evento no maneja cartas SSR
+  ni Legendarias: si se intenta ingresar una criatura SSR o Legendaria como carta de evento,
+  la operación es rechazada con un ValueError explícito.
+
+- Justificación de diseño:
+  El diseño económico del evento vigente (Halloween) restringe el sobre de evento
+  a rarezas Común, Rara y Súper Rara más el 15% de cartas exclusivas. Excluir SSR y
+  Legendarias del sobre de evento previene la devaluación de las cartas de máxima rareza
+  y mantiene la coherencia temática y estadística del evento.
+
+- Cómo se prueba:
+  Se verifica el caso vacío (devuelve dict vacío); con 2 Comunes + 1 Rara se verifica
+  que los pesos son C1=6.0, C2=6.0, R=3.0 (sumando 15.0). Asimismo, se prueba que
+  intentar calcular pesos incluyendo una carta SSR o Legendaria levanta ValueError.
+
+- Consecuencia si fallara:
+  Aparición indebida de criaturas Legendarias o SSR en sobres de evento temático,
+  desvirtuando el balance de poder y la economía del juego.
+
+--------------------------------------------------------------------------------
+REGLA 18: MISIÓN "COMPRAR 5 CARTAS DEL MERCADO" SE ACTIVA CON 5 COMPRAS
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_mision_comprar_cartas_mercado
+
+- Enunciado de la regla / Invariante:
+  El contador `cartas_compradas_mercado` del Jugador se incrementa en 1 por cada
+  llamada exitosa a `Juego.comprar_carta()`. La misión correspondiente se cumple
+  exactamente al llegar a 5, no antes.
+
+- Justificación de diseño:
+  El progreso del jugador en misiones de compra se rastrea mediante el atributo
+  `_cartas_compradas_mercado` en `Jugador`, incrementado atómicamente en `comprar_carta`.
+  Separar el rastreo del flujo de compra garantiza que el contador sea fiel a las
+  transacciones reales y no pueda ser manipulado desde fuera.
+
+- Cómo se prueba:
+  Se verifica que la misión no se cumple con 0 compras; se realizan 5 compras exitosas
+  de CDRA vía `juego.comprar_carta` y se verifica que la condición pasa a True y que
+  `jugador.cartas_compradas_mercado == 5`.
+
+- Consecuencia si fallara:
+  Misiones que no se completan nunca aunque el jugador compre la cantidad requerida,
+  o misiones que se completan antes de tiempo, rompiendo el sistema de progresión.
+
+--------------------------------------------------------------------------------
+REGLA 19: MISIÓN "CONSEGUIR AL LEVIATÁN" REQUIERE POSEER LA CARTA LLEV
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_mision_conseguir_leviatan
+
+- Enunciado de la regla / Invariante:
+  La misión "Conseguir al Leviatán" se cumple si y solo si el jugador posee al menos
+  una carta cuya plantilla tenga código "LLEV" o nombre "Leviatán". La criatura LLEV
+  debe existir en el catálogo de las 227 criaturas.
+
+- Justificación de diseño:
+  Las misiones de colección verifican el inventario actual del jugador usando el predicado
+  funcional almacenado en la misión. La criatura Leviatán está registrada como Legendaria
+  en el catálogo oficial, siendo uno de los objetivos de colección más codiciados del juego.
+
+- Cómo se prueba:
+  Se verifica que la condición no se cumple sin la carta; se crea una carta de LLEV desde
+  el catálogo, se agrega al jugador y se verifica que la condición se cumple.
+
+- Consecuencia si fallara:
+  Misión bloqueada que nunca se activa aunque el jugador obtenga el Leviatán, privándolo
+  de su recompensa de 100 monedas.
+
+--------------------------------------------------------------------------------
+REGLA 20: DESAFÍO DE VICTORIAS CONSECUTIVAS ACUMULA CON REGISTRAR_VICTORIA
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_desafio_victorias_consecutivas
+
+- Enunciado de la regla / Invariante:
+  El contador `victorias_consecutivas` del Jugador se incrementa con cada llamada a
+  `Juego.registrar_victoria()`. El desafío "Ganar 3 combates consecutivos" requiere
+  exactamente 3 (no se activa con 1 ni 2).
+
+- Justificación de diseño:
+  Preparación del sistema para el módulo de batalla futuro. Aunque `batallar` lanza
+  `NotImplementedError`, los contadores de victorias pueden incrementarse externamente
+  (p.ej. desde una integración futura), y los desafíos asociados deben funcionar
+  correctamente desde ya.
+
+- Cómo se prueba:
+  Se registran 2 victorias y se verifica que el desafío no se cumple; se registra la
+  3ª victoria y se verifica que se cumple y que `victorias_consecutivas == 3`.
+
+- Consecuencia si fallara:
+  Desafíos de racha que no se activan nunca o que se activan prematuramente, rompiendo
+  el sistema de logros y la progresión del jugador en el modo de batalla futuro.
+
+--------------------------------------------------------------------------------
+REGLA 21: DERROTA REINICIA EL CONTADOR DE VICTORIAS CONSECUTIVAS
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_registrar_derrota_reinicia_consecutivas
+
+- Enunciado de la regla / Invariante:
+  Registrar una derrota mediante `Juego.registrar_derrota()` debe resetear el
+  contador `victorias_consecutivas` del jugador a cero. La siguiente victoria
+  comienza una nueva racha desde 1.
+
+- Justificación de diseño:
+  La semántica de "victorias consecutivas" implica que la racha se interrumpe con
+  cualquier derrota. Mantener este invariante evita que un jugador acumule rachas
+  de victoria intercalando derrotas, lo que corrompería los desafíos de racha.
+
+- Cómo se prueba:
+  Se registran 2 victorias (racha = 2), se registra una derrota (racha = 0) y se
+  verifica el reset. Luego se registra una nueva victoria y se comprueba que la
+  racha reinicia desde 1.
+
+- Consecuencia si fallara:
+  Rachas que no se interrumpen con derrotas, permitiendo a los jugadores completar
+  desafíos de racha sin ganar combates consecutivos reales.
+
+--------------------------------------------------------------------------------
+REGLA 22: NOMBRES OFICIALES DE DIVISAS Y SOBRE DE EVENTO VIGENTE
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_economia_nombres_oficiales_evento_y_monedas
+
+- Enunciado de la regla / Invariante:
+  La moneda común del juego se denomina oficialmente "Aureos", la moneda de evento se
+  denomina "Jacks", el sobre de evento se denomina "Noche Eterna" y el evento temático
+  vigente se denomina "Halloween". El sobre de evento no incluye en sus probabilidades
+  ni permite la inclusión de criaturas de rareza SSR o Legendaria.
+
+- Justificación de diseño:
+  Coherencia de nomenclatura en todo el dominio y contratos de la API para el frontend.
+  Garantiza que el sistema exponga exactamente las divisas oficiales ("Aureos", "Jacks")
+  y los paquetes vigentes ("Noche Eterna") respetando los precios (20 Jacks para el
+  sobre de evento) y previniendo la mezcla de nombres provisionales.
+
+- Cómo se prueba:
+  Se comprueba que `NOMBRE_MONEDA_COMUN == "Aureos"`, `NOMBRE_MONEDA_EVENTO == "Jacks"`,
+  `NOMBRE_SOBRE_EVENTO == "Noche Eterna"` y `NOMBRE_EVENTO_VIGENTE == "Halloween"`.
+  Se verifica que `crear_sobre_evento()` instancia un sobre con nombre "Noche Eterna",
+  moneda "Jacks" y precio 20, sin presencia de SSR ni Legendaria en `azar_rareza`.
+  Se valida que intentar crearlo con cartas SSR o Legendarias levanta ValueError,
+  y que `crear_evento_halloween()` construye el evento oficial vinculado a dicho sobre.
+
+- Consecuencia si fallara:
+  Inconsistencias entre backend y frontend en los nombres de monedas y paquetes,
+  mostrando nombres genéricos o desactualizados a los jugadores.
+
+================================================================================
 RESUMEN DE EJECUCIÓN DE LA SUITE DE TESTS
 ================================================================================
-Todos los 14 tests se ejecutan satisfactoriamente mediante el runner estándar:
+Todos los 22 tests se ejecutan satisfactoriamente mediante el runner estándar:
     python -m unittest discover -s tests -v
 
-Resultado: 14 tests ejecutados, 0 fallos, 0 errores.
+Resultado: 22 tests ejecutados, 0 fallos, 0 errores.
 ================================================================================
