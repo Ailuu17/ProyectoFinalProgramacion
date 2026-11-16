@@ -1,0 +1,328 @@
+================================================================================
+PROYECTO FINAL: PROGRAMACIÓN CIENTÍFICA Y TÉCNICA
+PROYECTO B: MERCADO DE CARTAS
+REGISTRO DE INVARIANTES, REGLAS DEL SISTEMA Y BATERÍA DE TESTS
+================================================================================
+
+Este documento da cumplimiento al requisito de la consigna oficial:
+"Además del código y el UML, se entrega la lista de reglas que el sistema
+nunca debe violar, con el test que protege cada una."
+
+El sistema ha sido diseñado bajo los principios de la Programación Orientada
+a Objetos para el modelado de entidades y el encapsulamiento del estado, junto
+con principios de Programación Funcional para el cálculo puro, desacoplamiento
+de efectos secundarios (azar e inyección de funciones) e invariantes
+transaccionales que impiden la corrupción del mercado interno.
+
+A continuación se detallan las 11 reglas críticas del sistema y el test unitario
+específico (implementado en tests/test_mercado.py) que garantiza y protege cada una.
+
+--------------------------------------------------------------------------------
+REGLA 1: INTEGRIDAD, EXHAUSTIVIDAD Y UNICIDAD DEL CATÁLOGO DE CRIATURAS
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_criaturas_cargadas_correctamente
+
+- Enunciado de la regla / Invariante:
+  La base de datos de plantillas de criaturas debe ser íntegra, única y exhaustiva.
+  Existen exactamente 227 criaturas mitológicas extraídas del catálogo oficial;
+  cada una posee un código alfanumérico único (invariante de unicidad de clave primaria),
+  todos sus atributos base numéricos (vida, ataque, defensa, usos) e informativos
+  (nombre, rareza, tipo, habilidad, descripción) correctos y normalizados (por ejemplo,
+  tipos capitalizados con la primera letra en mayúscula).
+
+- Justificación de diseño:
+  El catálogo actúa como fuente de verdad inmutable para la generación de cartas.
+  Si existieran códigos duplicados o inconsistencias tipográficas, las cartas
+  producidas sobreescribirían o colisionarían con otras en el catálogo y mercado.
+
+- Cómo se prueba:
+  Se comprueba que tanto la tupla CRIATURAS como el diccionario PLANTILLAS_CRIATURAS
+  contengan exactamente 227 elementos. Se verifica que el conjunto de códigos tenga
+  la misma cardinalidad que la lista (cero colisiones). Se valida puntualmente la
+  criatura inicial "Dragonzuelo" (CDRA), criaturas legendarias como "Apep" (LAPE),
+  y se itera sobre todas las criaturas comprobando que `tipo[0].isupper()` sea verdadero.
+
+- Consecuencia si fallara:
+  Sobreescritura de cartas en el catálogo, filtros por tipo rotos o colisiones en
+  los prefijos de los identificadores únicos de las cartas físicas.
+
+--------------------------------------------------------------------------------
+REGLA 2: INVARIANTE DE SALDO NO NEGATIVO EN LA BILLETERA
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_invariante_saldo_no_negativo
+
+- Enunciado de la regla / Invariante:
+  La billetera de un jugador nunca puede tener un saldo negativo (saldo >= 0).
+  Está terminantemente prohibido retirar más dinero del disponible, y los depósitos
+  o retiros con montos negativos deben ser rechazados inmediatamente.
+
+- Justificación de diseño:
+  Encapsulamiento del estado financiero en la clase Billetera. El balance no puede
+  ser modificado directamente desde el exterior, sino únicamente a través de
+  métodos que validan las precondiciones antes de alterar el diccionario interno de saldos.
+
+- Cómo se prueba:
+  Se inicializa una billetera, se depositan 100 unidades de moneda común. Se intenta
+  retirar 150 unidades y depositar -10 unidades, comprobando que ambos intentos
+  levantan ValueError y que el saldo permanece intacto en 100.
+
+- Consecuencia si fallara:
+  Aparición de dinero "de la nada" o endeudamiento arbitrario de jugadores,
+  destruyendo la confianza y la economía del juego.
+
+--------------------------------------------------------------------------------
+REGLA 3: UNICIDAD Y SECUENCIALIDAD DE IDENTIFICADORES DE CARTAS MEDIANTE CONTADORES
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_invariante_contador_plantilla_produce_ids_unicos
+
+- Enunciado de la regla / Invariante:
+  Cada carta física creada a partir de una plantilla recibe un identificador único
+  e irrepetible dentro del juego con formato "{codigo}-{contador}", donde el contador
+  es un entero estrictamente secuencial y monótono creciente administrado de forma
+  centralizada por el Juego a través de su lista de diccionarios `_contadores list<dict>`.
+
+- Justificación de diseño:
+  Diferenciación estricta entre la "PlantillaCriatura" (tipo/molde inmutable) y la
+  "Carta" (instancia física coleccionable que posee un jugador). El atributo `_contadores`
+  en `Juego` mantiene la lista `[{"codigo": ..., "cantidad": ...}]` que registra
+  la cantidad total emitida por cada especie.
+
+- Cómo se prueba:
+  Se crean consecutivamente dos cartas de la plantilla "Dragonzuelo" (código CDRA).
+  Se comprueba que la primera recibe el ID "CDRA-1" y la segunda "CDRA-2", y que
+  el contador de existencias de dicha criatura se sitúa en 2.
+
+- Consecuencia si fallara:
+  Dos cartas compartirían el mismo identificador, haciendo imposible distinguirlas
+  en la colección de un jugador, en el mercado o en un intercambio.
+
+--------------------------------------------------------------------------------
+REGLA 4: DETERMINISMO EN LA APERTURA DE SOBRES MEDIANTE AZAR DESACOPLADO
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_azar_determinista_apertura_sobre
+
+- Enunciado de la regla / Invariante:
+  "Con los mismos datos y el mismo azar, el sistema debe producir siempre el
+  mismo resultado" (Restricción explícita de la consigna). El cálculo de apertura
+  de sobres y selección de cartas no debe depender de efectos colaterales no
+  controlables; la función de azar debe ser inyectable.
+
+- Justificación de diseño:
+  Separación de efectos del cálculo mediante programación funcional e inyección de
+  dependencias. El método `abrir` y `obtener_carta` aceptan un parámetro `tirar`
+  opcional. Si se provee, se ejecuta de forma pura y determinista; si no, utiliza
+  el generador pseudoaleatorio por defecto.
+
+- Cómo se prueba:
+  Se abre un SobreEstable inyectando una función lambda determinista como parámetro
+  `tirar`. Se valida que el sobre devuelva exactamente la cantidad y las criaturas
+  predichas por la función suministrada.
+
+- Consecuencia si fallara:
+  Imposibilidad de realizar pruebas unitarias reproducibles, pérdida de auditoría
+  ante reclamos de usuarios y falta de transparencia probabilística.
+
+--------------------------------------------------------------------------------
+REGLA 5: ATOMICIDAD Y SEGURIDAD TRANSACCIONAL EN LA COMPRA DE SOBRES Y CARTAS
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_comprar_sobre_y_carta
+
+- Enunciado de la regla / Invariante:
+  Al comprar un sobre o una carta, primero se valida el saldo; luego se genera el
+  contenido (las cartas concretas) y se entregan al jugador; y finalmente se descuenta
+  el precio de su billetera. Si la operación falla en cualquier punto (ej. saldo insuficiente
+  o error en la apertura), la economía permanece intacta: ni se cobra dinero ni se
+  entregan cartas.
+
+- Justificación de diseño:
+  Orden transaccional seguro y desacoplamiento para la interfaz visual. Al predeterminar
+  las cartas y asegurar su creación antes de cobrar, se garantiza que jamás se le
+  cobre dinero al jugador por un sobre que luego falle al abrirse o entregarse.
+  Además, esto habilita la animación visual posterior (el jugador ve el sobre ya comprado
+  sabiendo que su contenido está fijado de antemano).
+
+- Cómo se prueba:
+  Se depositan fondos suficientes en el jugador 1 y se compra un sobre y una carta,
+  verificando que las cartas se agregan al inventario y el saldo se reduce exactamente
+  en el precio establecido. Luego, con el jugador 2 con fondos insuficientes, se
+  intenta la compra, comprobando que lanza ValueError y que ni su saldo ni sus
+  cartas sufren modificación alguna.
+
+- Consecuencia si fallara:
+  Cobros indebidos donde el jugador paga pero el sistema se cae antes de darle las cartas,
+  o entregas de cartas gratuitas cuando el jugador no dispone de fondos.
+
+--------------------------------------------------------------------------------
+REGLA 6: CONSERVACIÓN DE LA MASA DE CARTAS EN INTERCAMBIOS (NO DUPLICACIÓN)
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_invariante_intercambio_cartas_sin_duplicacion
+
+- Enunciado de la regla / Invariante:
+  En un intercambio legítimo entre dos jugadores, las cartas transferidas salen
+  de la colección del emisor y entran en la colección del receptor. El número total
+  de cartas en el universo del juego permanece constante: ninguna carta puede
+  pertenecer simultáneamente a dos jugadores ni multiplicarse.
+
+- Justificación de diseño:
+  Invariante fundamental de conservación de ítems en economías cerradas. El método
+  `intercambiar` en `Juego` orquesta el movimiento atómico de las cartas mediante
+  `quitar_carta` y `agregar_carta`.
+
+- Cómo se prueba:
+  El jugador 1 posee la carta c1 y el jugador 2 la carta c2. Se ejecuta el intercambio.
+  Se verifica que c2 está en poder de jugador 1 (y ya no de 2) y que c1 está en poder
+  de jugador 2 (y ya no de 1).
+
+- Consecuencia si fallara:
+  Glitch de duplicación de cartas ("card duping"), que provocaría hiperinflación
+  y el colapso absoluto del valor de las cartas en la comunidad.
+
+--------------------------------------------------------------------------------
+REGLA 7: INOCUIDAD DE OPERACIONES INVÁLIDAS (TRANSACCIONALIDAD PURA)
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_invariante_intercambio_invalido_sin_rastros
+
+- Enunciado de la regla / Invariante:
+  "Una operación inválida no puede dejar rastros en el sistema" (Restricción de la consigna).
+  Si un intercambio incluye cartas que alguno de los jugadores no posee o cualquier
+  parámetro inválido, la transacción se aborta de inmediato antes de alterar el estado.
+
+- Justificación de diseño:
+  Verificación exhaustiva de precondiciones previas a cualquier mutación de estado.
+  Si un chequeo falla, se lanza una excepción dejando las colecciones exactamente
+  en su estado previo.
+
+- Cómo se prueba:
+  El jugador 1 posee una carta real y el jugador 2 intenta intercambiar una carta
+  inexistente ("CARTA_FANTASMA"). Se captura el ValueError y se comprueba que el
+  jugador 1 conserva su carta intacta y el jugador 2 no recibió nada.
+
+- Consecuencia si fallara:
+  Robo o pérdida asimétrica de cartas: un jugador perdería sus activos sin recibir
+  la contraprestación pactada.
+
+--------------------------------------------------------------------------------
+REGLA 8: VIGENCIA TEMPORAL ESTRICTA DE SOBRES EXCLUSIVOS DE EVENTO
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_sobres_disponibles_segun_vigencia_evento
+
+- Enunciado de la regla / Invariante:
+  Los sobres variables o exclusivos pertenecientes a un evento temático sólo
+  están disponibles en el mercado si la fecha de consulta se encuentra dentro del
+  rango cerrado [fecha_inicio, fecha_fin]. Fuera de ese período, el mercado únicamente
+  ofrece sobres estables/clásicos.
+
+- Justificación de diseño:
+  El método `sobres_disponibles` del Mercado evalúa las fechas de los eventos
+  de manera desacoplada del reloj del sistema operativo (recibiendo la fecha como
+  parámetro de consulta puro), permitiendo simular cualquier instante temporal.
+
+- Cómo se prueba:
+  Se define un evento vigente del 1 al 30 de noviembre de 2026. Se consulta la oferta
+  el 15 de noviembre (dentro de fecha) y se comprueba que incluye tanto el sobre estable
+  como el sobre variable. Se consulta el 1 de diciembre (fuera de fecha) y se valida
+  que el sobre variable desaparece de la oferta.
+
+- Consecuencia si fallara:
+  Venta extemporánea de ediciones limitadas o imposibilidad de programar temporadas
+  y eventos temáticos.
+
+--------------------------------------------------------------------------------
+REGLA 9: RESTRICCIÓN DE CONVERSIÓN DE DIVISAS A EVENTOS ACTIVOS
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_convertir_moneda_vigencia_evento
+
+- Enunciado de la regla / Invariante:
+  La conversión de moneda común a moneda temática de evento solo es permitida si
+  existe un evento vigente para dicha moneda en la fecha indicada y respetando la
+  tasa de cambio oficial del mercado. Fuera de vigencia, la operación es rechazada.
+
+- Justificación de diseño:
+  Evitar la circulación o especulación con monedas de eventos inexistentes o caducos.
+  `Juego.convertir_moneda` valida la presencia del evento vigente y descuenta fondos
+  en moneda origen antes de acreditar en moneda destino.
+
+- Cómo se prueba:
+  Con saldo suficiente, se realiza una conversión durante el evento validando que el
+  saldo de moneda común baja y el de moneda de evento se incrementa según la tasa (5 a 1).
+  Luego se intenta la conversión fuera de fecha del evento, verificando que levanta ValueError.
+
+- Consecuencia si fallara:
+  Creación o intercambio desregulado de divisas de eventos pasados o futuros, desestabilizando
+  la economía de tokens del juego.
+
+--------------------------------------------------------------------------------
+REGLA 10: UNICIDAD DE RECOMPENSAS EN ACTIVIDADES Y MISIONES
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_actividad_mision_recompensa_unica
+
+- Enunciado de la regla / Invariante:
+  Una actividad (misión o desafío) solo se recompensa si su condición predicado se
+  cumple fehacientemente sobre el jugador y sus cartas. Además, una actividad completada
+  no puede ser reclamada ni premiada más de una vez por el mismo jugador.
+
+- Justificación de diseño:
+  Uso de predicados funcionales de orden superior para la condición de cumplimiento
+  (`condicion(jugador, cartas) -> bool`) y registro en `_actividades_completadas`
+  dentro de Jugador para garantizar idempotencia y prevenir reclamos repetidos.
+
+- Cómo se prueba:
+  Se crea una misión condicionada a poseer una criatura de tipo "Dragónico". Se intenta
+  reclamar sin cumplirla (falla con ValueError). Se agrega la carta requerida y se
+  completa con éxito, acreditando 30 monedas. Finalmente, se intenta reclamar por
+  segunda vez y se comprueba que es rechazada con ValueError.
+
+- Consecuencia si fallara:
+  Explotación de recompensas infinitas ("infinite quest farming"), que generaría
+  hiperinflación de moneda común en el juego.
+
+--------------------------------------------------------------------------------
+REGLA 11: FIDELIDAD ARQUITECTÓNICA Y COHERENCIA ESTRICTA CON EL DIAGRAMA UML
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_coincidencia_con_uml
+
+- Enunciado de la regla / Invariante:
+  La estructura de clases, métodos, visibilidad de atributos y relaciones del código
+  debe coincidir con absoluta fidelidad con el diagrama UML del sistema (`Documentos/UML imagen.png`).
+  Específicamente:
+  - Moneda: únicamente contiene `nombre: str` y `evento: str` (sin color ni diseno).
+  - Carta: contiene `id: str` y `plantilla: PlantillaCriatura`.
+  - PlantillaCriatura: contiene sus 10 atributos estándar y el método `crear_carta() : Carta`.
+  - TipoSobre, SobreEstable y SobreVariable: jerarquía polimórfica de sobres con sus diccionarios de probabilidades.
+  - Actividad, Mision, Desafio: jerarquía de actividades con predicados de cumplimiento.
+  - Catalogo y Mercado: catálogos con métodos de consulta por código, rareza y tipo.
+  - Juego: orquestador con `-contadores list<dict>` para el seguimiento de cartas emitidas.
+
+- Justificación de diseño:
+  Requisito formal de evaluación (30% de la nota de POO): "El UML final debe coincidir
+  con el código. Se debe explicar qué cambió respecto del diseño original y por qué".
+  Garantiza que la arquitectura implementada responde fielmente al diseño presentado.
+
+- Cómo se prueba:
+  Se instancian objetos de cada clase y se verifican sus atributos mediante `hasattr`,
+  comprobando la ausencia de atributos descartados (como color o diseno en Moneda) y
+  la presencia de los modelados en el UML (incluyendo la lista de diccionarios en `_contadores`).
+
+- Consecuencia si fallara:
+  Pérdida de puntos en la evaluación por inconsistencias entre diseño y código,
+  y fallas durante la defensa oral del proyecto.
+
+================================================================================
+RESUMEN DE EJECUCIÓN DE LA SUITE DE TESTS
+================================================================================
+Todos los 11 tests se ejecutan satisfactoriamente mediante el runner estándar:
+    python -m unittest discover -s tests -v
+
+Resultado: 11 tests ejecutados, 0 fallos, 0 errores.
+================================================================================

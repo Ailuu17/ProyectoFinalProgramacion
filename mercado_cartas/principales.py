@@ -84,15 +84,19 @@ class PlantillaCriatura:
 
     @property
     def contador(self) -> int:
-        cartas = [c for c in Carta._todas_las_cartas if c.plantilla.codigo == self.codigo]
-        return max((c.contador for c in cartas), default=0)
+        try:
+            from .juego import Juego
+        except (ImportError, ValueError):
+            from juego import Juego
+        return Juego.contador_global_de(self.codigo)
 
     @contador.setter
     def contador(self, valor: int) -> None:
-        if valor == 0:
-            Carta._todas_las_cartas = [
-                c for c in Carta._todas_las_cartas if c.plantilla.codigo != self.codigo
-            ]
+        try:
+            from .juego import Juego
+        except (ImportError, ValueError):
+            from juego import Juego
+        Juego.establecer_contador_global(self.codigo, valor)
 
     @property
     def _contador(self) -> int:
@@ -102,8 +106,17 @@ class PlantillaCriatura:
     def _contador(self, valor: int) -> None:
         self.contador = valor
 
-    def crear_carta(self) -> Carta:
-        return Carta(plantilla=self)
+    def crear_carta(self, juego: Optional[Any] = None) -> Carta:
+        if juego is not None and hasattr(juego, "obtener_siguiente_contador"):
+            num = juego.obtener_siguiente_contador(self.codigo)
+        else:
+            try:
+                from .juego import Juego
+            except (ImportError, ValueError):
+                from juego import Juego
+            num = Juego.obtener_siguiente_contador_global(self.codigo)
+        carta_id = f"{self.codigo}-{num}"
+        return Carta(id=carta_id, plantilla=self)
 
     def __hash__(self) -> int:
         return hash(self.codigo)
@@ -115,8 +128,6 @@ class PlantillaCriatura:
 
 
 class Carta:
-    _todas_las_cartas: ClassVar[List["Carta"]] = []
-
     def __init__(
         self,
         id_o_plantilla: Union[str, PlantillaCriatura, None] = None,
@@ -124,6 +135,7 @@ class Carta:
         id: Optional[str] = None,
         contador: Optional[int] = None,
         _contador: Optional[int] = None,
+        **kwargs: Any,
     ) -> None:
         if isinstance(id_o_plantilla, PlantillaCriatura):
             self.plantilla = id_o_plantilla
@@ -138,30 +150,34 @@ class Carta:
         if self.plantilla is None:
             raise ValueError("Se requiere una PlantillaCriatura para la carta.")
 
-        c_val = contador if contador is not None else _contador
-        if c_val is not None and c_val > 0:
-            self._contador = c_val
-        else:
-            cartas_mismo_codigo = [
-                c for c in Carta._todas_las_cartas if c.plantilla.codigo == self.plantilla.codigo
-            ]
-            max_c = max((c.contador for c in cartas_mismo_codigo), default=0)
-            self._contador = max_c + 1
-
         if carta_id is not None:
             self.id = carta_id
         else:
-            self.id = f"{self.plantilla.codigo}-{self._contador}"
-
-        Carta._todas_las_cartas.append(self)
+            c_val = contador if contador is not None else _contador
+            if c_val is not None and c_val > 0:
+                self.id = f"{self.plantilla.codigo}-{c_val}"
+            else:
+                try:
+                    from .juego import Juego
+                except (ImportError, ValueError):
+                    from juego import Juego
+                num = Juego.obtener_siguiente_contador_global(self.plantilla.codigo)
+                self.id = f"{self.plantilla.codigo}-{num}"
 
     @property
     def contador(self) -> int:
-        return self._contador
+        try:
+            return int(self.id.split("-")[-1])
+        except (ValueError, IndexError):
+            return 0
 
     @classmethod
     def limpiar_registro(cls) -> None:
-        cls._todas_las_cartas.clear()
+        try:
+            from .juego import Juego
+        except (ImportError, ValueError):
+            from juego import Juego
+        Juego.reiniciar_contadores_globales()
 
     def __hash__(self) -> int:
         return hash(self.id)
@@ -172,7 +188,7 @@ class Carta:
         return self.id == other.id
 
     def __repr__(self) -> str:
-        return f"Carta(id={self.id!r}, plantilla={self.plantilla.nombre!r}, contador={self._contador})"
+        return f"Carta(id={self.id!r}, plantilla={self.plantilla.nombre!r})"
 
 
 @dataclass
@@ -201,6 +217,7 @@ class TipoSobre:
         catalogo: "Catalogo",
         evento: Optional["Evento"] = None,
         tirar: Optional[Callable] = None,
+        juego: Optional[Any] = None,
     ) -> Carta:
         if self.azar_rareza:
             opciones_r = list(self.azar_rareza.keys())
@@ -231,15 +248,16 @@ class TipoSobre:
         else:
             plantilla = catalogo.buscar(str(elegido))
 
-        return plantilla.crear_carta()
+        return plantilla.crear_carta(juego=juego)
 
     def abrir(
         self,
         catalogo: "Catalogo",
         evento: Optional["Evento"] = None,
         tirar: Optional[Callable] = None,
+        juego: Optional[Any] = None,
     ) -> List[Carta]:
-        return [self.obtener_carta(catalogo, evento, tirar) for _ in range(self.cantidad_cartas)]
+        return [self.obtener_carta(catalogo, evento, tirar, juego=juego) for _ in range(self.cantidad_cartas)]
 
 
 @dataclass

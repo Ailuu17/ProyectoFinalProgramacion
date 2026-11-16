@@ -4,29 +4,30 @@ from pathlib import Path
 import unittest
 
 root_dir = Path(__file__).resolve().parent.parent
-codigo_dir = root_dir / "Código del mercado de cartas"
-if str(codigo_dir) not in sys.path:
-    sys.path.insert(0, str(codigo_dir))
+if str(root_dir) not in sys.path:
+    sys.path.insert(0, str(root_dir))
 
-from principales import (
+from mercado_cartas import (
     Actividad,
+    Billetera,
     Carta,
+    Catalogo,
+    CRIATURAS,
     Desafio,
     Evento,
+    Juego,
+    Jugador,
+    Mercado,
     Mision,
     Moneda,
     PlantillaCriatura,
+    PLANTILLAS_CRIATURAS,
     SobreEstable,
     SobreVariable,
     TipoSobre,
-)
-from catalogo import Catalogo, Mercado
-from jugador import Billetera, Jugador
-from juego import Juego
-from criaturas import (
-    CRIATURAS,
-    PLANTILLAS_CRIATURAS,
     crear_catalogo_completo,
+)
+from mercado_cartas.criaturas import (
     dragonzuelo,
     apep,
     sirena,
@@ -36,6 +37,7 @@ from criaturas import (
 class TestMercadoCartasUML(unittest.TestCase):
     def setUp(self):
         Carta.limpiar_registro()
+        Juego.reiniciar_contadores_globales()
         dragonzuelo.contador = 0
         sirena.contador = 0
         apep.contador = 0
@@ -158,9 +160,10 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(cartas[1].plantilla.codigo, "CDRA")
 
     def test_comprar_sobre_y_carta(self):
-        """Regla: Al comprar un sobre o carta se descuenta la moneda y se asignan las cartas."""
+        """Regla: Al comprar un sobre o carta se descuenta la moneda y se asignan las cartas en orden seguro."""
         self.jugador_1.billetera.depositar(self.moneda_comun, 200)
 
+        # Compra exitosa de sobre: entrega cartas y luego debita saldo
         cartas = self.juego.comprar_sobre(
             "j1", self.sobre_estable, date(2026, 11, 15)
         )
@@ -168,9 +171,17 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_comun), 150)
         self.assertEqual(len(self.jugador_1.cartas), 2)
 
+        # Compra exitosa de carta
         cid = self.juego.comprar_carta("j1", "CDRA")
         self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_comun), 125)
         self.assertIn(cid, self.jugador_1.cartas)
+
+        # Si el jugador no tiene saldo suficiente, la compra falla sin modificar saldo ni entregar cartas
+        self.jugador_2.billetera.depositar(self.moneda_comun, 10)  # Sobre cuesta 50
+        with self.assertRaises(ValueError):
+            self.juego.comprar_sobre("j2", self.sobre_estable, date(2026, 11, 15))
+        self.assertEqual(self.jugador_2.billetera.saldo(self.moneda_comun), 10)
+        self.assertEqual(len(self.jugador_2.cartas), 0)
 
     def test_invariante_intercambio_cartas_sin_duplicacion(self):
         """Regla: En un intercambio, la carta sale de un jugador y entra al otro; no se duplica."""
@@ -309,6 +320,13 @@ class TestMercadoCartasUML(unittest.TestCase):
         comunes = self.catalogo.de_rareza("Común")
         self.assertGreaterEqual(len(comunes), 1)
         self.assertIn(dragonzuelo, comunes)
+
+        # 7. Juego: contadores es una list<dict>
+        self.assertIsInstance(self.juego.contadores, list)
+        for item in self.juego.contadores:
+            self.assertIsInstance(item, dict)
+            self.assertIn("codigo", item)
+            self.assertIn("cantidad", item)
 
 
 if __name__ == "__main__":

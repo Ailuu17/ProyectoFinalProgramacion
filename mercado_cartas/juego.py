@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Sequence
 
 try:
     from .catalogo import Catalogo, Mercado
@@ -23,6 +23,87 @@ class Juego:
     _jugadores: Dict[str, Jugador] = field(default_factory=dict)
     _cartas: Dict[str, Carta] = field(default_factory=dict)
     _historial: List[dict] = field(default_factory=list)
+    _contadores: List[Dict[str, Any]] = field(default_factory=list)
+
+    _instancia_actual: ClassVar[Optional["Juego"]] = None
+    _contadores_defecto: ClassVar[List[Dict[str, Any]]] = []
+
+    def __post_init__(self) -> None:
+        Juego._instancia_actual = self
+
+    @property
+    def contadores(self) -> List[Dict[str, Any]]:
+        return self._contadores
+
+    def obtener_siguiente_contador(self, codigo: str) -> int:
+        for item in self._contadores:
+            if item.get("codigo") == codigo:
+                item["cantidad"] = item.get("cantidad", 0) + 1
+                return item["cantidad"]
+        nuevo = {"codigo": codigo, "cantidad": 1}
+        self._contadores.append(nuevo)
+        return 1
+
+    def contador_de(self, codigo: str) -> int:
+        for item in self._contadores:
+            if item.get("codigo") == codigo:
+                return item.get("cantidad", 0)
+        return 0
+
+    def establecer_contador(self, codigo: str, valor: int) -> None:
+        for item in self._contadores:
+            if item.get("codigo") == codigo:
+                if valor == 0:
+                    self._contadores.remove(item)
+                else:
+                    item["cantidad"] = valor
+                return
+        if valor > 0:
+            self._contadores.append({"codigo": codigo, "cantidad": valor})
+
+    def reiniciar_contadores(self) -> None:
+        self._contadores.clear()
+
+    @classmethod
+    def obtener_siguiente_contador_global(cls, codigo: str) -> int:
+        if cls._instancia_actual is not None:
+            return cls._instancia_actual.obtener_siguiente_contador(codigo)
+        for item in cls._contadores_defecto:
+            if item.get("codigo") == codigo:
+                item["cantidad"] = item.get("cantidad", 0) + 1
+                return item["cantidad"]
+        nuevo = {"codigo": codigo, "cantidad": 1}
+        cls._contadores_defecto.append(nuevo)
+        return 1
+
+    @classmethod
+    def contador_global_de(cls, codigo: str) -> int:
+        if cls._instancia_actual is not None:
+            return cls._instancia_actual.contador_de(codigo)
+        for item in cls._contadores_defecto:
+            if item.get("codigo") == codigo:
+                return item.get("cantidad", 0)
+        return 0
+
+    @classmethod
+    def establecer_contador_global(cls, codigo: str, valor: int) -> None:
+        if cls._instancia_actual is not None:
+            cls._instancia_actual.establecer_contador(codigo, valor)
+        for item in cls._contadores_defecto:
+            if item.get("codigo") == codigo:
+                if valor == 0:
+                    cls._contadores_defecto.remove(item)
+                else:
+                    item["cantidad"] = valor
+                return
+        if valor > 0:
+            cls._contadores_defecto.append({"codigo": codigo, "cantidad": valor})
+
+    @classmethod
+    def reiniciar_contadores_globales(cls) -> None:
+        if cls._instancia_actual is not None:
+            cls._instancia_actual.reiniciar_contadores()
+        cls._contadores_defecto.clear()
 
     @property
     def jugadores(self) -> Dict[str, Jugador]:
@@ -52,17 +133,22 @@ class Juego:
 
     def comprar_sobre(self, jugador_id: str, sobre: TipoSobre, fecha: date) -> List[Carta]:
         jugador = self._obtener_jugador(jugador_id)
+        # 1. Validar saldo suficiente
         if jugador.billetera.saldo(sobre.moneda) < sobre.precio:
             raise ValueError("El jugador no tiene saldo suficiente para comprar el sobre.")
-        jugador.billetera.retirar(sobre.moneda, sobre.precio)
-        jugador._sobres_comprados[sobre.nombre] = jugador._sobres_comprados.get(sobre.nombre, 0) + 1
 
+        # 2. Generar el sobre y determinar las cartas previo a cobrar
         evento = self.mercado.evento_vigente(self.eventos, fecha)
-        cartas = sobre.abrir(self.catalogo, evento, None)
+        cartas = sobre.abrir(self.catalogo, evento, None, juego=self)
 
+        # 3. Entregar las cartas al jugador y registrarlas en el juego
         for carta in cartas:
             jugador.agregar_carta(carta.id)
             self._cartas[carta.id] = carta
+
+        # 4. Cobrar al jugador después de generar y entregar las cartas
+        jugador.billetera.retirar(sobre.moneda, sobre.precio)
+        jugador._sobres_comprados[sobre.nombre] = jugador._sobres_comprados.get(sobre.nombre, 0) + 1
 
         self._historial.append({
             "tipo": "comprar_sobre",
@@ -76,13 +162,14 @@ class Juego:
         jugador = self._obtener_jugador(jugador_id)
         precio = self.mercado.precio_de(codigo)
         moneda = self._moneda_comun()
+        # 1. Validar saldo
         if jugador.billetera.saldo(moneda) < precio:
             raise ValueError("El jugador no tiene saldo suficiente para comprar la carta.")
-        jugador.billetera.retirar(moneda, precio)
 
+        # 2. Generar la carta primero
         if codigo in self.catalogo.plantillas:
             plantilla = self.catalogo.buscar(codigo)
-            carta = plantilla.crear_carta()
+            carta = plantilla.crear_carta(juego=self)
             carta_id = carta.id
             self._cartas[carta_id] = carta
         elif codigo in self._cartas:
@@ -90,7 +177,12 @@ class Juego:
         else:
             carta_id = codigo
 
+        # 3. Entregar la carta al jugador
         jugador.agregar_carta(carta_id)
+
+        # 4. Cobrar al jugador después de entregar la carta
+        jugador.billetera.retirar(moneda, precio)
+
         self._historial.append({
             "tipo": "comprar_carta",
             "jugador": jugador_id,
