@@ -1,0 +1,1280 @@
+/* ==========================================================================
+   Mercado de Cartas Mitológicas - Estilos Principales
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #0a0b12;
+  --bg-secondary: #121422;
+  --bg-surface: rgba(18, 20, 34, 0.85);
+  --bg-surface-elevated: rgba(28, 31, 52, 0.95);
+  --bg-card: #151829;
+  
+  --gold-primary: #e6b450;
+  --gold-hover: #ffc857;
+  --gold-glow: rgba(230, 180, 80, 0.35);
+
+  --lunar-primary: #a855f7;
+  --lunar-hover: #c084fc;
+  --lunar-glow: rgba(168, 85, 247, 0.4);
+
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(230, 180, 80, 0.3);
+
+  --color-common: #94a3b8;
+  --color-rare: #38bdf8;
+  --color-sr: #f59e0b;
+  --color-ssr: #a855f7;
+  --color-legendary: #ef4444;
+  --color-exclusive: #06b6d4;
+
+  --font-heading: 'Cinzel', serif;
+  --font-stats: 'Rajdhani', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+  position: relative;
+}
+
+/* ==========================================================================
+   Fondo Ambiental Mitológico
+   ========================================================================== */
+.ambient-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 25%, rgba(230, 180, 80, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 40%, rgba(15, 23, 42, 0.8) 0%, #06070c 100%);
+  overflow: hidden;
+}
+
+.ambient-grid {
+  position: absolute;
+  inset: -100px;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(600px) rotateX(45deg);
+  opacity: 0.6;
+  animation: gridMove 25s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: perspective(600px) rotateX(45deg) translateY(0); }
+  100% { transform: perspective(600px) rotateX(45deg) translateY(50px); }
+}
+
+.mystic-particles {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 80px 80px;
+  opacity: 0.3;
+}
+
+/* ==========================================================================
+   Contenedor Principal de la App
+   ========================================================================== */
+.app-container {
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+}
+
+/* ==========================================================================
+   HUD Superior: Esquinas Izquierda y Derecha
+   ========================================================================== */
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* Esquina Superior Izquierda: Contadores de Monedas */
+.currency-cluster {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s ease;
+}
+
+.currency-cluster:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.currency-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.currency-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.currency-icon.common {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fbbf24;
+  border: 1px solid #fef3c7;
+}
+
+.currency-icon.event {
+  background: linear-gradient(135deg, #9333ea, #6b21a8);
+  color: #c084fc;
+  border: 1px solid #f3e8ff;
+}
+
+.currency-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.currency-amount {
+  font-family: var(--font-stats);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.currency-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.currency-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.demo-coin-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(230, 180, 80, 0.4);
+  color: var(--gold-primary);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.demo-coin-btn:hover {
+  background: var(--gold-glow);
+  border-style: solid;
+  transform: scale(1.05);
+}
+
+/* Esquina Superior Derecha: Logo Mercado / Tienda */
+.market-access-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, rgba(30, 27, 46, 0.95), rgba(45, 32, 60, 0.95));
+  border: 1px solid rgba(230, 180, 80, 0.4);
+  padding: 0.65rem 1.4rem;
+  border-radius: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 18px var(--gold-glow);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.market-access-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold-primary);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(230, 180, 80, 0.55);
+}
+
+.market-logo-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.5);
+}
+
+.market-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.market-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--gold-primary);
+}
+
+.market-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Centro: Escenario Principal / Tablero de Ambientación
+   ========================================================================== */
+.main-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 2rem 0;
+}
+
+.hero-banner {
+  text-align: center;
+  max-width: 750px;
+  z-index: 2;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: var(--lunar-hover);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #ffffff 30%, var(--gold-primary) 70%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 35px rgba(230, 180, 80, 0.3);
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+.hero-description {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+}
+
+.center-rune-circle {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  border: 1px dashed rgba(230, 180, 80, 0.2);
+  animation: rotateRune 80s linear infinite;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-rune-inner {
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  animation: rotateRuneRev 60s linear infinite;
+}
+
+@keyframes rotateRune {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotateRuneRev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.quick-actions-bar {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  z-index: 2;
+}
+
+.action-pill-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.action-pill-btn:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--gold-primary);
+  color: var(--gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   HUD Inferior: Esquina Inferior Izquierda (Perfil)
+   ========================================================================== */
+.hud-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+}
+
+/* Esquina Inferior Izquierda: Botón con tu perfil */
+.profile-access-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.6rem 1.3rem;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-main);
+}
+
+.profile-access-btn:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-glow);
+}
+
+.profile-avatar-badge {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-online-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid var(--bg-primary);
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.profile-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  color: var(--text-main);
+}
+
+.profile-role {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.profile-hint-badge {
+  background: rgba(230, 180, 80, 0.15);
+  border: 1px solid rgba(230, 180, 80, 0.4);
+  color: var(--gold-primary);
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  margin-left: 0.25rem;
+}
+
+.system-status-indicator {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
+   Modales y Ventanas Flotantes
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.82);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 960px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+.modal-overlay.active .modal-container {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-title-icon {
+  font-size: 1.5rem;
+}
+
+.modal-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+
+.modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.modal-body {
+  padding: 1.75rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ==========================================================================
+   Modal Mi Cuenta (Opciones Habilitadas y Deshabilitadas)
+   ========================================================================== */
+.account-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  margin-bottom: 1.75rem;
+}
+
+.account-user-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.account-avatar-large {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.account-user-name {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.account-user-id {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.account-balances-quick {
+  display: flex;
+  gap: 1.25rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.account-section-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.account-section-title.enabled {
+  color: #22c55e;
+}
+
+.account-section-title.disabled {
+  color: #94a3b8;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Tarjeta de Opción de Cuenta */
+.account-option-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Opciones Habilitadas */
+.account-option-card.enabled {
+  cursor: pointer;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.account-option-card.enabled:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--gold-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px var(--gold-glow);
+}
+
+.account-option-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.account-option-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.account-option-card.enabled .account-option-icon {
+  background: linear-gradient(135deg, rgba(230, 180, 80, 0.15), rgba(230, 180, 80, 0.3));
+  border: 1px solid rgba(230, 180, 80, 0.3);
+  color: var(--gold-hover);
+}
+
+.account-option-info h4 {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.account-option-info p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.account-option-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold-primary);
+}
+
+/* Opciones Deshabilitadas */
+.account-option-card.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: rgba(15, 17, 28, 0.6);
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.account-option-card.disabled:hover {
+  opacity: 0.7;
+}
+
+.account-option-card.disabled .account-option-icon {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-dim);
+}
+
+.status-lock-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Sub-vistas: Catálogo, Inventario, Intercambio, Mercado
+   ========================================================================== */
+.subview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.search-filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.search-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  min-width: 220px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: var(--gold-primary);
+}
+
+.filter-select {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  border-color: var(--gold-primary);
+}
+
+/* Rejilla de Cartas */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.25rem;
+}
+
+.creature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.creature-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Bordes por Rareza */
+.creature-card.rareza-comun { border-color: rgba(148, 163, 184, 0.4); }
+.creature-card.rareza-comun:hover { border-color: var(--color-common); box-shadow: 0 0 15px rgba(148, 163, 184, 0.3); }
+
+.creature-card.rareza-rara { border-color: rgba(56, 189, 248, 0.4); }
+.creature-card.rareza-rara:hover { border-color: var(--color-rare); box-shadow: 0 0 18px rgba(56, 189, 248, 0.35); }
+
+.creature-card.rareza-sr { border-color: rgba(245, 158, 11, 0.4); }
+.creature-card.rareza-sr:hover { border-color: var(--color-sr); box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+
+.creature-card.rareza-ssr { border-color: rgba(168, 85, 247, 0.5); }
+.creature-card.rareza-ssr:hover { border-color: var(--color-ssr); box-shadow: 0 0 22px rgba(168, 85, 247, 0.45); }
+
+.creature-card.rareza-legendaria { border-color: rgba(239, 68, 68, 0.6); }
+.creature-card.rareza-legendaria:hover { border-color: var(--color-legendary); box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
+
+.creature-card.rareza-exclusiva { border-color: rgba(6, 182, 212, 0.6); }
+.creature-card.rareza-exclusiva:hover { border-color: var(--color-exclusive); box-shadow: 0 0 25px rgba(6, 182, 212, 0.5); }
+
+.card-top-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.card-code {
+  font-family: var(--font-stats);
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.card-rarity-badge {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card-illustration {
+  height: 100px;
+  border-radius: 10px;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.4) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-creature-name {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-type-tag {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.card-stats-row {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  font-family: var(--font-stats);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.card-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.card-stat.hp { color: #ef4444; }
+.card-stat.atk { color: #f59e0b; }
+.card-stat.def { color: #3b82f6; }
+
+.card-ability-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.card-ability-name {
+  font-weight: 700;
+  color: var(--gold-hover);
+  margin-bottom: 0.15rem;
+  display: block;
+}
+
+/* ==========================================================================
+   Interfaz de Intercambio (Trade)
+   ========================================================================== */
+.trade-arena {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.trade-player-column {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.trade-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trade-slots-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.trade-card-slot {
+  aspect-ratio: 2/3;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 0.5rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.trade-card-slot.filled {
+  border-style: solid;
+  border-color: var(--gold-primary);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.trade-center-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.trade-arrows-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-primary), #b45309);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.trade-acceptance-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.trade-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.execute-trade-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s;
+}
+
+.execute-trade-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+.execute-trade-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+/* ==========================================================================
+   Tienda / Mercado Modal
+   ========================================================================== */
+.market-packs-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.pack-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.pack-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-primary);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--gold-glow);
+}
+
+.pack-card.event-pack {
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.pack-card.event-pack:hover {
+  border-color: var(--lunar-hover);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--lunar-glow);
+}
+
+.pack-graphic {
+  width: 120px;
+  height: 160px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.pack-graphic.classic {
+  background: linear-gradient(135deg, #1e1b4b, #312e81, #d97706);
+}
+
+.pack-graphic.lunar {
+  background: linear-gradient(135deg, #3b0764, #581c87, #c084fc);
+}
+
+.pack-price-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-stats);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.buy-pack-btn {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  background: linear-gradient(135deg, var(--gold-primary), #b45309);
+  color: #1a0f00;
+}
+
+.buy-pack-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.buy-pack-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #334155;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   Modal de Login / Selección de Jugador
+   ========================================================================== */
+.login-dialog {
+  max-width: 480px;
+  text-align: center;
+}
+
+.login-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.login-player-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.player-select-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.85rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.player-select-pill:hover, .player-select-pill.selected {
+  border-color: var(--gold-primary);
+  background: var(--bg-surface-elevated);
+  box-shadow: 0 0 15px var(--gold-glow);
+}
+
+.start-session-btn {
+  background: linear-gradient(135deg, var(--gold-primary), #b45309);
+  color: #1a0f00;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px var(--gold-glow);
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.start-session-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* Notificaciones Toast */
+.toast-notification {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--gold-primary);
+  color: var(--text-main);
+  padding: 0.85rem 1.4rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px var(--gold-glow);
+  z-index: 1000;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.toast-notification.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .hud-header, .hud-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .currency-cluster, .market-access-btn, .profile-access-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .trade-arena {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+}

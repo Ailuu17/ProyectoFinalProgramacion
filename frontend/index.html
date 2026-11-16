@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mercado de Cartas Mitológicas - Reino Mitológico</title>
+  
+  <!-- Estilos del Frontend -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Favicon simbólico -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
+</head>
+<body>
+
+  <!-- Fondo Ambiental Mitológico y Partículas -->
+  <div class="ambient-background">
+    <div class="ambient-grid"></div>
+    <div class="mystic-particles"></div>
+  </div>
+
+  <!-- Contenedor Principal HUD -->
+  <div class="app-container">
+
+    <!-- ======================================================================
+         HUD SUPERIOR
+         - Esquina Superior Izquierda: Contadores de Monedas (Comunes y Evento)
+         - Esquina Superior Derecha: Logo Mercado / Tienda de Cartas
+         ====================================================================== -->
+    <header class="hud-header">
+      
+      <!-- ESQUINA SUPERIOR IZQUIERDA: Contadores de Monedas -->
+      <div class="currency-cluster" title="Billetera del Jugador">
+        
+        <!-- Contador de Monedas Comunes (comienza en 0) -->
+        <div class="currency-pill">
+          <div class="currency-icon common">🪙</div>
+          <div class="currency-info">
+            <span class="currency-amount" id="contador-comunes">0</span>
+            <span class="currency-label">Comunes</span>
+          </div>
+        </div>
+
+        <div class="currency-divider"></div>
+
+        <!-- A su derecha: Contador de Monedas de Eventos (comienza en 0) -->
+        <div class="currency-pill">
+          <div class="currency-icon event">🌙</div>
+          <div class="currency-info">
+            <span class="currency-amount" id="contador-evento">0</span>
+            <span class="currency-label">Evento Lunar</span>
+          </div>
+        </div>
+
+        <!-- Botón Demo auxiliar para pruebas de compras -->
+        <button class="demo-coin-btn" id="btn-demo-coins" title="Añade 100 monedas para probar la apertura de sobres">
+          <span>+100</span>
+        </button>
+      </div>
+
+      <!-- ESQUINA SUPERIOR DERECHA: Logo para acceder a la Tienda de Cartas (Mercado) -->
+      <button class="market-access-btn" id="btn-acceder-mercado" title="Abrir Tienda y Mercado de Cartas">
+        <div class="market-logo-icon">🏛️</div>
+        <div class="market-text">
+          <span class="market-title">MERCADO</span>
+          <span class="market-subtitle">Tienda de Cartas y Sobres</span>
+        </div>
+      </button>
+
+    </header>
+
+    <!-- ======================================================================
+         ESCENARIO CENTRAL: Ambientación del Juego de Cartas
+         ====================================================================== -->
+    <main class="main-stage">
+      <div class="center-rune-circle">
+        <div class="center-rune-inner"></div>
+      </div>
+
+      <div class="hero-banner">
+        <div class="hero-badge">
+          <span>✨</span>
+          <span>Temporada Mitológica: Festival de Luna Activo</span>
+        </div>
+        <h1 class="hero-title">Mercado de Cartas</h1>
+        <p class="hero-description">
+          Colecciona criaturas legendarias, adquiere sobres ancestrales en el mercado e intercambia
+          cartas con otros jugadores en un ecosistema vivo de 227 criaturas únicas.
+        </p>
+
+        <!-- Accesos directos convenientes en el escenario central -->
+        <div class="quick-actions-bar">
+          <button class="action-pill-btn" onclick="openModal('modal-cuenta')">
+            <span>👤</span>
+            <span>Mi Perfil y Opciones</span>
+          </button>
+          <button class="action-pill-btn" onclick="openModal('modal-mercado')">
+            <span>📦</span>
+            <span>Comprar Sobres</span>
+          </button>
+          <button class="action-pill-btn" onclick="renderCatalogView(); openModal('modal-catalogo')">
+            <span>📖</span>
+            <span>Explorar Catálogo</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ======================================================================
+         HUD INFERIOR
+         - Esquina Inferior Izquierda: Botón con tu perfil para acceder a tu cuenta
+         ====================================================================== -->
+    <footer class="hud-footer">
+      
+      <!-- ESQUINA INFERIOR IZQUIERDA: Botón con tu perfil -->
+      <button class="profile-access-btn" id="btn-acceder-perfil" title="Abrir opciones de cuenta y perfil">
+        <div class="profile-avatar-badge">
+          <div class="profile-avatar-img" id="hud-profile-avatar">🧙‍♂️</div>
+          <div class="profile-online-indicator"></div>
+        </div>
+        <div class="profile-details">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span class="profile-name" id="hud-profile-name">Ash</span>
+            <span class="profile-hint-badge">Cuenta</span>
+          </div>
+          <span class="profile-role">Jugador Activo</span>
+        </div>
+      </button>
+
+      <!-- Indicador informativo del sistema -->
+      <div class="system-status-indicator">
+        <span>⚡ Versión 1.0 • UCU 2026 • Batalla: Próximamente</span>
+      </div>
+
+    </footer>
+
+  </div>
+
+  <!-- ======================================================================
+       MODAL 1: LOGIN INICIAL (Capa de Presentación / Desacoplada)
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-login">
+    <div class="modal-container login-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">🏰</div>
+          <div>
+            <h3 class="modal-title">Acceso al Reino</h3>
+            <p class="modal-subtitle">Selecciona tu perfil de jugador activo</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5; margin-bottom: 1.25rem;">
+          Bienvenido al <strong>Mercado de Cartas Mitológicas</strong>. Según el diseño de arquitectura,
+          el inicio de sesión pertenece a la <em>capa de presentación</em>, identificando qué jugador
+          está activo en la sesión.
+        </p>
+
+        <div class="login-player-picker">
+          <!-- Jugador 1 -->
+          <div class="player-select-pill selected" data-id="j1">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <span style="font-size: 1.5rem;">🧙‍♂️</span>
+              <div style="text-align: left;">
+                <div style="font-weight: 700; color: #f1f5f9;">Ash</div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">ID: j1 • Saldo inicial: 0 monedas</div>
+              </div>
+            </div>
+            <span style="color: #e6b450; font-size: 0.85rem;">Seleccionar</span>
+          </div>
+
+          <!-- Jugador 2 -->
+          <div class="player-select-pill" data-id="j2">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <span style="font-size: 1.5rem;">🧝‍♀️</span>
+              <div style="text-align: left;">
+                <div style="font-weight: 700; color: #f1f5f9;">Misty</div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">ID: j2 • Saldo inicial: 0 monedas</div>
+              </div>
+            </div>
+            <span style="color: #e6b450; font-size: 0.85rem;">Seleccionar</span>
+          </div>
+        </div>
+
+        <button class="start-session-btn" id="btn-confirm-login" style="margin-top: 1.5rem;">
+          Ingresar al Juego
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 2: TU CUENTA (Opciones Habilitadas y Deshabilitadas)
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-cuenta">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">👤</div>
+          <div>
+            <h3 class="modal-title">Tu Cuenta</h3>
+            <p class="modal-subtitle">Gestión de perfil, inventario y servicios del jugador</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Tarjeta de Perfil del Usuario Activo -->
+        <div class="account-profile-header">
+          <div class="account-user-card">
+            <div class="account-avatar-large" id="account-avatar">🧙‍♂️</div>
+            <div>
+              <div class="account-user-name" id="account-user-name">Ash</div>
+              <div class="account-user-id" id="account-user-id">ID: j1</div>
+            </div>
+          </div>
+
+          <div class="account-balances-quick">
+            <div style="text-align: center;">
+              <div style="font-family: var(--font-stats); font-size: 1.2rem; font-weight: 700; color: #fbbf24;" id="account-balance-comun">0</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase;">Comunes</div>
+            </div>
+            <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+            <div style="text-align: center;">
+              <div style="font-family: var(--font-stats); font-size: 1.2rem; font-weight: 700; color: #c084fc;" id="account-balance-evento">0</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase;">Evento</div>
+            </div>
+            <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
+            <div style="text-align: center;">
+              <div style="font-family: var(--font-stats); font-size: 1.2rem; font-weight: 700; color: #38bdf8;" id="account-total-cartas">0</div>
+              <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase;">Cartas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             OPCIONES HABILITADAS
+             ================================================================ -->
+        <h4 class="account-section-title enabled">
+          <span>✓</span>
+          <span>Opciones Habilitadas</span>
+        </h4>
+
+        <div class="account-grid">
+          
+          <!-- HABILITADA 1: Intercambio de cartas entre jugadores -->
+          <div class="account-option-card enabled" id="opt-intercambio">
+            <div class="account-option-header">
+              <div class="account-option-icon">🔄</div>
+              <div class="account-option-info">
+                <h4>Intercambio de Cartas</h4>
+                <p>Ofrece hasta 3 cartas con otro jugador. La transferencia se realiza solo si ambos aceptan.</p>
+              </div>
+            </div>
+            <div class="account-option-action">
+              <span>Acceder al Intercambio</span>
+              <span>→</span>
+            </div>
+          </div>
+
+          <!-- HABILITADA 2: Catálogo de Criaturas Existentes -->
+          <div class="account-option-card enabled" id="opt-catalogo">
+            <div class="account-option-header">
+              <div class="account-option-icon">📖</div>
+              <div class="account-option-info">
+                <h4>Catálogo de Criaturas</h4>
+                <p>Explora las 227 criaturas mitológicas del juego con sus estadísticas, habilidades y rarezas.</p>
+              </div>
+            </div>
+            <div class="account-option-action">
+              <span>Abrir Catálogo</span>
+              <span>→</span>
+            </div>
+          </div>
+
+          <!-- HABILITADA 3: Mis Cartas (Colección del Jugador) -->
+          <div class="account-option-card enabled" id="opt-mis-cartas">
+            <div class="account-option-header">
+              <div class="account-option-icon">🃏</div>
+              <div class="account-option-info">
+                <h4>Mis Cartas</h4>
+                <p>Visualiza todas las cartas que posees con sus identificadores únicos generados (ej. CDRA-1).</p>
+              </div>
+            </div>
+            <div class="account-option-action">
+              <span>Ver mi Inventario</span>
+              <span>→</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             OPCIONES DESHABILITADAS
+             ================================================================ -->
+        <h4 class="account-section-title disabled">
+          <span>🔒</span>
+          <span>Opciones Deshabilitadas (En Desarrollo / Próximamente)</span>
+        </h4>
+
+        <div class="account-grid">
+          
+          <!-- DESHABILITADA 1: Chat para hablar con otros jugadores -->
+          <div class="account-option-card disabled" data-feature="chat">
+            <div class="account-option-header">
+              <div class="account-option-icon">💬</div>
+              <div class="account-option-info">
+                <h4>Chat de Jugadores</h4>
+                <p>Canal de comunicación en tiempo real para negociar e interactuar con otros usuarios.</p>
+              </div>
+            </div>
+            <div class="account-option-action">
+              <span class="status-lock-pill">🔒 Próximamente</span>
+            </div>
+          </div>
+
+          <!-- DESHABILITADA 2: Batalla -->
+          <div class="account-option-card disabled" data-feature="batalla">
+            <div class="account-option-header">
+              <div class="account-option-icon">⚔️</div>
+              <div class="account-option-info">
+                <h4>Sistema de Batalla</h4>
+                <p>Enfréntate en combates por turnos utilizando los puntos de vida, ataque y habilidades de tus criaturas.</p>
+              </div>
+            </div>
+            <div class="account-option-action">
+              <span class="status-lock-pill" style="color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.1);">
+                🚧 En Desarrollo (Futura Versión)
+              </span>
+            </div>
+          </div>
+
+          <!-- DESHABILITADA 3: Configuración de la cuenta -->
+          <div class="account-option-card disabled" data-feature="config">
+            <div class="account-option-header">
+              <div class="account-option-icon">⚙️</div>
+              <div class="account-option-info">
+                <h4>Configuración de Cuenta</h4>
+                <p>Ajustes de perfil, preferencias de audio, idioma y seguridad de la sesión.</p>
+              </div>
+            </div>
+            <div class="account-option-action">
+              <span class="status-lock-pill">🔒 Próximamente</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Barra inferior de la cuenta con botón para cambiar de perfil -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          <button class="action-pill-btn" id="btn-logout" style="color: #f87171; border-color: rgba(239,68,68,0.3);">
+            <span>🚪</span>
+            <span>Cambiar de Jugador / Cerrar Sesión</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 3: TIENDA DE CARTAS Y MERCADO
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-mercado">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">🏛️</div>
+          <div>
+            <h3 class="modal-title">Mercado y Tienda de Cartas</h3>
+            <p class="modal-subtitle">Adquiere sobres y participa del cambio de moneda en eventos activos</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <h4 class="account-section-title enabled" style="margin-bottom: 1rem;">
+          <span>📦</span>
+          <span>Sobres Disponibles en Tienda</span>
+        </h4>
+
+        <!-- Lista de sobres (Clásico y Exclusivo de Evento) -->
+        <div class="market-packs-container" id="market-packs-list">
+          <!-- Renderizado dinámicamente por app.js -->
+        </div>
+
+        <!-- Casa de Cambio de Moneda de Evento -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem;">
+          <h4 style="font-family: var(--font-heading); color: #c084fc; font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🌙</span>
+            <span>Casa de Cambio: Festival de Luna</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem;">
+            Durante el evento activo puedes convertir tus monedas comunes en monedas de evento.
+            <strong id="exchange-rate-factor" style="color: #e6b450;">1 Moneda Común = 5 Monedas de Evento</strong>.
+          </p>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center; max-width: 450px;">
+            <input type="number" id="convert-amount-input" class="search-input" placeholder="Cantidad de monedas comunes" min="1" value="10">
+            <button class="action-pill-btn" onclick="convertCurrency()" style="border-color: #a855f7; color: #c084fc;">
+              <span>Convertir</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 4: CATÁLOGO DE CRIATURAS (227 Criaturas del Juego)
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-catalogo">
+    <div class="modal-container" style="max-width: 1100px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">📖</div>
+          <div>
+            <h3 class="modal-title">Catálogo Oficial de Criaturas</h3>
+            <p class="modal-subtitle" id="catalog-count-badge">Cargando 227 Criaturas Mitológicas...</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="subview-header">
+          <div class="search-filter-bar">
+            <input type="text" id="catalog-search" class="search-input" placeholder="🔍 Buscar por nombre o código (ej. Dragonzuelo, CDRA)...">
+            
+            <select id="catalog-rarity" class="filter-select">
+              <option value="">Todas las Rarezas</option>
+              <option value="Común">Común</option>
+              <option value="Rara">Rara</option>
+              <option value="Súper Rara">Súper Rara</option>
+              <option value="Súper Súper Rara">Súper Súper Rara</option>
+              <option value="Legendaria">Legendaria</option>
+              <option value="Exclusiva">Exclusiva</option>
+            </select>
+
+            <select id="catalog-type" class="filter-select">
+              <option value="">Todos los Tipos</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Rejilla de Cartas del Catálogo -->
+        <div class="cards-grid" id="catalog-cards-container">
+          <!-- Renderizado dinámicamente -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 5: MIS CARTAS (Inventario del Jugador)
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-inventario">
+    <div class="modal-container" style="max-width: 1050px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">🃏</div>
+          <div>
+            <h3 class="modal-title">Mis Cartas</h3>
+            <p class="modal-subtitle" id="inventory-count-badge">0 Cartas en Posesión</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Estado Vacío Inicial -->
+        <div id="inventory-empty-state" style="text-align: center; padding: 3rem 1rem;">
+          <div style="font-size: 3.5rem; margin-bottom: 1rem;">📭</div>
+          <h4 style="font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 0.5rem;">Aún no posees cartas</h4>
+          <p style="font-size: 0.9rem; color: #94a3b8; max-width: 480px; margin: 0 auto 1.5rem auto;">
+            Todos los jugadores comienzan con 0 monedas y 0 cartas. Puedes adquirir sobres en la Tienda del Mercado
+            o completar misiones para comenzar a forjar tu baraja legendaria.
+          </p>
+          <button class="action-pill-btn" style="margin: 0 auto; border-color: #e6b450;" onclick="closeModal('modal-inventario'); openModal('modal-mercado');">
+            <span>🏛️</span>
+            <span>Ir a la Tienda de Cartas</span>
+          </button>
+        </div>
+
+        <!-- Rejilla de Cartas del Jugador -->
+        <div class="cards-grid" id="inventory-cards-container">
+          <!-- Renderizado dinámicamente -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 6: INTERCAMBIO DE CARTAS ENTRE JUGADORES
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-intercambio">
+    <div class="modal-container" style="max-width: 1050px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">🔄</div>
+          <div>
+            <h3 class="modal-title">Intercambio de Cartas</h3>
+            <p class="modal-subtitle">Máximo 3 cartas por jugador • Transferencia atómica con doble aceptación</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <div class="trade-arena">
+          
+          <!-- Lado Izquierdo: Jugador A (Activo) -->
+          <div class="trade-player-column">
+            <div class="trade-player-header">
+              <h4 style="font-family: var(--font-heading); color: #fbbf24;" id="trade-player-a-name">Ash</h4>
+              <span style="font-size: 0.75rem; color: #94a3b8;">(Tú)</span>
+            </div>
+
+            <!-- Ranuras para ofrecer cartas (Máximo 3) -->
+            <div class="trade-slots-container">
+              <div class="trade-card-slot" id="trade-slot-a-0"><span>+ Ranura 1</span><small>Vacío</small></div>
+              <div class="trade-card-slot" id="trade-slot-a-1"><span>+ Ranura 2</span><small>Vacío</small></div>
+              <div class="trade-card-slot" id="trade-slot-a-2"><span>+ Ranura 3</span><small>Vacío</small></div>
+            </div>
+
+            <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">Selecciona cartas de tu inventario:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; max-height: 120px; overflow-y: auto;" id="trade-pool-a"></div>
+
+            <label class="trade-checkbox-label">
+              <input type="checkbox" id="trade-accept-a" onchange="toggleTradeAcceptance('active')">
+              <span>He verificado y acepto el intercambio</span>
+            </label>
+          </div>
+
+          <!-- Centro: Botón de Intercambio y Flechas -->
+          <div class="trade-center-status">
+            <div class="trade-arrows-icon">⇄</div>
+            <button class="execute-trade-btn" id="btn-execute-trade" onclick="executeTrade()" disabled>
+              Realizar Intercambio
+            </button>
+            <div style="font-size: 0.72rem; color: #94a3b8; max-width: 140px;">
+              Requiere que ambos jugadores marquen su aceptación.
+            </div>
+          </div>
+
+          <!-- Lado Derecho: Jugador B (Segundo Jugador) -->
+          <div class="trade-player-column">
+            <div class="trade-player-header">
+              <h4 style="font-family: var(--font-heading); color: #c084fc;" id="trade-player-b-name">Misty</h4>
+              <span style="font-size: 0.75rem; color: #94a3b8;">(Segundo Jugador)</span>
+            </div>
+
+            <!-- Ranuras para ofrecer cartas (Máximo 3) -->
+            <div class="trade-slots-container">
+              <div class="trade-card-slot" id="trade-slot-b-0"><span>+ Ranura 1</span><small>Vacío</small></div>
+              <div class="trade-card-slot" id="trade-slot-b-1"><span>+ Ranura 2</span><small>Vacío</small></div>
+              <div class="trade-card-slot" id="trade-slot-b-2"><span>+ Ranura 3</span><small>Vacío</small></div>
+            </div>
+
+            <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">Cartas disponibles de Misty:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; max-height: 120px; overflow-y: auto;" id="trade-pool-b"></div>
+
+            <label class="trade-checkbox-label">
+              <input type="checkbox" id="trade-accept-b" onchange="toggleTradeAcceptance('target')">
+              <span>Misty acepta el intercambio</span>
+            </label>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       NOTIFICACIONES TOAST FLOTANTES
+       ====================================================================== -->
+  <div class="toast-notification" id="toast-notification">
+    <span>✨</span>
+    <span id="toast-text">Notificación del sistema</span>
+  </div>
+
+  <!-- Scripts: Datos de 227 Criaturas y Lógica de la Aplicación -->
+  <script src="js/creaturas-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
