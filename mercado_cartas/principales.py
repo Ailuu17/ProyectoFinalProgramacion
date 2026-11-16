@@ -14,40 +14,14 @@ if TYPE_CHECKING:
 
 
 def _tirar_opcion(
-    tirar: Optional[Callable],
+    tirar: Optional[Callable[[Sequence[Any], Optional[Sequence[float]]], Any]],
     opciones: Sequence[Any],
     pesos: Optional[Sequence[float]] = None,
 ) -> Any:
     if not opciones:
         raise ValueError("No hay opciones disponibles para elegir.")
     if tirar is not None:
-        try:
-            return tirar(opciones, pesos)
-        except TypeError:
-            pass
-        try:
-            return tirar(opciones)
-        except TypeError:
-            pass
-        try:
-            resultado = tirar()
-            if resultado in opciones:
-                return resultado
-            if isinstance(resultado, (int, float)):
-                total = sum(pesos) if pesos else float(len(opciones))
-                val = float(resultado)
-                if val < 1.0 and total > 1.0:
-                    val = val * total
-                acumulado = 0.0
-                pesos_lista = pesos if pesos else [1.0] * len(opciones)
-                for op, p in zip(opciones, pesos_lista):
-                    acumulado += p
-                    if val < acumulado:
-                        return op
-                return opciones[-1]
-            return resultado
-        except TypeError:
-            pass
+        return tirar(opciones, pesos)
 
     import random
     if pesos is not None:

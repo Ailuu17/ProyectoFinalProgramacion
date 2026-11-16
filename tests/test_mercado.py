@@ -159,6 +159,32 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(cartas[0].plantilla.codigo, "CDRA")
         self.assertEqual(cartas[1].plantilla.codigo, "CDRA")
 
+    def test_error_en_tirar_se_propaga_sin_ser_silenciado(self):
+        """Regla: Si la función de azar inyectada falla o tiene un bug, el error se propaga y no se oculta."""
+        # 1. Error con excepción estándar (RuntimeError): no debe ser capturado ni reemplazado por random
+        def tirar_con_error(opciones, pesos=None):
+            raise RuntimeError("Fallo deliberado en el generador de azar inyectado.")
+
+        with self.assertRaises(RuntimeError) as ctx:
+            self.sobre_estable.abrir(
+                self.catalogo,
+                evento=None,
+                tirar=tirar_con_error,
+            )
+        self.assertIn("Fallo deliberado", str(ctx.exception))
+
+        # 2. Error de tipo (TypeError): anteriormente este error era capturado silenciosamente por
+        # 'except TypeError: pass' y el sistema elegía al azar sin avisar. Ahora se propaga visiblemente.
+        def tirar_con_type_error(opciones, pesos=None):
+            return "texto" + 123  # TypeError real dentro de la función de azar
+
+        with self.assertRaises(TypeError):
+            self.sobre_estable.abrir(
+                self.catalogo,
+                evento=None,
+                tirar=tirar_con_type_error,
+            )
+
     def test_comprar_sobre_y_carta(self):
         """Regla: Al comprar un sobre o carta se descuenta la moneda y se asignan las cartas en orden seguro."""
         self.jugador_1.billetera.depositar(self.moneda_comun, 200)

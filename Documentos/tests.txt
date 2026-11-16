@@ -14,7 +14,7 @@ con principios de Programación Funcional para el cálculo puro, desacoplamiento
 de efectos secundarios (azar e inyección de funciones) e invariantes
 transaccionales que impiden la corrupción del mercado interno.
 
-A continuación se detallan las 11 reglas críticas del sistema y el test unitario
+A continuación se detallan las 12 reglas críticas del sistema y el test unitario
 específico (implementado en tests/test_mercado.py) que garantiza y protege cada una.
 
 --------------------------------------------------------------------------------
@@ -294,7 +294,7 @@ REGLA 11: FIDELIDAD ARQUITECTÓNICA Y COHERENCIA ESTRICTA CON EL DIAGRAMA UML
 
 - Enunciado de la regla / Invariante:
   La estructura de clases, métodos, visibilidad de atributos y relaciones del código
-  debe coincidir con absoluta fidelidad con el diagrama UML del sistema (`Documentos/UML imagen.png`).
+  debe coincidir con absoluta fidelidad con el diagrama UML del sistema (`Documentos/UML_imagen.png`).
   Específicamente:
   - Moneda: únicamente contiene `nombre: str` y `evento: str` (sin color ni diseno).
   - Carta: contiene `id: str` y `plantilla: PlantillaCriatura`.
@@ -318,11 +318,43 @@ REGLA 11: FIDELIDAD ARQUITECTÓNICA Y COHERENCIA ESTRICTA CON EL DIAGRAMA UML
   Pérdida de puntos en la evaluación por inconsistencias entre diseño y código,
   y fallas durante la defensa oral del proyecto.
 
+--------------------------------------------------------------------------------
+REGLA 12: TRANSPARENCIA Y PROPAGACIÓN DE ERRORES EN EL AZAR INYECTADO
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_error_en_tirar_se_propaga_sin_ser_silenciado
+
+- Enunciado de la regla / Invariante:
+  La función de azar inyectada debe poseer una interfaz unívoca `tirar(opciones, pesos)`.
+  Si la función inyectada contiene un error de programación (como un TypeError) o una
+  excepción durante su ejecución, el sistema jamás debe silenciar el fallo mediante
+  bloques `try/except` que recurran al azar aleatorio sin avisar; el error debe
+  propagarse y hacerse visible de forma inmediata.
+
+- Justificación de diseño:
+  Principios de robustez, depuración y transparencia en el azar (requisito ético de la consigna).
+  Anteriormente, múltiples intentos de llamada a `tirar` terminaban en `except TypeError: pass`,
+  lo que enmascaraba bugs reales dentro de la función de azar inyectada y provocaba que el sistema
+  eligiera pseudoaleatoriamente sin que nadie lo notara. Al fijar la signatura estándar
+  `tirar(opciones, pesos)` y eliminar los bloques `except` permisivos, cualquier defecto en la
+  lógica de cálculo se detecta de inmediato.
+
+- Cómo se prueba:
+  Se abren sobres inyectando deliberadamente dos tipos de funciones defectuosas:
+  1) Una que lanza un `RuntimeError` explícito ("Fallo deliberado").
+  2) Una que contiene un error de tipado real (`TypeError`, ej. concatenación ilícita de string y entero).
+  Se comprueba con `assertRaises` que ambas excepciones se propagan intactas hacia el invocador
+  sin ser capturadas ni sustituidas por elecciones aleatorias automáticas.
+
+- Consecuencia si fallara:
+  Ocultamiento silencioso de errores lógicos o de probabilidades en auditorías o en producción,
+  impidiendo la trazabilidad y violando el principio de verificabilidad de la economía del juego.
+
 ================================================================================
 RESUMEN DE EJECUCIÓN DE LA SUITE DE TESTS
 ================================================================================
-Todos los 11 tests se ejecutan satisfactoriamente mediante el runner estándar:
+Todos los 12 tests se ejecutan satisfactoriamente mediante el runner estándar:
     python -m unittest discover -s tests -v
 
-Resultado: 11 tests ejecutados, 0 fallos, 0 errores.
+Resultado: 12 tests ejecutados, 0 fallos, 0 errores.
 ================================================================================
