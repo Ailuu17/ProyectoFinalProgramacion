@@ -14,7 +14,7 @@ con principios de Programación Funcional para el cálculo puro, desacoplamiento
 de efectos secundarios (azar e inyección de funciones) e invariantes
 transaccionales que impiden la corrupción del mercado interno.
 
-A continuación se detallan las 12 reglas críticas del sistema y el test unitario
+A continuación se detallan las 14 reglas críticas del sistema y el test unitario
 específico (implementado en tests/test_mercado.py) que garantiza y protege cada una.
 
 --------------------------------------------------------------------------------
@@ -350,11 +350,64 @@ REGLA 12: TRANSPARENCIA Y PROPAGACIÓN DE ERRORES EN EL AZAR INYECTADO
   Ocultamiento silencioso de errores lógicos o de probabilidades en auditorías o en producción,
   impidiendo la trazabilidad y violando el principio de verificabilidad de la economía del juego.
 
-================================================================================
+--------------------------------------------------------------------------------
+REGLA 13: LÍMITE DE INTERCAMBIO (MÁXIMO 3 CARTAS) Y ACEPTACIÓN BILATERAL
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_intercambio_reglas_maximo_tres_cartas_y_ambos_aceptan
+
+- Enunciado de la regla / Invariante:
+  Los intercambios entre jugadores tienen un límite máximo estricto de 3 cartas ofrecidas
+  por cada participante (`len(oferta) <= 3`). La operación requiere la conformidad
+  expresa de ambas partes (`aceptado_a` y `aceptado_b`), no admite cartas duplicadas
+  en una misma oferta y prohíbe el auto-intercambio (un jugador consigo mismo).
+
+- Justificación de diseño:
+  Regla económica propia y protección contra abusos de red y vaciamiento masivo de cuentas.
+  Establecer un límite por transacción y exigir confirmación explícita mitiga fraudes,
+  transferencias involuntarias o errores de usuario en el frontend.
+
+- Cómo se prueba:
+  Se valida que intentar intercambiar 4 cartas, intentar intercambiar consigo mismo,
+  intentar un intercambio donde una de las partes no acepta (`aceptado_b=False`), o incluir
+  cartas duplicadas en la oferta, levantan ValueError sin modificar los inventarios.
+  Asimismo, se prueba que un intercambio legítimo de hasta 3 cartas con aceptación mutua
+  se ejecuta con éxito.
+
+- Consecuencia si fallara:
+  Transferencias abusivas sin consentimiento bilateral, vaciamiento descontrolado de colecciones
+  y transacciones circulares que podrían corromper la integridad de inventarios.
+
+--------------------------------------------------------------------------------
+REGLA 14: SEÑALIZACIÓN EXPLÍCITA DE FUNCIONALIDADES NO IMPLEMENTADAS
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_batalla_no_implementada_documentada
+
+- Enunciado de la regla / Invariante:
+  Las características reservadas para versiones futuras (como el sistema de combate entre
+  jugadores) deben estar señalizadas formalmente mediante la excepción `NotImplementedError`,
+  evitando dejar código a medio implementar o métodos stub que devuelvan resultados ficticios
+  sin avisar.
+
+- Justificación de diseño:
+  Principio de diseño seguro y delimitación explícita de alcance. Aunque las criaturas poseen
+  estadísticas de combate (vida, ataque, defensa, habilidad) y se pueden registrar victorias,
+  la lógica de batalla se pospone oficialmente sin generar deuda técnica encubierta.
+
+- Cómo se prueba:
+  Se invoca el método `juego.batallar(j1, j2)` comprobando que lanza de manera predecible
+  un `NotImplementedError`.
+
+- Consecuencia si fallara:
+  Ejecución de métodos incompletos que generarían comportamientos erráticos o falsas
+  expectativas de funcionalidad en el frontend.
+
+===============================================================================
 RESUMEN DE EJECUCIÓN DE LA SUITE DE TESTS
 ================================================================================
-Todos los 12 tests se ejecutan satisfactoriamente mediante el runner estándar:
+Todos los 14 tests se ejecutan satisfactoriamente mediante el runner estándar:
     python -m unittest discover -s tests -v
 
-Resultado: 12 tests ejecutados, 0 fallos, 0 errores.
+Resultado: 14 tests ejecutados, 0 fallos, 0 errores.
 ================================================================================

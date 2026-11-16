@@ -239,6 +239,49 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertIn(c1.id, self.jugador_1.cartas)
         self.assertEqual(len(self.jugador_2.cartas), 0)
 
+    def test_intercambio_reglas_maximo_tres_cartas_y_ambos_aceptan(self):
+        """Regla: Intercambio limitado a un máximo de 3 cartas por jugador y requiere mutuo acuerdo."""
+        # Preparar 4 cartas para jugador 1
+        c1 = dragonzuelo.crear_carta()
+        c2 = dragonzuelo.crear_carta()
+        c3 = dragonzuelo.crear_carta()
+        c4 = dragonzuelo.crear_carta()
+        cb = sirena.crear_carta()
+
+        for c in (c1, c2, c3, c4):
+            self.juego.cartas[c.id] = c
+            self.jugador_1.agregar_carta(c.id)
+        self.juego.cartas[cb.id] = cb
+        self.jugador_2.agregar_carta(cb.id)
+
+        # 1. Intentar intercambiar más de 3 cartas (4 cartas) debe ser rechazado
+        with self.assertRaises(ValueError):
+            self.juego.intercambiar("j1", [c1.id, c2.id, c3.id, c4.id], "j2", [cb.id])
+
+        # 2. Intentar intercambiar consigo mismo debe ser rechazado
+        with self.assertRaises(ValueError):
+            self.juego.intercambiar("j1", [c1.id], "j1", [c2.id])
+
+        # 3. Si uno de los jugadores no acepta el intercambio, se rechaza
+        with self.assertRaises(ValueError):
+            self.juego.intercambiar("j1", [c1.id], "j2", [cb.id], aceptado_b=False)
+
+        # 4. No se permiten cartas duplicadas en la misma oferta
+        with self.assertRaises(ValueError):
+            self.juego.intercambiar("j1", [c1.id, c1.id], "j2", [cb.id])
+
+        # 5. Intercambio legítimo de hasta 3 cartas con aceptación mutua
+        self.juego.intercambiar("j1", [c1.id, c2.id, c3.id], "j2", [cb.id], aceptado_a=True, aceptado_b=True)
+        self.assertIn(cb.id, self.jugador_1.cartas)
+        self.assertIn(c1.id, self.jugador_2.cartas)
+        self.assertIn(c2.id, self.jugador_2.cartas)
+        self.assertIn(c3.id, self.jugador_2.cartas)
+
+    def test_batalla_no_implementada_documentada(self):
+        """Regla: El sistema de batalla está reservado y señalizado con NotImplementedError."""
+        with self.assertRaises(NotImplementedError):
+            self.juego.batallar("j1", "j2")
+
     def test_sobres_disponibles_segun_vigencia_evento(self):
         """Regla: El sobre exclusivo de un evento solo está disponible durante su vigencia."""
         fecha_en_evento = date(2026, 11, 15)
@@ -253,6 +296,11 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(len(sobres_fuera), 1)
         self.assertIn(self.sobre_estable, sobres_fuera)
         self.assertNotIn(self.sobre_variable, sobres_fuera)
+
+        # Si el jugador intenta comprar el sobre exclusivo fuera de la vigencia del evento, falla
+        self.jugador_1.billetera.depositar(self.moneda_evento, 200)
+        with self.assertRaises(ValueError):
+            self.juego.comprar_sobre("j1", self.sobre_variable, fecha_fuera_evento)
 
     def test_convertir_moneda_vigencia_evento(self):
         """Regla: Solo se puede convertir moneda si hay un evento vigente."""

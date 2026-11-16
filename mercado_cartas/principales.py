@@ -100,6 +100,20 @@ class PlantillaCriatura:
             return False
         return self.codigo == other.codigo
 
+    def a_dict(self) -> Dict[str, Any]:
+        return {
+            "codigo": self.codigo,
+            "nombre": self.nombre,
+            "rareza": self.rareza,
+            "tipo": self.tipo,
+            "vida": self.vida,
+            "ataque": self.ataque,
+            "defensa": self.defensa,
+            "habilidad": self.habilidad,
+            "descripcion_habilidad": self.descripcion_habilidad,
+            "usos_habilidad": self.usos_habilidad,
+        }
+
 
 class Carta:
     def __init__(
@@ -163,6 +177,13 @@ class Carta:
 
     def __repr__(self) -> str:
         return f"Carta(id={self.id!r}, plantilla={self.plantilla.nombre!r})"
+
+    def a_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "contador": self.contador,
+            "plantilla": self.plantilla.a_dict(),
+        }
 
 
 @dataclass

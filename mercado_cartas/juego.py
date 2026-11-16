@@ -133,20 +133,25 @@ class Juego:
 
     def comprar_sobre(self, jugador_id: str, sobre: TipoSobre, fecha: date) -> List[Carta]:
         jugador = self._obtener_jugador(jugador_id)
-        # 1. Validar saldo suficiente
+        # 1. Validar que el sobre esté disponible en el mercado en la fecha indicada
+        sobres_disponibles = self.mercado.sobres_disponibles(self.eventos, fecha)
+        if sobre not in sobres_disponibles:
+            raise ValueError("El sobre no está disponible en la fecha especificada.")
+
+        # 2. Validar saldo suficiente
         if jugador.billetera.saldo(sobre.moneda) < sobre.precio:
             raise ValueError("El jugador no tiene saldo suficiente para comprar el sobre.")
 
-        # 2. Generar el sobre y determinar las cartas previo a cobrar
+        # 3. Generar el sobre y determinar las cartas previo a cobrar
         evento = self.mercado.evento_vigente(self.eventos, fecha)
         cartas = sobre.abrir(self.catalogo, evento, None, juego=self)
 
-        # 3. Entregar las cartas al jugador y registrarlas en el juego
+        # 4. Entregar las cartas al jugador y registrarlas en el juego
         for carta in cartas:
             jugador.agregar_carta(carta.id)
             self._cartas[carta.id] = carta
 
-        # 4. Cobrar al jugador después de generar y entregar las cartas
+        # 5. Cobrar al jugador después de generar y entregar las cartas
         jugador.billetera.retirar(sobre.moneda, sobre.precio)
         jugador._sobres_comprados[sobre.nombre] = jugador._sobres_comprados.get(sobre.nombre, 0) + 1
 
@@ -197,7 +202,23 @@ class Juego:
         cartas_a_ids: Sequence[str],
         jugador_b_id: str,
         cartas_b_ids: Sequence[str],
+        aceptado_a: bool = True,
+        aceptado_b: bool = True,
     ) -> None:
+        if jugador_a_id == jugador_b_id:
+            raise ValueError("Un jugador no puede intercambiar cartas consigo mismo.")
+        if len(cartas_a_ids) > 3 or len(cartas_b_ids) > 3:
+            raise ValueError("No se pueden ofrecer más de 3 cartas por jugador en un intercambio.")
+        if len(cartas_a_ids) == 0 and len(cartas_b_ids) == 0:
+            raise ValueError("El intercambio debe incluir al menos una carta.")
+        if not aceptado_a or not aceptado_b:
+            raise ValueError("El intercambio requiere la aceptación de ambos jugadores.")
+
+        if len(cartas_a_ids) != len(set(cartas_a_ids)):
+            raise ValueError("No se permiten cartas duplicadas en la oferta del jugador A.")
+        if len(cartas_b_ids) != len(set(cartas_b_ids)):
+            raise ValueError("No se permiten cartas duplicadas en la oferta del jugador B.")
+
         jugador_a = self._obtener_jugador(jugador_a_id)
         jugador_b = self._obtener_jugador(jugador_b_id)
         for carta_id in cartas_a_ids:
@@ -219,6 +240,10 @@ class Juego:
             "cartas_a": list(cartas_a_ids),
             "cartas_b": list(cartas_b_ids),
         })
+
+    def batallar(self, jugador_a_id: str, jugador_b_id: str) -> None:
+        """Sistema de batalla planificado para versiones futuras."""
+        raise NotImplementedError("El sistema de batalla aún no está implementado.")
 
     def convertir_moneda(self, jugador_id: str, cantidad_comunes: int, fecha: date) -> None:
         if cantidad_comunes < 0:
@@ -284,3 +309,16 @@ class Juego:
             codigo = self._cartas[carta_id].plantilla.codigo if carta_id in self._cartas else carta_id
             coleccion[codigo] = coleccion.get(codigo, 0) + 1
         return coleccion
+
+    def resumen_jugador(self, jugador_id: str) -> Dict[str, Any]:
+        jugador = self._obtener_jugador(jugador_id)
+        return {
+            "id": jugador.id,
+            "nombre": jugador.nombre,
+            "saldos": {m.nombre: jugador.billetera.saldo(m) for m in jugador.billetera.saldos},
+            "cartas": list(jugador.cartas),
+            "coleccion": self.coleccion_de(jugador_id),
+            "actividades_completadas": list(jugador.actividades_completadas),
+            "sobres_comprados": dict(jugador.sobres_comprados),
+            "victorias_por_dia": {str(k): v for k, v in jugador._victorias_por_dia.items()},
+        }
