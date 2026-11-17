@@ -467,15 +467,7 @@ function filterCatalog() {
 
   const filtered = window.CRIATURAS_DATA.filter(c => {
     const matchesQuery = !query || c.nombre.toLowerCase().includes(query) || c.codigo.toLowerCase().includes(query);
-    const isExclusive = CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(c.codigo);
-
-    let matchesRarity = true;
-    if (rarity === "exclusiva" || rarity === "exclusivo" || rarity.includes("exclus")) {
-      matchesRarity = isExclusive;
-    } else if (rarity) {
-      matchesRarity = c.rareza.toLowerCase() === rarity;
-    }
-
+    const matchesRarity = !rarity || c.rareza.toLowerCase() === rarity;
     const matchesType = !type || c.tipo.toLowerCase() === type;
     return matchesQuery && matchesRarity && matchesType;
   });
