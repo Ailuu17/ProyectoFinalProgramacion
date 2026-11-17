@@ -504,7 +504,6 @@ const creatureArtworkByName = new Map(
 );
 
 const creatureArtworkAliases = {
-  cocatricito: "cocatrice.png",
   duendesdehollin: "duendes_de_holin.png",
   fenixlegendario: "fenix_legenedario.png",
   golemamatista: "golem_de_amatista.png",
