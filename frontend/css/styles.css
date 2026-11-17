@@ -882,8 +882,8 @@ body {
 .creature-card.rareza-legendaria { border-color: rgba(239, 68, 68, 0.6); }
 .creature-card.rareza-legendaria:hover { border-color: var(--color-legendary); box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
 
-.creature-card.rareza-exclusiva { border-color: rgba(6, 182, 212, 0.6); }
-.creature-card.rareza-exclusiva:hover { border-color: var(--color-exclusive); box-shadow: 0 0 25px rgba(6, 182, 212, 0.5); }
+.creature-card.rareza-exclusiva { border-color: rgba(168, 85, 247, 0.5); }
+.creature-card.rareza-exclusiva:hover { border-color: var(--lunar-hover); box-shadow: 0 0 25px var(--lunar-glow); }
 
 .card-top-info {
   position: absolute;
