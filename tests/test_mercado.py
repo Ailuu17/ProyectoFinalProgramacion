@@ -441,11 +441,13 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertIsInstance(mercado, Mercado)
         self.assertEqual(len(mercado.sobres), 3)
 
-        # Comprobar precios de los sobres
+        # Comprobar precios y cantidad de cartas de los sobres (6 cartas por sobre estándar)
         precios = {s.nombre: s.precio for s in mercado.sobres}
         self.assertEqual(precios["Sobre común"], PRECIO_SOBRE_COMUN)          # 20
         self.assertEqual(precios["Sobre especial"], PRECIO_SOBRE_ESPECIAL)    # 45
         self.assertEqual(precios["Sobre legendario"], PRECIO_SOBRE_LEGENDARIO)  # 80
+        for s in mercado.sobres:
+            self.assertEqual(s.cantidad_cartas, 6)
 
         # Comprobar tasa de cambio
         self.assertEqual(mercado.tasa_cambio, TASA_CAMBIO_NORMAL_A_EVENTO)    # 5
@@ -543,11 +545,12 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(MONEDA_EVENTO.nombre, "Jacks")
         self.assertEqual(MONEDA_EVENTO.evento, "Halloween")
 
-        # Sobre de evento por defecto: nombre 'Noche Eterna', moneda 'Jacks', precio 20 Jacks
+        # Sobre de evento por defecto: nombre 'Noche Eterna', moneda 'Jacks', precio 20 Jacks, 3 cartas
         sobre_evento = crear_sobre_evento()
         self.assertEqual(sobre_evento.nombre, "Noche Eterna")
         self.assertEqual(sobre_evento.moneda.nombre, "Jacks")
         self.assertEqual(sobre_evento.precio, 20)
+        self.assertEqual(sobre_evento.cantidad_cartas, 3)
 
         # El sobre de evento no tiene SSR ni Legendaria en sus probabilidades
         self.assertNotIn("Súper Súper Rara", sobre_evento.azar_rareza)
@@ -573,6 +576,7 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(evento_hw.nombre, "Halloween")
         self.assertEqual(evento_hw.moneda.nombre, "Jacks")
         self.assertEqual(evento_hw.sobre.nombre, "Noche Eterna")
+        self.assertEqual(evento_hw.sobre.cantidad_cartas, 3)
         self.assertIn("TH01", evento_hw.pesos_cartas)
 
     def test_economia_mision_comprar_cartas_mercado(self):

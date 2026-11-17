@@ -36,13 +36,19 @@ except (ImportError, ValueError):
 NOMBRE_MONEDA_COMUN = "Aureos"
 NOMBRE_MONEDA_EVENTO = "Jacks"
 NOMBRE_SOBRE_EVENTO = "Noche Eterna"
-NOMBRE_EVENTO_VIGENTE = "Noche Eterna"
+NOMBRE_EVENTO_VIGENTE = "Halloween"
 
 # ----------------------------------------------------------------------
 # Monedas estándar
 # ----------------------------------------------------------------------
 MONEDA_COMUN = Moneda(NOMBRE_MONEDA_COMUN)
 MONEDA_EVENTO = Moneda(NOMBRE_MONEDA_EVENTO, evento=NOMBRE_EVENTO_VIGENTE)
+
+# ----------------------------------------------------------------------
+# Cantidad de cartas por tipo de sobre
+# ----------------------------------------------------------------------
+CANTIDAD_CARTAS_SOBRE_ESTANDAR = 6
+CANTIDAD_CARTAS_SOBRE_EVENTO = 3
 
 # ----------------------------------------------------------------------
 # Precios de sobres (en monedas normales salvo el sobre de evento)
@@ -137,9 +143,9 @@ def calcular_pesos_cartas_evento(
 
 def crear_sobres_estandar(
     moneda_comun: Optional[Moneda] = None,
-    cantidad_cartas: int = 5,
+    cantidad_cartas: int = CANTIDAD_CARTAS_SOBRE_ESTANDAR,
 ) -> List[SobreEstable]:
-    """Crea los tres sobres estables oficiales del juego."""
+    """Crea los tres sobres estables oficiales del juego (cada uno contiene 6 cartas)."""
     moneda = moneda_comun or MONEDA_COMUN
     sobre_comun = SobreEstable(
         nombre="Sobre común",
@@ -169,9 +175,9 @@ def crear_sobre_evento(
     moneda_evento: Optional[Moneda] = None,
     cartas_evento: Sequence[PlantillaCriatura] = (),
     nombre: str = NOMBRE_SOBRE_EVENTO,
-    cantidad_cartas: int = 5,
+    cantidad_cartas: int = CANTIDAD_CARTAS_SOBRE_EVENTO,
 ) -> SobreVariable:
-    """Crea el sobre de evento (por defecto 'Noche Eterna') con probabilidad
+    """Crea el sobre de evento (por defecto 'Noche Eterna', contiene 3 cartas) con probabilidad
     40% C, 30% R, 15% SR y 15% cartas de evento (no maneja SSR ni L).
     """
     for c in cartas_evento:
@@ -194,14 +200,16 @@ def crear_evento_halloween(
     cartas_evento: Sequence[PlantillaCriatura],
     fecha_inicio: Optional[date] = None,
     fecha_fin: Optional[date] = None,
+    cantidad_cartas: int = CANTIDAD_CARTAS_SOBRE_EVENTO,
 ) -> Evento:
-    """Crea el evento oficial vigente de Halloween con la moneda Jacks y el sobre Noche Eterna."""
+    """Crea el evento oficial vigente de Halloween con la moneda Jacks y el sobre Noche Eterna (3 cartas)."""
     f_inicio = fecha_inicio or date(2026, 10, 20)
     f_fin = fecha_fin or date(2026, 11, 20)
     sobre = crear_sobre_evento(
         moneda_evento=MONEDA_EVENTO,
         cartas_evento=cartas_evento,
         nombre=NOMBRE_SOBRE_EVENTO,
+        cantidad_cartas=cantidad_cartas,
     )
     pesos = calcular_pesos_cartas_evento(cartas_evento)
     return Evento(

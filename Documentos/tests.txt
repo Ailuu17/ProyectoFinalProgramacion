@@ -411,10 +411,10 @@ REGLA 15: CORRECTITUD DE PRECIOS Y OFERTA DEL MERCADO ESTÁNDAR
 
 - Enunciado de la regla / Invariante:
   El mercado estándar creado por `crear_mercado_estandar()` debe contener exactamente
-  3 sobres (Común a 20, Especial a 45, Legendario a 80 monedas normales), la tasa de
-  cambio debe ser 5 (normales por 1 de evento) y las ofertas de cartas deben incluir
-  únicamente criaturas Comunes (10), Raras (25) y Súper Raras (40); las SSR y Legendarias
-  no se venden directamente en el mercado.
+  3 sobres (Común a 20, Especial a 45, Legendario a 80 monedas normales), cada uno
+  conteniendo exactamente 6 cartas; la tasa de cambio debe ser 5 (normales por 1 de evento)
+  y las ofertas de cartas deben incluir únicamente criaturas Comunes (10), Raras (25) y
+  Súper Raras (40); las SSR y Legendarias no se venden directamente en el mercado.
 
 - Justificación de diseño:
   La economía del juego está definida en `economia.py` como constantes y fábricas centralizadas.
@@ -591,9 +591,9 @@ REGLA 22: NOMBRES OFICIALES DE DIVISAS Y SOBRE DE EVENTO VIGENTE
 
 - Enunciado de la regla / Invariante:
   La moneda común del juego se denomina oficialmente "Aureos", la moneda de evento se
-  denomina "Jacks", el sobre de evento se denomina "Noche Eterna" y el evento temático
-  vigente se denomina "Halloween". El sobre de evento no incluye en sus probabilidades
-  ni permite la inclusión de criaturas de rareza SSR o Legendaria.
+  denomina "Jacks", el sobre de evento se denomina "Noche Eterna" (que contiene exactamente
+  3 cartas) y el evento temático vigente se denomina "Halloween". El sobre de evento no
+  incluye en sus probabilidades ni permite la inclusión de criaturas de rareza SSR o Legendaria.
 
 - Justificación de diseño:
   Coherencia de nomenclatura en todo el dominio y contratos de la API para el frontend.
