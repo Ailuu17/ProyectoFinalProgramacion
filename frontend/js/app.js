@@ -13,7 +13,7 @@ const NOMBRE_EVENTO_VIGENTE = "Noche Eterna";
 
 const MISIONES = [
   { id: "comprar-cartas", tipo: "compras", nombre: "Comprador frecuente", objetivo: 3, recompensa: 50, descripcion: "Compra 3 cartas individuales en el mercado." },
-  { id: "abrir-sobres", tipo: "sobres", nombre: "A abrir sobres", objetivo: 2, recompensa: 50, descripcion: "Compra y abre 2 sobres." },
+  { id: "abrir-sobres", tipo: "sobres", nombre: "Abrir sobres", objetivo: 2, recompensa: 50, descripcion: "Compra y abre 2 sobres." },
   { id: "realizar-intercambio", tipo: "intercambios", nombre: "Un buen trato", objetivo: 1, recompensa: 50, descripcion: "Completa 1 intercambio como jugador activo." },
   { id: "coleccionar-cartas", tipo: "coleccion", nombre: "Coleccionista", objetivo: 15, recompensa: 50, descripcion: "Ten 15 cartas en tu inventario." }
 ];
