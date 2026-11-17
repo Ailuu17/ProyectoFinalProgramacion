@@ -80,7 +80,7 @@
       <div class="hero-banner">
         <div class="hero-badge">
           <span>✨</span>
-          <span>Temporada Mitológica: Halloween Activo</span>
+          <span>Temporada Mitológica: Noche Eterna</span>
         </div>
         <h1 class="hero-title">Folktheon</h1>
         <p class="hero-description">
@@ -277,6 +277,21 @@
             </div>
           </div>
 
+          <!-- HABILITADA 4: Misiones del Jugador -->
+          <div class="account-option-card enabled" id="opt-misiones">
+            <div class="account-option-header">
+              <div class="account-option-icon">🎯</div>
+              <div class="account-option-info">
+                <h4>Misiones</h4>
+                <p>Completa objetivos de compra, sobres, intercambios y colección para ganar Aureos.</p>
+              </div>
+            </div>
+            <div class="account-option-action">
+              <span>Ver misiones</span>
+              <span>→</span>
+            </div>
+          </div>
+
         </div>
 
         <!-- ================================================================
@@ -348,6 +363,27 @@
   </div>
 
   <!-- ======================================================================
+       MODAL: MISIONES DEL JUGADOR
+       ====================================================================== -->
+  <div class="modal-overlay" id="modal-misiones" role="dialog" aria-modal="true" aria-labelledby="missions-title">
+    <div class="modal-container" style="max-width: 850px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">🎯</div>
+          <div>
+            <h3 class="modal-title" id="missions-title">Misiones del Jugador</h3>
+            <p class="modal-subtitle">Completa objetivos y reclama tus recompensas en Aureos</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="mission-list" id="missions-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
        MODAL 3: TIENDA DE CARTAS Y MERCADO
        ====================================================================== -->
   <div class="modal-overlay" id="modal-mercado">
@@ -389,7 +425,7 @@
         <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem;">
           <h4 style="font-family: var(--font-heading); color: #c084fc; font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
             <span>🌙</span>
-            <span>Casa de Cambio: Halloween</span>
+            <span>Casa de Cambio: Noche Eterna</span>
           </h4>
           <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem;">
             Durante el evento activo puedes convertir tus Aureos en Jacks.
@@ -469,7 +505,6 @@
               <option value="Súper Rara">Súper Rara</option>
               <option value="Súper Súper Rara">Súper Súper Rara</option>
               <option value="Legendaria">Legendaria</option>
-              <option value="Exclusiva">Exclusiva</option>
             </select>
 
             <select id="catalog-type" class="filter-select">

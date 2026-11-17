@@ -11,6 +11,13 @@ const NOMBRE_MONEDA_EVENTO = "Jacks";
 const NOMBRE_SOBRE_EVENTO = "Noche Eterna";
 const NOMBRE_EVENTO_VIGENTE = "Noche Eterna";
 
+const MISIONES = [
+  { id: "comprar-cartas", tipo: "compras", nombre: "Comprador frecuente", objetivo: 3, recompensa: 50, descripcion: "Compra 3 cartas individuales en el mercado." },
+  { id: "abrir-sobres", tipo: "sobres", nombre: "Abrir sobres", objetivo: 2, recompensa: 50, descripcion: "Compra y abre 2 sobres." },
+  { id: "realizar-intercambio", tipo: "intercambios", nombre: "Un buen trato", objetivo: 1, recompensa: 50, descripcion: "Completa 1 intercambio como jugador activo." },
+  { id: "coleccionar-cartas", tipo: "coleccion", nombre: "Coleccionista", objetivo: 15, recompensa: 50, descripcion: "Ten 15 cartas en tu inventario." }
+];
+
 // Cartas exclusivas del evento Noche Eterna
 // Chupacabritas (Comun), Espíritu oscuro (Comun) y Wendigo (Rara)
 // No se pueden conseguir en ningún sobre que no sea el de evento
@@ -74,7 +81,8 @@ const GameState = {
         evento: 0
       },
       cartas: [], // Lista de objetos { id: "CDRA-1", plantilla: {...} }
-      actividades_completadas: []
+      actividades_completadas: [],
+      contadoresMisiones: { compras: 0, sobres: 0, intercambios: 0 }
     },
     "j2": {
       id: "j2",
@@ -85,7 +93,8 @@ const GameState = {
         evento: 0
       },
       cartas: [],
-      actividades_completadas: []
+      actividades_completadas: [],
+      contadoresMisiones: { compras: 0, sobres: 0, intercambios: 0 }
     }
   },
 
@@ -128,7 +137,7 @@ const GameState = {
       moneda: "evento",
       precio: 20,
       cantidad_cartas: 3,
-      descripcion: `Disponible solo durante el evento ${NOMBRE_EVENTO_VIGENTE}. Contiene 3 cartas (40% Comun, 30% Rara, 15% Super Rara y 15% Cartas de evento). ¡Sin SSR ni Legendarias!`,
+      descripcion: `Disponible solo durante el evento ${NOMBRE_EVENTO_VIGENTE}. Contiene 3 cartas. ¡Sin SSR ni Legendarias!`,
       probabilidadesRareza: {
         "Comun": 40,
         "Rara": 30,
@@ -304,6 +313,15 @@ function setupEventListeners() {
     });
   }
 
+  const btnOptionMisiones = document.getElementById("opt-misiones");
+  if (btnOptionMisiones) {
+    btnOptionMisiones.addEventListener("click", () => {
+      closeModal("modal-cuenta");
+      renderMissionsView();
+      openModal("modal-misiones");
+    });
+  }
+
   // Botón "+ Monedas Demo" para poder probar compras sin romper el estado inicial de 0 monedas
   const btnDemoCoins = document.getElementById("btn-demo-coins");
   if (btnDemoCoins) {
@@ -472,6 +490,14 @@ function filterCatalog() {
     return matchesQuery && matchesRarity && matchesType;
   });
 
+  // Las cartas exclusivas del evento del momento se colocan al inicio del catálogo
+  filtered.sort((a, b) => {
+    const aEx = CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(a.codigo) ? 1 : 0;
+    const bEx = CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(b.codigo) ? 1 : 0;
+    if (bEx !== aEx) return bEx - aEx;
+    return 0;
+  });
+
   if (countBadge) {
     countBadge.textContent = `${filtered.length} de ${window.CRIATURAS_DATA.length} Criaturas`;
   }
@@ -481,7 +507,8 @@ function filterCatalog() {
 
 // Renderizar HTML para una carta de criatura
 function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null) {
-  const rarezaClass = getRarityClass(creatura.rareza);
+  const isExclusive = CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(creatura.codigo);
+  const rarezaClass = isExclusive ? "rareza-exclusiva" : getRarityClass(creatura.rareza);
   const typeIcon = getTypeIcon(creatura.tipo);
   const artworkPath = getCreatureArtworkPath(creatura.nombre);
 
@@ -490,11 +517,26 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
       <div class="card-illustration">
         ${artworkPath ? `<img class="creature-artwork" src="${artworkPath}" alt="${creatura.nombre}" loading="lazy" decoding="async" onerror="this.remove()">` : ""}
         <span aria-hidden="true">${typeIcon}</span>
-        <div class="card-top-info">
-          <span class="card-code">${esCartaFisica ? cartaId : creatura.codigo}</span>
-          <span class="card-rarity-badge">
-            ${creatura.rareza}
-          </span>
+        <div class="card-top-info" style="display: flex; justify-content: space-between; align-items: center; gap: 0.35rem;">
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <span class="card-code">${esCartaFisica ? cartaId : creatura.codigo}</span>
+            ${isExclusive ? `
+              <span class="card-rarity-badge">
+                ${creatura.rareza}
+              </span>
+            ` : ""}
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            ${isExclusive ? `
+              <span class="hero-badge" style="margin: 0; font-size: 0.65rem; padding: 0.2rem 0.55rem; background: rgba(168, 85, 247, 0.25); border: 1px solid rgba(192, 132, 252, 0.6); color: #c084fc; letter-spacing: 0.5px;">
+                Evento Especial
+              </span>
+            ` : `
+              <span class="card-rarity-badge">
+                ${creatura.rareza}
+              </span>
+            `}
+          </div>
         </div>
         <div class="card-caption">
           <div class="card-creature-name" title="${creatura.nombre}">${creatura.nombre}</div>
@@ -615,6 +657,70 @@ function renderInventoryView() {
   }
 }
 
+function renderMissionsView() {
+  const container = document.getElementById("missions-list");
+  const player = getActivePlayer();
+  if (!container || !player) return;
+
+  container.innerHTML = MISIONES.map(mision => {
+    const avance = mision.tipo === "coleccion"
+      ? player.cartas.length
+      : player.contadoresMisiones[mision.tipo];
+    const progreso = Math.min(avance, mision.objetivo);
+    const reclamada = player.actividades_completadas.includes(mision.id);
+    const puedeReclamar = progreso >= mision.objetivo && !reclamada;
+
+    return `
+      <article class="mission-card">
+        <div class="mission-info">
+          <h4>${mision.nombre}</h4>
+          <p>${mision.descripcion}</p>
+        </div>
+        <div class="mission-progress">
+          <div class="mission-progress-label">
+            <span>Progreso</span>
+            <span>${progreso} / ${mision.objetivo}</span>
+          </div>
+          <div class="mission-progress-track" role="progressbar" aria-valuenow="${progreso}" aria-valuemin="0" aria-valuemax="${mision.objetivo}" aria-label="${mision.nombre}">
+            <div class="mission-progress-fill" style="width: ${(progreso / mision.objetivo) * 100}%"></div>
+          </div>
+          <span class="mission-reward">Recompensa: ${mision.recompensa} ${NOMBRE_MONEDA_COMUN}</span>
+        </div>
+        <button class="mission-claim-btn" ${!puedeReclamar ? "disabled" : ""} onclick="claimMission('${mision.id}')">
+          ${reclamada ? "Reclamada" : puedeReclamar ? "Reclamar" : "En progreso"}
+        </button>
+      </article>
+    `;
+  }).join("");
+}
+
+function claimMission(missionId) {
+  const player = getActivePlayer();
+  const mision = MISIONES.find(item => item.id === missionId);
+  if (!mision) {
+    showToast("❌ No se encontró la misión.");
+    return;
+  }
+  if (player.actividades_completadas.includes(missionId)) {
+    showToast("Esta misión ya fue reclamada.");
+    return;
+  }
+
+  const avance = mision.tipo === "coleccion"
+    ? player.cartas.length
+    : player.contadoresMisiones[mision.tipo];
+  if (avance < mision.objetivo) {
+    showToast("Aún no completaste esta misión.");
+    return;
+  }
+
+  player.actividades_completadas.push(missionId);
+  player.billetera.comun += mision.recompensa;
+  updateHUD();
+  renderMissionsView();
+  showToast(`✅ Misión completada: recibiste ${mision.recompensa} ${NOMBRE_MONEDA_COMUN}.`);
+}
+
 // ============================================================================
 // VISTA: Mercado de Cartas y Sobres
 // ============================================================================
@@ -731,6 +837,7 @@ function buyMarketCard(codigo) {
 
   // Entregar carta con ID único
   player.cartas.push(crearCarta(creatura.codigo));
+  player.contadoresMisiones.compras += 1;
 
   updateHUD();
   renderMarketView();
@@ -774,6 +881,7 @@ function buyPack(sobreId) {
     player.cartas.push(carta);
     cartasObtenidas.push(carta);
   }
+  player.contadoresMisiones.sobres += 1;
 
   updateHUD();
   renderMarketView();
@@ -1123,6 +1231,7 @@ function executeTrade() {
   GameState.tradeState.acceptedActive = false;
   GameState.tradeState.acceptedTarget = false;
 
+  active.contadoresMisiones.intercambios += 1;
   updateHUD();
   setupTradeArena();
   showToast("🤝 ¡Intercambio completado con éxito!");
