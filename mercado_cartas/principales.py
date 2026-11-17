@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from datetime import date
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Optional, Sequence, Union
@@ -80,7 +78,7 @@ class PlantillaCriatura:
     def _contador(self, valor: int) -> None:
         self.contador = valor
 
-    def crear_carta(self, juego: Optional[Any] = None) -> Carta:
+    def crear_carta(self, juego: Optional[Any] = None) -> 'Carta':
         if juego is not None and hasattr(juego, "obtener_siguiente_contador"):
             num = juego.obtener_siguiente_contador(self.codigo)
         else:

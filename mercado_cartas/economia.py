@@ -1,6 +1,4 @@
 """Configuración oficial de la economía, sobres y actividades del juego."""
-from __future__ import annotations
-
 from datetime import date
 from typing import Dict, List, Optional, Sequence
 try:

@@ -1,6 +1,4 @@
 """Definición de todas las plantillas de criaturas mitológicas del juego."""
-from __future__ import annotations
-
 from typing import Dict, List
 try:
     from .principales import PlantillaCriatura
