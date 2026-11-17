@@ -137,7 +137,7 @@ const GameState = {
       moneda: "evento",
       precio: 20,
       cantidad_cartas: 3,
-      descripcion: `Disponible solo durante el evento ${NOMBRE_EVENTO_VIGENTE}. Contiene 3 cartas (40% Comun, 30% Rara, 15% Super Rara y 15% Cartas de evento). ¡Sin SSR ni Legendarias!`,
+      descripcion: `Disponible solo durante el evento ${NOMBRE_EVENTO_VIGENTE}. Contiene 3 cartas. ¡Sin SSR ni Legendarias!`,
       probabilidadesRareza: {
         "Comun": 40,
         "Rara": 30,
@@ -490,6 +490,14 @@ function filterCatalog() {
     return matchesQuery && matchesRarity && matchesType;
   });
 
+  // Las cartas exclusivas del evento del momento se colocan al inicio del catálogo
+  filtered.sort((a, b) => {
+    const aEx = CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(a.codigo) ? 1 : 0;
+    const bEx = CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(b.codigo) ? 1 : 0;
+    if (bEx !== aEx) return bEx - aEx;
+    return 0;
+  });
+
   if (countBadge) {
     countBadge.textContent = `${filtered.length} de ${window.CRIATURAS_DATA.length} Criaturas`;
   }
@@ -499,7 +507,8 @@ function filterCatalog() {
 
 // Renderizar HTML para una carta de criatura
 function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null) {
-  const rarezaClass = getRarityClass(creatura.rareza);
+  const isExclusive = CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(creatura.codigo);
+  const rarezaClass = isExclusive ? "rareza-exclusiva" : getRarityClass(creatura.rareza);
   const typeIcon = getTypeIcon(creatura.tipo);
   const artworkPath = getCreatureArtworkPath(creatura.nombre);
 
@@ -508,11 +517,26 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
       <div class="card-illustration">
         ${artworkPath ? `<img class="creature-artwork" src="${artworkPath}" alt="${creatura.nombre}" loading="lazy" decoding="async" onerror="this.remove()">` : ""}
         <span aria-hidden="true">${typeIcon}</span>
-        <div class="card-top-info">
-          <span class="card-code">${esCartaFisica ? cartaId : creatura.codigo}</span>
-          <span class="card-rarity-badge">
-            ${creatura.rareza}
-          </span>
+        <div class="card-top-info" style="display: flex; justify-content: space-between; align-items: center; gap: 0.35rem;">
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <span class="card-code">${esCartaFisica ? cartaId : creatura.codigo}</span>
+            ${isExclusive ? `
+              <span class="card-rarity-badge">
+                ${creatura.rareza}
+              </span>
+            ` : ""}
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            ${isExclusive ? `
+              <span class="hero-badge" style="margin: 0; font-size: 0.65rem; padding: 0.2rem 0.55rem; background: rgba(168, 85, 247, 0.25); border: 1px solid rgba(192, 132, 252, 0.6); color: #c084fc; letter-spacing: 0.5px;">
+                Evento Especial
+              </span>
+            ` : `
+              <span class="card-rarity-badge">
+                ${creatura.rareza}
+              </span>
+            `}
+          </div>
         </div>
         <div class="card-caption">
           <div class="card-creature-name" title="${creatura.nombre}">${creatura.nombre}</div>
