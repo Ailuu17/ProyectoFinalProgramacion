@@ -876,7 +876,8 @@ body {
 }
 
 .card-code,
-.card-type-tag {
+.card-type-tag,
+.card-rarity-badge {
   display: inline-block;
   color: var(--text-main);
   padding: 0.2rem 0.45rem;
@@ -885,14 +886,6 @@ body {
   font-family: var(--font-stats);
   font-size: 0.75rem;
   font-weight: 700;
-}
-
-.card-rarity-badge {
-  font-size: 0.68rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  font-weight: 700;
-  text-transform: uppercase;
 }
 
 .card-illustration {
