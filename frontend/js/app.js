@@ -6,6 +6,11 @@
 // ============================================================================
 // Estado Global del Frontend (Simulación del Dominio / Puente con API)
 // ============================================================================
+const NOMBRE_MONEDA_COMUN = "Aureos";
+const NOMBRE_MONEDA_EVENTO = "Jacks";
+const NOMBRE_SOBRE_EVENTO = "Noche Eterna";
+const NOMBRE_EVENTO_VIGENTE = "Halloween";
+
 const GameState = {
   activePlayerId: null,
   currentDate: "2026-11-16",
@@ -41,10 +46,10 @@ const GameState = {
 
   // Evento Activo
   eventoActivo: {
-    nombre: "Festival de Luna",
+    nombre: NOMBRE_EVENTO_VIGENTE,
     fecha_inicio: "2026-11-01",
     fecha_fin: "2026-11-30",
-    moneda: "Evento Lunar",
+    moneda: NOMBRE_MONEDA_EVENTO,
     tasa_cambio: 5 // 1 común = 5 de evento
   },
 
@@ -64,12 +69,12 @@ const GameState = {
     },
     {
       id: "sobre_exclusivo",
-      nombre: "Sobre Exclusivo Lunar",
+      nombre: NOMBRE_SOBRE_EVENTO,
       tipo: "variable",
       moneda: "evento",
       precio: 100,
       cantidad_cartas: 1,
-      descripcion: "Disponible solo durante el Festival de Luna. ¡Criaturas raras y legendarias!",
+      descripcion: `Disponible solo durante ${NOMBRE_EVENTO_VIGENTE}. ¡Criaturas raras y legendarias!`,
       grafico: "lunar",
       imagen: "Especial.png",
       badge: "Evento Especial"
@@ -552,7 +557,7 @@ function renderMarketView() {
 
         <div class="pack-price-tag">
           <span>${isEvent ? '🌙' : '🪙'}</span>
-          <span>${sobre.precio} ${isEvent ? 'Event Coins' : 'Monedas'}</span>
+          <span>${sobre.precio} ${isEvent ? NOMBRE_MONEDA_EVENTO : NOMBRE_MONEDA_COMUN}</span>
         </div>
 
         <button class="buy-pack-btn" ${!canAfford ? 'disabled' : ''} onclick="buyPack('${sobre.id}')">
@@ -565,7 +570,7 @@ function renderMarketView() {
   // Casa de cambio de moneda (comunes a evento)
   const exchangeRateSpan = document.getElementById("exchange-rate-factor");
   if (exchangeRateSpan) {
-    exchangeRateSpan.textContent = `1 Moneda Común = ${GameState.eventoActivo.tasa_cambio} Monedas de Evento Lunar`;
+    exchangeRateSpan.textContent = `1 ${NOMBRE_MONEDA_COMUN} = ${GameState.eventoActivo.tasa_cambio} ${NOMBRE_MONEDA_EVENTO}`;
   }
 }
 
@@ -652,7 +657,7 @@ function convertCurrency() {
 
   updateHUD();
   renderMarketView();
-  showToast(`✨ Convertiste ${inputAmount} comunes a ${converted} Monedas de Evento Lunar.`);
+  showToast(`✨ Convertiste ${inputAmount} ${NOMBRE_MONEDA_COMUN} a ${converted} ${NOMBRE_MONEDA_EVENTO}.`);
 }
 
 // ============================================================================
