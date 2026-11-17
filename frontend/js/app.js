@@ -431,7 +431,7 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
         <span aria-hidden="true">${typeIcon}</span>
         <div class="card-top-info">
           <span class="card-code">${esCartaFisica ? cartaId : creatura.codigo}</span>
-          <span class="card-rarity-badge" style="background: ${getRarityColor(creatura.rareza)}22; color: ${getRarityColor(creatura.rareza)};">
+          <span class="card-rarity-badge">
             ${creatura.rareza}
           </span>
         </div>
@@ -509,17 +509,6 @@ function getRarityClass(rareza) {
   if (r.includes("legen")) return "rareza-legendaria";
   if (r.includes("exclus")) return "rareza-exclusiva";
   return "rareza-comun";
-}
-
-function getRarityColor(rareza) {
-  const r = (rareza || "").toLowerCase();
-  if (r.includes("com")) return "#94a3b8";
-  if (r.includes("super super") || r.includes("súper súper") || r.includes("ssr")) return "#c084fc";
-  if (r.includes("super") || r.includes("súper") || r.includes("sr")) return "#f59e0b";
-  if (r.includes("rara")) return "#38bdf8";
-  if (r.includes("legen")) return "#ef4444";
-  if (r.includes("exclus")) return "#06b6d4";
-  return "#94a3b8";
 }
 
 function getTypeIcon(tipo) {
