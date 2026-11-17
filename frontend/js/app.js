@@ -59,6 +59,7 @@ const GameState = {
       cantidad_cartas: 2,
       descripcion: "Contiene 2 criaturas míticas comunes o raras del reino antiguo.",
       grafico: "classic",
+      imagen: "Común.png",
       badge: "Estándar"
     },
     {
@@ -70,6 +71,7 @@ const GameState = {
       cantidad_cartas: 1,
       descripcion: "Disponible solo durante el Festival de Luna. ¡Criaturas raras y legendarias!",
       grafico: "lunar",
+      imagen: "Especial.png",
       badge: "Evento Especial"
     }
   ],
@@ -380,6 +382,7 @@ function filterCatalog() {
 function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null) {
   const rarezaClass = getRarityClass(creatura.rareza);
   const typeIcon = getTypeIcon(creatura.tipo);
+  const artworkPath = getCreatureArtworkPath(creatura.nombre);
 
   return `
     <div class="creature-card ${rarezaClass}">
@@ -391,7 +394,8 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
       </div>
 
       <div class="card-illustration">
-        <span>${typeIcon}</span>
+        ${artworkPath ? `<img class="creature-artwork" src="${artworkPath}" alt="${creatura.nombre}" loading="lazy" decoding="async" onerror="this.remove()">` : ""}
+        <span aria-hidden="true">${typeIcon}</span>
       </div>
 
       <div>
@@ -411,6 +415,51 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
       </div>
     </div>
   `;
+}
+
+const creatureArtworkFiles = [
+  "Cocatriz.png", "Diabillo.png", "Diablo de Jersey.png", "Dragón de fuego.png",
+  "Duendecillo.png", "Duendes de Hollín.png", "Espiritú errante.png",
+  "Fenix Legendario.png", "Goblin.png", "Golem De Amatista.png",
+  "Golem De Piedra.png", "Golem De Rayo.png", "Hada Del Agua.png",
+  "Hada Del Bosque.png", "Hija De Lucifer.png", "Kitsune De Tres Colas.png",
+  "Kranken Joven.png", "Leviatán.png", "Loquace (Pixie).png", "Mantícora.png",
+  "Mooncalf.png", "Niño Fauno.png", "Nixie.png", "Oni Travieso.png",
+  "Pegaso.png", "Pequeño Cíclope.png", "Pichón De Fénix.png",
+  "Reina De Las Pixies.png", "Sirena.png", "Titán Del Viento.png",
+  "Titán Niño.png", "Trío Dragónico.png", "Tritón.png",
+  "Troll De Las Cavernas.png", "Troll Hechicero.png", "Unicornio.png",
+  "Vita (Pixie).png"
+];
+
+const creatureArtworkByName = new Map(
+  creatureArtworkFiles.map(filename => [
+    normalizeArtworkName(filename.replace(/\.png$/i, "")),
+    filename
+  ])
+);
+
+const creatureArtworkAliases = {
+  cocatricito: "Cocatriz.png",
+  cocatrice: "Cocatriz.png",
+  diablillo: "Diabillo.png",
+  golemamatista: "Golem De Amatista.png",
+  krakenjoven: "Kranken Joven.png",
+  trolldecaverna: "Troll De Las Cavernas.png"
+};
+
+function normalizeArtworkName(name) {
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function getCreatureArtworkPath(name) {
+  const normalizedName = normalizeArtworkName(name);
+  const filename = creatureArtworkAliases[normalizedName] || creatureArtworkByName.get(normalizedName);
+  return filename ? `/Documentos/Imagenes/Personajes/${encodeURIComponent(filename)}` : null;
+}
+
+function getPackArtworkPath(filename) {
+  return `/Documentos/Imagenes/Sobres/${encodeURIComponent(filename)}`;
 }
 
 function getRarityClass(rareza) {
@@ -493,10 +542,7 @@ function renderMarketView() {
           ${sobre.badge}
         </span>
         <div class="pack-graphic ${sobre.grafico}">
-          <span style="font-size: 2.2rem;">${isEvent ? '🌙' : '📦'}</span>
-          <div style="font-family: var(--font-heading); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; padding: 0 0.5rem;">
-            ${sobre.nombre}
-          </div>
+          <img src="${getPackArtworkPath(sobre.imagen)}" alt="${sobre.nombre}" loading="lazy" decoding="async">
         </div>
 
         <div>
@@ -556,10 +602,34 @@ function buyPack(sobreId) {
 
   updateHUD();
   renderMarketView();
-  
-  // Mostrar notificación con las cartas conseguidas
-  const nombres = cartasObtenidas.map(c => `${c.plantilla.nombre} (${c.id})`).join(", ");
-  showToast(`🎉 ¡Has abierto ${sobre.nombre}! Obtuviste: ${nombres}`);
+  showPackOpening(sobre, cartasObtenidas);
+}
+
+function showPackOpening(sobre, cartasObtenidas) {
+  const pack = document.getElementById("opening-pack");
+  const cards = document.getElementById("opening-cards");
+  const subtitle = document.getElementById("opening-subtitle");
+  if (!pack || !cards || !subtitle) return;
+
+  pack.style.setProperty("--pack-image", `url("${getPackArtworkPath(sobre.imagen)}")`);
+  pack.classList.remove("is-tearing");
+  cards.classList.remove("is-revealed");
+  cards.innerHTML = cartasObtenidas.map((carta, index) => `
+    <div class="opening-reward-card" style="--card-index: ${index}">
+      ${renderCreatureCardHTML(carta.plantilla, true, carta.id)}
+    </div>
+  `).join("");
+  subtitle.textContent = `¡Abriendo ${sobre.nombre}!`;
+  openModal("modal-apertura-sobre");
+
+  window.requestAnimationFrame(() => {
+    pack.classList.add("is-tearing");
+    const revealDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 1050;
+    window.setTimeout(() => {
+      cards.classList.add("is-revealed");
+      subtitle.textContent = "¡Estas son las cartas que obtuviste!";
+    }, revealDelay);
+  });
 }
 
 function convertCurrency() {

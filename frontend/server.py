@@ -11,6 +11,7 @@ Luego abre en el navegador:
 import os
 import sys
 import json
+from urllib.parse import unquote, urlsplit
 from datetime import date
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
@@ -84,6 +85,7 @@ juego_global.agregar_jugador(jugador_ash)
 juego_global.agregar_jugador(jugador_misty)
 
 FRONTEND_DIR = Path(__file__).resolve().parent
+ARTWORK_DIR = ROOT_DIR / "Documentos" / "Imagenes"
 
 
 class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
@@ -91,6 +93,37 @@ class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(FRONTEND_DIR), **kwargs)
 
     def do_GET(self):
+        image_path = urlsplit(self.path).path
+        artwork_routes = {
+            "/Documentos/Imagenes/Personajes/": ARTWORK_DIR / "Personajes",
+            "/Documentos/Imagenes/Sobres/": ARTWORK_DIR / "Sobres",
+        }
+        for route, artwork_dir in artwork_routes.items():
+            if image_path.startswith(route):
+                filename = unquote(image_path[len(route):])
+                if (
+                    not filename
+                    or Path(filename).name != filename
+                    or "\\" in filename
+                    or Path(filename).suffix.lower() != ".png"
+                ):
+                    self.send_error(404)
+                    return
+
+                artwork_path = artwork_dir / filename
+                if not artwork_path.is_file():
+                    self.send_error(404)
+                    return
+
+                image = artwork_path.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "image/png")
+                self.send_header("Content-Length", str(len(image)))
+                self.send_header("Cache-Control", "public, max-age=86400")
+                self.end_headers()
+                self.wfile.write(image)
+                return
+
         # Endpoints API REST
         if self.path == "/api/estado":
             self.send_response(200)

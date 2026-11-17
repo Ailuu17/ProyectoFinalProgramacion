@@ -414,6 +414,37 @@
   </div>
 
   <!-- ======================================================================
+       MODAL: APERTURA ANIMADA DE SOBRES
+       ====================================================================== -->
+  <div class="modal-overlay pack-opening-modal" id="modal-apertura-sobre" role="dialog" aria-modal="true" aria-labelledby="opening-title">
+    <div class="modal-container pack-opening-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-title-icon">✨</div>
+          <div>
+            <h3 class="modal-title" id="opening-title">¡Sobre abierto!</h3>
+            <p class="modal-subtitle" id="opening-subtitle">Preparando tus cartas...</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body pack-opening-body">
+        <div class="opening-pack-stage" aria-hidden="true">
+          <div class="opening-pack" id="opening-pack">
+            <div class="opening-pack-fragment opening-pack-top"></div>
+            <div class="opening-pack-fragment opening-pack-bottom"></div>
+          </div>
+          <div class="opening-spark opening-spark-one"></div>
+          <div class="opening-spark opening-spark-two"></div>
+          <div class="opening-spark opening-spark-three"></div>
+        </div>
+        <div class="opening-cards cards-grid" id="opening-cards" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
        MODAL 4: CATÁLOGO DE CRIATURAS (227 Criaturas del Juego)
        ====================================================================== -->
   <div class="modal-overlay" id="modal-catalogo">
