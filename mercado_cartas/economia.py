@@ -109,7 +109,7 @@ def calcular_pesos_cartas_evento(
     """Reparte el 15% del sobre de evento entre sus cartas exclusivas según rareza.
     El sobre de evento no maneja cartas SSR ni Legendarias.
     
-    Para el evento vigente (Halloween):
+    Para el evento vigente (Noche Eterna):
     - Común: peso relativo 2.0 (ej. 6% cada una si son 2 Comunes)
     - Rara: peso relativo 1.0 (ej. 3% si es 1 Rara)
     - Súper Rara: peso relativo 0.5
@@ -194,13 +194,13 @@ def crear_sobre_evento(
     )
 
 
-def crear_evento_halloween(
+def crear_evento_noche_eterna(
     cartas_evento: Sequence[PlantillaCriatura],
     fecha_inicio: Optional[date] = None,
     fecha_fin: Optional[date] = None,
     cantidad_cartas: int = CANTIDAD_CARTAS_SOBRE_EVENTO,
 ) -> Evento:
-    """Crea el evento oficial vigente de Halloween con la moneda Jacks y el sobre Noche Eterna (3 cartas)."""
+    """Crea el evento oficial vigente Noche Eterna con la moneda Jacks y el sobre Noche Eterna (3 cartas)."""
     f_inicio = fecha_inicio or date(2026, 10, 20)
     f_fin = fecha_fin or date(2026, 11, 20)
     sobre = crear_sobre_evento(
@@ -218,6 +218,10 @@ def crear_evento_halloween(
         sobre=sobre,
         pesos_cartas=pesos,
     )
+
+
+# Alias de compatibilidad hacia atrás
+crear_evento_halloween = crear_evento_noche_eterna
 
 
 def crear_ofertas_mercado(catalogo: Optional[Catalogo] = None) -> Dict[str, int]:

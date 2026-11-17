@@ -469,7 +469,7 @@ REGLA 17: DISTRIBUCIÓN PROPORCIONAL EN SOBRES DE EVENTO Y EXCLUSIÓN DE SSR/L
   la operación es rechazada con un ValueError explícito.
 
 - Justificación de diseño:
-  El diseño económico del evento vigente (Halloween) restringe el sobre de evento
+  El diseño económico del evento vigente (Noche Eterna) restringe el sobre de evento
   a rarezas Común, Rara y Súper Rara más el 15% de cartas exclusivas. Excluir SSR y
   Legendarias del sobre de evento previene la devaluación de las cartas de máxima rareza
   y mantiene la coherencia temática y estadística del evento.
@@ -592,7 +592,7 @@ REGLA 22: NOMBRES OFICIALES DE DIVISAS Y SOBRE DE EVENTO VIGENTE
 - Enunciado de la regla / Invariante:
   La moneda común del juego se denomina oficialmente "Aureos", la moneda de evento se
   denomina "Jacks", el sobre de evento se denomina "Noche Eterna" (que contiene exactamente
-  3 cartas) y el evento temático vigente se denomina "Halloween". El sobre de evento no
+  3 cartas) y el evento temático vigente se denomina "Noche Eterna". El sobre de evento no
   incluye en sus probabilidades ni permite la inclusión de criaturas de rareza SSR o Legendaria.
 
 - Justificación de diseño:
@@ -603,11 +603,11 @@ REGLA 22: NOMBRES OFICIALES DE DIVISAS Y SOBRE DE EVENTO VIGENTE
 
 - Cómo se prueba:
   Se comprueba que `NOMBRE_MONEDA_COMUN == "Aureos"`, `NOMBRE_MONEDA_EVENTO == "Jacks"`,
-  `NOMBRE_SOBRE_EVENTO == "Noche Eterna"` y `NOMBRE_EVENTO_VIGENTE == "Halloween"`.
+  `NOMBRE_SOBRE_EVENTO == "Noche Eterna"` y `NOMBRE_EVENTO_VIGENTE == "Noche Eterna"`.
   Se verifica que `crear_sobre_evento()` instancia un sobre con nombre "Noche Eterna",
   moneda "Jacks" y precio 20, sin presencia de SSR ni Legendaria en `azar_rareza`.
   Se valida que intentar crearlo con cartas SSR o Legendarias levanta ValueError,
-  y que `crear_evento_halloween()` construye el evento oficial vinculado a dicho sobre.
+  y que `crear_evento_noche_eterna()` construye el evento oficial vinculado a dicho sobre.
 
 - Consecuencia si fallara:
   Inconsistencias entre backend y frontend en los nombres de monedas y paquetes,

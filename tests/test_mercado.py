@@ -44,6 +44,7 @@ from mercado_cartas import (
     calcular_pesos_cartas_evento,
     crear_sobres_estandar,
     crear_sobre_evento,
+    crear_evento_noche_eterna,
     crear_evento_halloween,
     crear_mercado_estandar,
     crear_actividades,
@@ -534,16 +535,16 @@ class TestMercadoCartasUML(unittest.TestCase):
             calcular_pesos_cartas_evento([comun1, leg1])
 
     def test_economia_nombres_oficiales_evento_y_monedas(self):
-        """Regla: Moneda común es Aureos, moneda evento es Jacks, sobre evento es Noche Eterna (evento Halloween)."""
+        """Regla: Moneda común es Aureos, moneda evento es Jacks, sobre y evento son Noche Eterna."""
         # Verificación de nombres y constantes oficiales
         self.assertEqual(NOMBRE_MONEDA_COMUN, "Aureos")
         self.assertEqual(NOMBRE_MONEDA_EVENTO, "Jacks")
         self.assertEqual(NOMBRE_SOBRE_EVENTO, "Noche Eterna")
-        self.assertEqual(NOMBRE_EVENTO_VIGENTE, "Halloween")
+        self.assertEqual(NOMBRE_EVENTO_VIGENTE, "Noche Eterna")
 
         self.assertEqual(MONEDA_COMUN.nombre, "Aureos")
         self.assertEqual(MONEDA_EVENTO.nombre, "Jacks")
-        self.assertEqual(MONEDA_EVENTO.evento, "Halloween")
+        self.assertEqual(MONEDA_EVENTO.evento, "Noche Eterna")
 
         # Sobre de evento por defecto: nombre 'Noche Eterna', moneda 'Jacks', precio 20 Jacks, 3 cartas
         sobre_evento = crear_sobre_evento()
@@ -567,17 +568,17 @@ class TestMercadoCartasUML(unittest.TestCase):
         with self.assertRaises(ValueError):
             crear_sobre_evento(cartas_evento=[leg])
 
-        # Evento oficial Halloween
+        # Evento oficial Noche Eterna
         c1 = PlantillaCriatura(
             codigo="TH01", nombre="Jackalope", rareza="Común", tipo="Híbrido",
             vida=15, ataque=3, defensa=2, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
         )
-        evento_hw = crear_evento_halloween(cartas_evento=[c1])
-        self.assertEqual(evento_hw.nombre, "Halloween")
-        self.assertEqual(evento_hw.moneda.nombre, "Jacks")
-        self.assertEqual(evento_hw.sobre.nombre, "Noche Eterna")
-        self.assertEqual(evento_hw.sobre.cantidad_cartas, 3)
-        self.assertIn("TH01", evento_hw.pesos_cartas)
+        evento_ne = crear_evento_noche_eterna(cartas_evento=[c1])
+        self.assertEqual(evento_ne.nombre, "Noche Eterna")
+        self.assertEqual(evento_ne.moneda.nombre, "Jacks")
+        self.assertEqual(evento_ne.sobre.nombre, "Noche Eterna")
+        self.assertEqual(evento_ne.sobre.cantidad_cartas, 3)
+        self.assertIn("TH01", evento_ne.pesos_cartas)
 
     def test_economia_mision_comprar_cartas_mercado(self):
         """Regla: La misión 'Comprar 5 cartas del mercado' se cumple tras 5 compras."""
