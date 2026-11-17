@@ -613,11 +613,57 @@ REGLA 22: NOMBRES OFICIALES DE DIVISAS Y SOBRE DE EVENTO VIGENTE
   Inconsistencias entre backend y frontend en los nombres de monedas y paquetes,
   mostrando nombres genéricos o desactualizados a los jugadores.
 
+--------------------------------------------------------------------------------
+REGLA 23: PROBABILIDADES DEL SOBRE DE EVENTO Y DISTRIBUCIÓN DE EXCLUSIVAS
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_sobre_evento_probabilidades_y_cartas_exclusivas
+
+- Enunciado de la regla / Invariante:
+  El sobre de evento (Noche Eterna) contiene un 40% Comun, 30% Rara, 15% Super Rara
+  y 15% Cartas de evento (sin SSR ni Legendarias). Las tres criaturas exclusivas del
+  evento son Chupacabritas (CCHU, Comun), Espíritu oscuro (CESO, Comun) y Diablo de
+  Jersey (RDJE, Rara), cuyo 15% se reparte proporcionalmente (6% Chupacabritas,
+  6% Espíritu oscuro y 3% Diablo de Jersey). Tratadas como "Comun" y "Super Rara" sin tildes.
+
+- Justificación de diseño:
+  Mantiene equilibrada la probabilidad de obtención y reserva las cartas de temática
+  Halloween/Noche Eterna exclusivamente al sobre del evento con pesos justos por rareza.
+
+- Cómo se prueba:
+  Se verifican los porcentajes de azar_rareza del sobre de evento y la ausencia de SSR/L;
+  y se valida que pesos_cartas contenga exactamente 6.0 para CCHU, 6.0 para CESO y 3.0 para RDJE.
+
+- Consecuencia si fallara:
+  Alteración de las probabilidades temáticas o reparto desbalanceado de las cartas de evento.
+
+--------------------------------------------------------------------------------
+REGLA 24: EXCLUSIVIDAD DE CARTAS DE EVENTO (INOBTENIBLES EN OTROS SOBRES)
+--------------------------------------------------------------------------------
+- Test que la protege:
+  TestMercadoCartasUML.test_cartas_exclusivas_no_obtenibles_en_sobres_regulares
+
+- Enunciado de la regla / Invariante:
+  Las tres criaturas del evento Noche Eterna (Chupacabritas, Espíritu oscuro y Diablo
+  de Jersey) no se pueden conseguir en ningún sobre regular (Sobre común, Sobre especial,
+  Sobre legendario).
+
+- Justificación de diseño:
+  Preserva el valor de exclusividad de los eventos de temporada, impidiendo que criaturas
+  temáticas diluyan los sobres del juego base o se obtengan fuera de la vigencia del evento.
+
+- Cómo se prueba:
+  Se abren repetidamente sobres estándar verificando que ninguna carta obtenida tenga un
+  código perteneciente a CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.
+
+- Consecuencia si fallara:
+  Pérdida de la exclusividad temática de las cartas de evento.
+
 ================================================================================
 RESUMEN DE EJECUCIÓN DE LA SUITE DE TESTS
 ================================================================================
-Todos los 22 tests se ejecutan satisfactoriamente mediante el runner estándar:
+Todos los 24 tests se ejecutan satisfactoriamente mediante el runner estándar:
     python -m unittest discover -s tests -v
 
-Resultado: 22 tests ejecutados, 0 fallos, 0 errores.
+Resultado: 24 tests ejecutados, 0 fallos, 0 errores.
 ================================================================================

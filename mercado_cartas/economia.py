@@ -1,9 +1,10 @@
 """Configuración oficial de la economía, sobres y actividades del juego."""
 from datetime import date
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Tuple
 try:
     from .principales import (
         Actividad,
+        CODIGOS_CARTAS_EVENTO_EXCLUSIVAS,
         Desafio,
         Evento,
         Mision,
@@ -13,10 +14,17 @@ try:
         SobreVariable,
     )
     from .catalogo import Catalogo, Mercado
-    from .criaturas import CRIATURAS, PLANTILLAS_CRIATURAS
+    from .criaturas import (
+        CRIATURAS,
+        PLANTILLAS_CRIATURAS,
+        chupacabritas,
+        espiritu_oscuro,
+        diablo_de_jersey,
+    )
 except (ImportError, ValueError):
     from principales import (
         Actividad,
+        CODIGOS_CARTAS_EVENTO_EXCLUSIVAS,
         Desafio,
         Evento,
         Mision,
@@ -26,7 +34,13 @@ except (ImportError, ValueError):
         SobreVariable,
     )
     from catalogo import Catalogo, Mercado
-    from criaturas import CRIATURAS, PLANTILLAS_CRIATURAS
+    from criaturas import (
+        CRIATURAS,
+        PLANTILLAS_CRIATURAS,
+        chupacabritas,
+        espiritu_oscuro,
+        diablo_de_jersey,
+    )
 
 # ----------------------------------------------------------------------
 # Nombres oficiales de monedas, sobres y eventos
@@ -72,35 +86,43 @@ TASA_CAMBIO_NORMAL_A_EVENTO = 5
 # Probabilidades de los sobres
 # ----------------------------------------------------------------------
 PROBABILIDADES_SOBRE_COMUN: Dict[str, float] = {
-    "Común": 74.0,
+    "Comun": 74.0,
     "Rara": 20.0,
-    "Súper Rara": 5.0,
-    "Súper Súper Rara": 0.9,
+    "Super Rara": 5.0,
+    "Super Super Rara": 0.9,
     "Legendaria": 0.1,
 }
 
 PROBABILIDADES_SOBRE_ESPECIAL: Dict[str, float] = {
-    "Común": 45.0,
+    "Comun": 45.0,
     "Rara": 35.0,
-    "Súper Rara": 15.0,
-    "Súper Súper Rara": 4.0,
+    "Super Rara": 15.0,
+    "Super Super Rara": 4.0,
     "Legendaria": 1.0,
 }
 
 PROBABILIDADES_SOBRE_LEGENDARIO: Dict[str, float] = {
-    "Común": 20.0,
+    "Comun": 20.0,
     "Rara": 35.0,
-    "Súper Rara": 30.0,
-    "Súper Súper Rara": 10.0,
+    "Super Rara": 30.0,
+    "Super Super Rara": 10.0,
     "Legendaria": 5.0,
 }
 
 PROBABILIDADES_SOBRE_EVENTO: Dict[str, float] = {
-    "Común": 40.0,
+    "Comun": 40.0,
     "Rara": 30.0,
-    "Súper Rara": 15.0,
+    "Super Rara": 15.0,
     "Cartas del evento": 15.0,
 }
+
+# Cartas oficiales exclusivas del evento Noche Eterna
+# Chupacabritas (Comun), Espíritu oscuro (Comun) y Diablo de Jersey (Rara)
+CARTAS_EVENTO_NOCHE_ETERNA: Tuple[PlantillaCriatura, ...] = (
+    chupacabritas,
+    espiritu_oscuro,
+    diablo_de_jersey,
+)
 
 
 def calcular_pesos_cartas_evento(
@@ -110,31 +132,27 @@ def calcular_pesos_cartas_evento(
     El sobre de evento no maneja cartas SSR ni Legendarias.
     
     Para el evento vigente (Noche Eterna):
-    - Común: peso relativo 2.0 (ej. 6% cada una si son 2 Comunes)
+    - Comun: peso relativo 2.0 (ej. 6% cada una si son 2 Comunes)
     - Rara: peso relativo 1.0 (ej. 3% si es 1 Rara)
-    - Súper Rara: peso relativo 0.5
+    - Super Rara: peso relativo 0.5
     """
     if not cartas_evento:
         return {}
     for c in cartas_evento:
-        r = c.rareza.lower()
-        if r in ("ssr", "súper súper rara", "super super rara", "legendaria", "legendario", "l"):
+        r = c.rareza.strip().lower().replace("ú", "u")
+        if r in ("ssr", "super super rara", "legendaria", "legendario", "l"):
             raise ValueError(
                 f"El sobre de evento no maneja cartas SSR o Legendarias: {c.nombre} ({c.rareza})"
             )
     peso_rareza = {
-        "común": 2.0,
         "comun": 2.0,
         "rara": 1.0,
-        "raro": 1.0,
-        "súper rara": 0.5,
         "super rara": 0.5,
-        "sr": 0.5,
     }
-    total_rel = sum(peso_rareza.get(c.rareza.lower(), 1.0) for c in cartas_evento)
+    total_rel = sum(peso_rareza.get(c.rareza.strip().lower().replace("ú", "u"), 1.0) for c in cartas_evento)
     pesos: Dict[str, float] = {}
     for c in cartas_evento:
-        rel = peso_rareza.get(c.rareza.lower(), 1.0)
+        rel = peso_rareza.get(c.rareza.strip().lower().replace("ú", "u"), 1.0)
         pesos[c.codigo] = round(15.0 * (rel / total_rel), 2)
     return pesos
 
@@ -176,11 +194,11 @@ def crear_sobre_evento(
     cantidad_cartas: int = CANTIDAD_CARTAS_SOBRE_EVENTO,
 ) -> SobreVariable:
     """Crea el sobre de evento (por defecto 'Noche Eterna', contiene 3 cartas) con probabilidad
-    40% C, 30% R, 15% SR y 15% cartas de evento (no maneja SSR ni L).
+    40% Comun, 30% Rara, 15% Super Rara y 15% cartas de evento (no maneja SSR ni L).
     """
     for c in cartas_evento:
-        r = c.rareza.lower()
-        if r in ("ssr", "súper súper rara", "super super rara", "legendaria", "legendario", "l"):
+        r = c.rareza.strip().lower().replace("ú", "u")
+        if r in ("ssr", "super super rara", "legendaria", "legendario", "l"):
             raise ValueError(
                 f"El sobre de evento no maneja cartas SSR o Legendarias: {c.nombre} ({c.rareza})"
             )
@@ -195,12 +213,14 @@ def crear_sobre_evento(
 
 
 def crear_evento_noche_eterna(
-    cartas_evento: Sequence[PlantillaCriatura],
+    cartas_evento: Optional[Sequence[PlantillaCriatura]] = None,
     fecha_inicio: Optional[date] = None,
     fecha_fin: Optional[date] = None,
     cantidad_cartas: int = CANTIDAD_CARTAS_SOBRE_EVENTO,
 ) -> Evento:
     """Crea el evento oficial vigente Noche Eterna con la moneda Jacks y el sobre Noche Eterna (3 cartas)."""
+    if cartas_evento is None:
+        cartas_evento = CARTAS_EVENTO_NOCHE_ETERNA
     f_inicio = fecha_inicio or date(2026, 10, 20)
     f_fin = fecha_fin or date(2026, 11, 20)
     sobre = crear_sobre_evento(
@@ -226,20 +246,23 @@ crear_evento_halloween = crear_evento_noche_eterna
 
 def crear_ofertas_mercado(catalogo: Optional[Catalogo] = None) -> Dict[str, int]:
     """Genera las ofertas de mercado asignando precios por rareza:
-    - Común: 10 monedas
+    - Comun: 10 monedas
     - Rara: 25 monedas
-    - Súper Rara: 40 monedas
-    (SSR y Legendarias no se venden directamente en el mercado).
+    - Super Rara: 40 monedas
+    (SSR y Legendarias no se venden directamente en el mercado.
+     Las cartas exclusivas de evento tampoco se venden directamente en el mercado).
     """
     plantillas = catalogo.plantillas.values() if catalogo else CRIATURAS
     ofertas: Dict[str, int] = {}
     for p in plantillas:
-        r = p.rareza.lower()
-        if r in ("común", "comun"):
+        if p.codigo in CODIGOS_CARTAS_EVENTO_EXCLUSIVAS:
+            continue
+        r = p.rareza.strip().lower().replace("ú", "u")
+        if r in ("comun", "c"):
             ofertas[p.codigo] = PRECIO_CARTA_COMUN
-        elif r in ("rara", "raro"):
+        elif r in ("rara", "raro", "r"):
             ofertas[p.codigo] = PRECIO_CARTA_RARA
-        elif r in ("súper rara", "super rara", "sr"):
+        elif r in ("super rara", "sr"):
             ofertas[p.codigo] = PRECIO_CARTA_SUPER_RARA
     return ofertas
 

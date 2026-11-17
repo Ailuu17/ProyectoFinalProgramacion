@@ -32,50 +32,23 @@ from mercado_cartas import (
     SobreEstable,
     SobreVariable,
     crear_catalogo_completo,
+    crear_mercado_estandar,
+    crear_evento_noche_eterna,
+    MONEDA_COMUN,
+    MONEDA_EVENTO,
 )
 
 # ==============================================================================
 # Inicialización del Dominio del Juego
 # ==============================================================================
 catalogo_global = crear_catalogo_completo()
-
-moneda_comun = Moneda("Común")
-moneda_evento = Moneda("Evento Lunar", "Festival de Luna")
-
-sobre_clasico = SobreEstable(
-    nombre="Sobre Clásico",
-    cantidad_cartas=2,
-    precio=50,
-    moneda=moneda_comun,
-    azar_rareza={"Común": 80, "Rara": 20},
-)
-
-sobre_exclusivo = SobreVariable(
-    nombre="Sobre Exclusivo",
-    cantidad_cartas=1,
-    precio=100,
-    moneda=moneda_evento,
-    azar_rareza={"Exclusiva": 100},
-)
-
-evento_lunar = Evento(
-    nombre="Festival de Luna",
-    fecha_inicio=date(2026, 11, 1),
-    fecha_fin=date(2026, 11, 30),
-    moneda=moneda_evento,
-    sobre=sobre_exclusivo,
-)
-
-mercado_global = Mercado(
-    ofertas={"CDRA": 25, "CSIR": 30},
-    sobres=[sobre_clasico],
-    tasa_cambio=5,
-)
+mercado_global = crear_mercado_estandar(catalogo_global)
+evento_global = crear_evento_noche_eterna()
 
 juego_global = Juego(
     catalogo=catalogo_global,
     mercado=mercado_global,
-    eventos=[evento_lunar],
+    eventos=[evento_global],
 )
 
 # Jugadores iniciales
@@ -136,9 +109,9 @@ class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
                     for j_id in juego_global.jugadores
                 },
                 "evento": {
-                    "nombre": evento_lunar.nombre,
-                    "fecha_inicio": str(evento_lunar.fecha_inicio),
-                    "fecha_fin": str(evento_lunar.fecha_fin),
+                    "nombre": evento_global.nombre,
+                    "fecha_inicio": str(evento_global.fecha_inicio),
+                    "fecha_fin": str(evento_global.fecha_fin),
                     "tasa_cambio": mercado_global.tasa_cambio,
                 },
                 "total_criaturas_catalogo": len(catalogo_global.plantillas),

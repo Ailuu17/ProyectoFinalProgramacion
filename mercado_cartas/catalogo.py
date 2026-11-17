@@ -18,10 +18,24 @@ class Catalogo:
         return self.plantillas[codigo]
 
     def de_rareza(self, rareza: str) -> List[PlantillaCriatura]:
+        r = rareza.strip().lower().replace("ú", "u")
+        if r in ("c", "comun"):
+            target = "comun"
+        elif r in ("sr", "super rara", "super_rara"):
+            target = "super rara"
+        elif r in ("ssr", "super super rara", "super_super_rara"):
+            target = "super super rara"
+        elif r in ("r", "rara", "raro"):
+            target = "rara"
+        elif r in ("l", "legendaria", "legendario"):
+            target = "legendaria"
+        else:
+            target = r
+
         return [
             plantilla
             for plantilla in self.plantillas.values()
-            if plantilla.rareza.lower() == rareza.lower()
+            if plantilla.rareza.strip().lower().replace("ú", "u") == target
         ]
 
     def de_tipo(self, tipo: str) -> List[PlantillaCriatura]:

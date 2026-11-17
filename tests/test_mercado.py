@@ -41,6 +41,9 @@ from mercado_cartas import (
     PRECIO_CARTA_RARA,
     PRECIO_CARTA_SUPER_RARA,
     TASA_CAMBIO_NORMAL_A_EVENTO,
+    PROBABILIDADES_SOBRE_EVENTO,
+    CODIGOS_CARTAS_EVENTO_EXCLUSIVAS,
+    CARTAS_EVENTO_NOCHE_ETERNA,
     calcular_pesos_cartas_evento,
     crear_sobres_estandar,
     crear_sobre_evento,
@@ -123,7 +126,7 @@ class TestMercadoCartasUML(unittest.TestCase):
         # Verificar Dragonzuelo
         self.assertEqual(dragonzuelo.codigo, "CDRA")
         self.assertEqual(dragonzuelo.nombre, "Dragonzuelo")
-        self.assertEqual(dragonzuelo.rareza, "Común")
+        self.assertEqual(dragonzuelo.rareza, "Comun")
         self.assertEqual(dragonzuelo.tipo, "Dragónico")
         self.assertEqual(dragonzuelo.vida, 50)
         self.assertEqual(dragonzuelo.ataque, 12)
@@ -421,7 +424,7 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertGreaterEqual(len(dragones), 1)
         self.assertIn(dragonzuelo, dragones)
 
-        comunes = self.catalogo.de_rareza("Común")
+        comunes = self.catalogo.de_rareza("Comun")
         self.assertGreaterEqual(len(comunes), 1)
         self.assertIn(dragonzuelo, comunes)
 
@@ -655,6 +658,42 @@ class TestMercadoCartasUML(unittest.TestCase):
         # Una nueva victoria empieza desde 1
         self.juego.registrar_victoria("jder", date(2026, 11, 15))
         self.assertEqual(jugador.victorias_consecutivas, 1)
+
+    def test_sobre_evento_probabilidades_y_cartas_exclusivas(self):
+        """Regla: Sobre de evento tiene 40% Comun, 30% Rara, 15% Super Rara, 15% Cartas de evento.
+        Sin SSR ni Legendarias. Las 3 exclusivas son Chupacabritas (Comun), Espíritu oscuro (Comun)
+        y Diablo de Jersey (Rara), con pesos proporcionales (6%, 6%, 3%).
+        """
+        sobre = crear_sobre_evento()
+        self.assertEqual(sobre.azar_rareza.get("Comun"), 40.0)
+        self.assertEqual(sobre.azar_rareza.get("Rara"), 30.0)
+        self.assertEqual(sobre.azar_rareza.get("Super Rara"), 15.0)
+        self.assertEqual(sobre.azar_rareza.get("Cartas del evento"), 15.0)
+        self.assertNotIn("SSR", sobre.azar_rareza)
+        self.assertNotIn("Super Super Rara", sobre.azar_rareza)
+        self.assertNotIn("Legendaria", sobre.azar_rareza)
+
+        # Pesos oficiales del evento Noche Eterna
+        evento = crear_evento_noche_eterna()
+        self.assertEqual(evento.pesos_cartas.get("CCHU"), 6.0)
+        self.assertEqual(evento.pesos_cartas.get("CESO"), 6.0)
+        self.assertEqual(evento.pesos_cartas.get("RDJE"), 3.0)
+        self.assertEqual(sum(evento.pesos_cartas.values()), 15.0)
+
+    def test_cartas_exclusivas_no_obtenibles_en_sobres_regulares(self):
+        """Regla: Chupacabritas, Espíritu oscuro y Diablo de Jersey no se pueden conseguir en ningún sobre regular."""
+        sobres_regulares = crear_sobres_estandar()
+        catalogo = crear_catalogo_completo()
+
+        # Abrir repetidamente sobres comunes y especiales: nunca debe salir CCHU, CESO ni RDJE
+        for sobre in sobres_regulares:
+            cartas = sobre.abrir(catalogo=catalogo)
+            for carta in cartas:
+                self.assertNotIn(
+                    carta.plantilla.codigo,
+                    CODIGOS_CARTAS_EVENTO_EXCLUSIVAS,
+                    f"La carta exclusiva {carta.plantilla.nombre} ({carta.plantilla.codigo}) apareció en {sobre.nombre}."
+                )
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Optional, Sequence, Set, Union
 
 if TYPE_CHECKING:
     try:
@@ -41,6 +41,12 @@ class Moneda:
         return (self.nombre, self.evento) == (other.nombre, other.evento)
 
 
+# Cartas exclusivas del evento Noche Eterna
+# Chupacabritas (Comun), Espíritu oscuro (Comun) y Diablo de Jersey (Rara)
+# No se pueden conseguir en ningún sobre que no sea el de evento
+CODIGOS_CARTAS_EVENTO_EXCLUSIVAS: Set[str] = {"CCHU", "CESO", "RDJE"}
+
+
 @dataclass
 class PlantillaCriatura:
     codigo: str
@@ -53,6 +59,20 @@ class PlantillaCriatura:
     habilidad: str
     descripcion_habilidad: str
     usos_habilidad: int = 1
+
+    def __post_init__(self) -> None:
+        if self.rareza:
+            r = self.rareza.strip().lower().replace("ú", "u")
+            if r in ("c", "comun"):
+                self.rareza = "Comun"
+            elif r in ("r", "rara", "raro"):
+                self.rareza = "Rara"
+            elif r in ("sr", "super rara", "super_rara"):
+                self.rareza = "Super Rara"
+            elif r in ("ssr", "super super rara", "super_super_rara"):
+                self.rareza = "Super Super Rara"
+            elif r in ("l", "legendaria", "legendario"):
+                self.rareza = "Legendaria"
 
     @property
     def contador(self) -> int:
@@ -196,12 +216,12 @@ class TipoSobre:
     azar_criatura_sr: Dict[Any, float] = field(default_factory=dict)
 
     def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
-        r = rareza.strip().lower()
-        if r in ("c", "comun", "común"):
+        r = rareza.strip().lower().replace("ú", "u")
+        if r in ("c", "comun"):
             return self.azar_criatura_c
         elif r in ("r", "rara", "raro"):
             return self.azar_criatura_r
-        elif r in ("sr", "super rara", "súper rara", "super_rara"):
+        elif r in ("sr", "super rara", "super_rara"):
             return self.azar_criatura_sr
         return {}
 
@@ -217,7 +237,7 @@ class TipoSobre:
             pesos_r = list(self.azar_rareza.values())
             rareza = _tirar_opcion(tirar, opciones_r, pesos_r)
         else:
-            rareza = "Común"
+            rareza = "Comun"
 
         rareza_str = str(rareza).strip()
         dict_criaturas = self._dict_para_rareza(rareza_str)
@@ -231,16 +251,25 @@ class TipoSobre:
                 pesos_ev = list(evento.pesos_cartas.values())
                 elegido = _tirar_opcion(tirar, opciones_ev, pesos_ev)
             else:
-                elegido = _tirar_opcion(tirar, list(catalogo.plantillas.values()))
+                elegido = _tirar_opcion(tirar, list(CODIGOS_CARTAS_EVENTO_EXCLUSIVAS))
         else:
             plantillas = catalogo.de_rareza(rareza_str)
+            # Regla: Las cartas exclusivas de evento (Chupacabritas, Espíritu oscuro, Diablo de Jersey)
+            # NO se pueden conseguir en ningún sobre que no sea el de evento
+            plantillas = [
+                p for p in plantillas
+                if p.codigo not in CODIGOS_CARTAS_EVENTO_EXCLUSIVAS
+            ]
             if not plantillas:
                 if evento is not None and evento.pesos_cartas:
                     opciones_ev = list(evento.pesos_cartas.keys())
                     pesos_ev = list(evento.pesos_cartas.values())
                     elegido = _tirar_opcion(tirar, opciones_ev, pesos_ev)
                 else:
-                    plantillas = list(catalogo.plantillas.values())
+                    plantillas = [
+                        p for p in catalogo.plantillas.values()
+                        if p.codigo not in CODIGOS_CARTAS_EVENTO_EXCLUSIVAS
+                    ]
                     if not plantillas:
                         raise ValueError(f"No hay cartas disponibles en el catálogo para la rareza {rareza}.")
                     elegido = _tirar_opcion(tirar, plantillas)
@@ -270,8 +299,8 @@ class SobreEstable(TipoSobre):
     azar_criatura_l: Dict[Any, float] = field(default_factory=dict)
 
     def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
-        r = rareza.strip().lower()
-        if r in ("ssr", "super super rara", "súper súper rara", "super_super_rara"):
+        r = rareza.strip().lower().replace("ú", "u")
+        if r in ("ssr", "super super rara", "super_super_rara"):
             return self.azar_criatura_ssr
         elif r in ("l", "legendaria", "legendario"):
             return self.azar_criatura_l

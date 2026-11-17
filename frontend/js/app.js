@@ -9,7 +9,20 @@
 const NOMBRE_MONEDA_COMUN = "Aureos";
 const NOMBRE_MONEDA_EVENTO = "Jacks";
 const NOMBRE_SOBRE_EVENTO = "Noche Eterna";
-const NOMBRE_EVENTO_VIGENTE = "Halloween";
+const NOMBRE_EVENTO_VIGENTE = "Noche Eterna";
+
+// Cartas exclusivas del evento Noche Eterna
+// Chupacabritas (Comun), Espíritu oscuro (Comun) y Diablo de Jersey (Rara)
+// No se pueden conseguir en ningún sobre que no sea el de evento
+const CODIGOS_CARTAS_EVENTO_EXCLUSIVAS = ["CCHU", "CESO", "RDJE"];
+
+// Distribución del 15% de cartas exclusivas según rareza (Comun 2x, Rara 1x):
+// Chupacabritas: 6.0%, Espíritu oscuro: 6.0%, Diablo de Jersey: 3.0%
+const PESOS_CARTAS_EVENTO = {
+  "CCHU": 6.0,
+  "CESO": 6.0,
+  "RDJE": 3.0
+};
 
 const GameState = {
   activePlayerId: null,
@@ -57,12 +70,19 @@ const GameState = {
   sobres: [
     {
       id: "sobre_clasico",
-      nombre: "Sobre Común",
+      nombre: "Sobre Comun",
       tipo: "estable",
       moneda: "comun",
       precio: 20,
       cantidad_cartas: 6,
       descripcion: "Contiene 6 criaturas míticas comunes o raras del reino antiguo.",
+      probabilidadesRareza: {
+        "Comun": 74,
+        "Rara": 20,
+        "Super Rara": 5,
+        "Super Super Rara": 0.9,
+        "Legendaria": 0.1
+      },
       grafico: "classic",
       imagen: "comun.png"
     },
@@ -73,7 +93,13 @@ const GameState = {
       moneda: "evento",
       precio: 20,
       cantidad_cartas: 3,
-      descripcion: `Disponible solo durante ${NOMBRE_EVENTO_VIGENTE}. ¡Criaturas raras y legendarias!`,
+      descripcion: `Disponible solo durante el evento ${NOMBRE_EVENTO_VIGENTE}. Contiene 3 cartas (40% Comun, 30% Rara, 15% Super Rara y 15% Cartas de evento). ¡Sin SSR ni Legendarias!`,
+      probabilidadesRareza: {
+        "Comun": 40,
+        "Rara": 30,
+        "Super Rara": 15,
+        "Cartas del evento": 15
+      },
       grafico: "lunar",
       imagen: "noche_eterna.png",
       badge: "Evento Especial"
@@ -87,10 +113,10 @@ const GameState = {
       cantidad_cartas: 6,
       descripcion: "Contiene 6 cartas con probabilidades de rareza especiales.",
       probabilidadesRareza: {
-        "Común": 45,
+        "Comun": 45,
         "Rara": 35,
-        "Súper Rara": 15,
-        "Súper Súper Rara": 4,
+        "Super Rara": 15,
+        "Super Super Rara": 4,
         "Legendaria": 1
       },
       grafico: "special",
@@ -105,10 +131,10 @@ const GameState = {
       cantidad_cartas: 6,
       descripcion: "Contiene 6 cartas con altas probabilidades de obtener una legendaria!",
       probabilidadesRareza: {
-        "Común": 20,
+        "Comun": 20,
         "Rara": 35,
-        "Súper Rara": 30,
-        "Súper Súper Rara": 10,
+        "Super Rara": 30,
+        "Super Super Rara": 10,
         "Legendaria": 5
       },
       grafico: "legendary",
@@ -623,7 +649,9 @@ function buyPack(sobreId) {
   for (let i = 0; i < sobre.cantidad_cartas; i++) {
     const plantilla = sobre.probabilidadesRareza
       ? elegirCriaturaPorRareza(sobre.probabilidadesRareza)
-      : elegirCriaturaAleatoria(window.CRIATURAS_DATA);
+      : elegirCriaturaAleatoria(
+          window.CRIATURAS_DATA.filter(c => !CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(c.codigo))
+        );
     const carta = crearCarta(plantilla.codigo);
     player.cartas.push(carta);
     cartasObtenidas.push(carta);
@@ -653,9 +681,31 @@ function elegirCriaturaPorRareza(probabilidadesRareza) {
     }
   }
 
+  // Si la categoría elegida es "Cartas del evento":
+  // Distribución exclusiva entre Chupacabritas (6%), Espíritu oscuro (6%) y Diablo de Jersey (3%)
+  if (rarezaElegida.toLowerCase().includes("evento")) {
+    const opcionesEvento = Object.entries(PESOS_CARTAS_EVENTO);
+    const totalPesosEvento = opcionesEvento.reduce((tot, [, p]) => tot + p, 0);
+    let tiradaEvento = Math.random() * totalPesosEvento;
+    let codigoElegido = opcionesEvento[opcionesEvento.length - 1][0];
+    for (const [codigo, peso] of opcionesEvento) {
+      tiradaEvento -= peso;
+      if (tiradaEvento < 0) {
+        codigoElegido = codigo;
+        break;
+      }
+    }
+    const criaturaEvento = window.CRIATURAS_DATA.find(c => c.codigo === codigoElegido);
+    if (criaturaEvento) return criaturaEvento;
+  }
+
+  // Para categorías regulares (Comun, Rara, Super Rara, etc.):
+  // Las cartas exclusivas de evento NO se pueden conseguir en ningún sobre regular ni pool regular
   const rarezaNormalizada = normalizarRareza(rarezaElegida);
   const candidatas = window.CRIATURAS_DATA.filter(
-    criatura => normalizarRareza(criatura.rareza) === rarezaNormalizada
+    criatura =>
+      !CODIGOS_CARTAS_EVENTO_EXCLUSIVAS.includes(criatura.codigo) &&
+      normalizarRareza(criatura.rareza) === rarezaNormalizada
   );
   if (candidatas.length === 0) {
     throw new Error(`No hay criaturas disponibles de rareza "${rarezaElegida}".`);
@@ -664,7 +714,14 @@ function elegirCriaturaPorRareza(probabilidadesRareza) {
 }
 
 function normalizarRareza(rareza) {
-  return rareza.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  if (!rareza) return "comun";
+  let r = rareza.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  if (r === "c" || r === "comun") return "comun";
+  if (r === "r" || r === "rara" || r === "raro") return "rara";
+  if (r === "sr" || r === "super rara" || r === "super_rara") return "super rara";
+  if (r === "ssr" || r === "super super rara" || r === "super_super_rara") return "super super rara";
+  if (r === "l" || r === "legendaria" || r === "legendario") return "legendaria";
+  return r;
 }
 
 function showPackOpening(sobre, cartasObtenidas) {
