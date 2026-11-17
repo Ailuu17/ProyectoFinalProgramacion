@@ -675,8 +675,10 @@ function renderMarketView() {
       .filter(Boolean);
 
     cardsContainer.innerHTML = marketCards.map(creatura => {
-      const rarezaNorm = normalizarRareza(creatura.rareza);
-      const precio = PRECIOS_POR_RAREZA[rarezaNorm] || 10;
+      const precio = obtenerPrecioCartaMercado(creatura);
+      if (precio === null) {
+        throw new Error(`No se pudo determinar el precio de ${creatura.codigo} en el mercado.`);
+      }
       const canAfford = player.billetera.comun >= precio;
 
       return `
@@ -695,11 +697,22 @@ function renderMarketView() {
 
 function buyMarketCard(codigo) {
   const player = getActivePlayer();
-  const creatura = window.CRIATURAS_DATA.find(c => c.codigo === codigo);
-  if (!creatura) return;
+  if (!CODIGOS_CARTAS_MERCADO.includes(codigo)) {
+    showToast("❌ Esta carta no está disponible en el mercado.");
+    return;
+  }
 
-  const rarezaNorm = normalizarRareza(creatura.rareza);
-  const precio = PRECIOS_POR_RAREZA[rarezaNorm] || 10;
+  const creatura = window.CRIATURAS_DATA.find(c => c.codigo === codigo);
+  if (!creatura) {
+    showToast("❌ No se encontró la carta seleccionada.");
+    return;
+  }
+
+  const precio = obtenerPrecioCartaMercado(creatura);
+  if (precio === null) {
+    showToast("❌ No se pudo determinar el precio de esta carta.");
+    return;
+  }
 
   if (player.billetera.comun < precio) {
     showToast(`❌ Saldo insuficiente (${player.billetera.comun}/${precio} ${NOMBRE_MONEDA_COMUN}).`);
@@ -710,15 +723,16 @@ function buyMarketCard(codigo) {
   player.billetera.comun -= precio;
 
   // Entregar carta con ID único
-  const nuevaCarta = {
-    id: `${creatura.codigo}-${Date.now().toString().slice(-4)}`,
-    plantilla: creatura
-  };
-  player.cartas.push(nuevaCarta);
+  player.cartas.push(crearCarta(creatura.codigo));
 
-  updatePlayerHUD();
+  updateHUD();
   renderMarketView();
   showToast(`✅ ¡Has adquirido a ${creatura.nombre} por ${precio} ${NOMBRE_MONEDA_COMUN}!`);
+}
+
+function obtenerPrecioCartaMercado(creatura) {
+  if (!CODIGOS_CARTAS_MERCADO.includes(creatura.codigo)) return null;
+  return PRECIOS_POR_RAREZA[normalizarRareza(creatura.rareza)] ?? null;
 }
 
 function buyPack(sobreId) {
