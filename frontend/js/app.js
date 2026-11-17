@@ -11,6 +11,13 @@ const NOMBRE_MONEDA_EVENTO = "Jacks";
 const NOMBRE_SOBRE_EVENTO = "Noche Eterna";
 const NOMBRE_EVENTO_VIGENTE = "Noche Eterna";
 
+const MISIONES = [
+  { id: "comprar-cartas", tipo: "compras", nombre: "Comprador frecuente", objetivo: 3, recompensa: 50, descripcion: "Compra 3 cartas individuales en el mercado." },
+  { id: "abrir-sobres", tipo: "sobres", nombre: "A abrir sobres", objetivo: 2, recompensa: 50, descripcion: "Compra y abre 2 sobres." },
+  { id: "realizar-intercambio", tipo: "intercambios", nombre: "Un buen trato", objetivo: 1, recompensa: 50, descripcion: "Completa 1 intercambio como jugador activo." },
+  { id: "coleccionar-cartas", tipo: "coleccion", nombre: "Coleccionista", objetivo: 15, recompensa: 50, descripcion: "Ten 15 cartas en tu inventario." }
+];
+
 // Cartas exclusivas del evento Noche Eterna
 // Chupacabritas (Comun), Espíritu oscuro (Comun) y Wendigo (Rara)
 // No se pueden conseguir en ningún sobre que no sea el de evento
@@ -74,7 +81,8 @@ const GameState = {
         evento: 0
       },
       cartas: [], // Lista de objetos { id: "CDRA-1", plantilla: {...} }
-      actividades_completadas: []
+      actividades_completadas: [],
+      contadoresMisiones: { compras: 0, sobres: 0, intercambios: 0 }
     },
     "j2": {
       id: "j2",
@@ -85,7 +93,8 @@ const GameState = {
         evento: 0
       },
       cartas: [],
-      actividades_completadas: []
+      actividades_completadas: [],
+      contadoresMisiones: { compras: 0, sobres: 0, intercambios: 0 }
     }
   },
 
@@ -301,6 +310,15 @@ function setupEventListeners() {
     btnPerfil.addEventListener("click", () => {
       updateHUD();
       openModal("modal-cuenta");
+    });
+  }
+
+  const btnOptionMisiones = document.getElementById("opt-misiones");
+  if (btnOptionMisiones) {
+    btnOptionMisiones.addEventListener("click", () => {
+      closeModal("modal-cuenta");
+      renderMissionsView();
+      openModal("modal-misiones");
     });
   }
 
@@ -615,6 +633,70 @@ function renderInventoryView() {
   }
 }
 
+function renderMissionsView() {
+  const container = document.getElementById("missions-list");
+  const player = getActivePlayer();
+  if (!container || !player) return;
+
+  container.innerHTML = MISIONES.map(mision => {
+    const avance = mision.tipo === "coleccion"
+      ? player.cartas.length
+      : player.contadoresMisiones[mision.tipo];
+    const progreso = Math.min(avance, mision.objetivo);
+    const reclamada = player.actividades_completadas.includes(mision.id);
+    const puedeReclamar = progreso >= mision.objetivo && !reclamada;
+
+    return `
+      <article class="mission-card">
+        <div class="mission-info">
+          <h4>${mision.nombre}</h4>
+          <p>${mision.descripcion}</p>
+        </div>
+        <div class="mission-progress">
+          <div class="mission-progress-label">
+            <span>Progreso</span>
+            <span>${progreso} / ${mision.objetivo}</span>
+          </div>
+          <div class="mission-progress-track" role="progressbar" aria-valuenow="${progreso}" aria-valuemin="0" aria-valuemax="${mision.objetivo}" aria-label="${mision.nombre}">
+            <div class="mission-progress-fill" style="width: ${(progreso / mision.objetivo) * 100}%"></div>
+          </div>
+          <span class="mission-reward">Recompensa: ${mision.recompensa} ${NOMBRE_MONEDA_COMUN}</span>
+        </div>
+        <button class="mission-claim-btn" ${!puedeReclamar ? "disabled" : ""} onclick="claimMission('${mision.id}')">
+          ${reclamada ? "Reclamada" : puedeReclamar ? "Reclamar" : "En progreso"}
+        </button>
+      </article>
+    `;
+  }).join("");
+}
+
+function claimMission(missionId) {
+  const player = getActivePlayer();
+  const mision = MISIONES.find(item => item.id === missionId);
+  if (!mision) {
+    showToast("❌ No se encontró la misión.");
+    return;
+  }
+  if (player.actividades_completadas.includes(missionId)) {
+    showToast("Esta misión ya fue reclamada.");
+    return;
+  }
+
+  const avance = mision.tipo === "coleccion"
+    ? player.cartas.length
+    : player.contadoresMisiones[mision.tipo];
+  if (avance < mision.objetivo) {
+    showToast("Aún no completaste esta misión.");
+    return;
+  }
+
+  player.actividades_completadas.push(missionId);
+  player.billetera.comun += mision.recompensa;
+  updateHUD();
+  renderMissionsView();
+  showToast(`✅ Misión completada: recibiste ${mision.recompensa} ${NOMBRE_MONEDA_COMUN}.`);
+}
+
 // ============================================================================
 // VISTA: Mercado de Cartas y Sobres
 // ============================================================================
@@ -731,6 +813,7 @@ function buyMarketCard(codigo) {
 
   // Entregar carta con ID único
   player.cartas.push(crearCarta(creatura.codigo));
+  player.contadoresMisiones.compras += 1;
 
   updateHUD();
   renderMarketView();
@@ -774,6 +857,7 @@ function buyPack(sobreId) {
     player.cartas.push(carta);
     cartasObtenidas.push(carta);
   }
+  player.contadoresMisiones.sobres += 1;
 
   updateHUD();
   renderMarketView();
@@ -1123,6 +1207,7 @@ function executeTrade() {
   GameState.tradeState.acceptedActive = false;
   GameState.tradeState.acceptedTarget = false;
 
+  active.contadoresMisiones.intercambios += 1;
   updateHUD();
   setupTradeArena();
   showToast("🤝 ¡Intercambio completado con éxito!");
