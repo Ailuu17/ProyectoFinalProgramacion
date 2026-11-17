@@ -34,7 +34,7 @@ except (ImportError, ValueError):
 NOMBRE_MONEDA_COMUN = "Aureos"
 NOMBRE_MONEDA_EVENTO = "Jacks"
 NOMBRE_SOBRE_EVENTO = "Noche Eterna"
-NOMBRE_EVENTO_VIGENTE = "Halloween"
+NOMBRE_EVENTO_VIGENTE = "Noche Eterna"
 
 # ----------------------------------------------------------------------
 # Monedas estándar
