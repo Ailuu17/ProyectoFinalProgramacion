@@ -426,21 +426,19 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
 
   return `
     <div class="creature-card ${rarezaClass}">
-      <div class="card-top-info">
-        <span class="card-code">${esCartaFisica ? cartaId : creatura.codigo}</span>
-        <span class="card-rarity-badge" style="background: ${getRarityColor(creatura.rareza)}22; color: ${getRarityColor(creatura.rareza)};">
-          ${creatura.rareza}
-        </span>
-      </div>
-
       <div class="card-illustration">
         ${artworkPath ? `<img class="creature-artwork" src="${artworkPath}" alt="${creatura.nombre}" loading="lazy" decoding="async" onerror="this.remove()">` : ""}
         <span aria-hidden="true">${typeIcon}</span>
-      </div>
-
-      <div>
-        <div class="card-creature-name" title="${creatura.nombre}">${creatura.nombre}</div>
-        <div class="card-type-tag">${creatura.tipo}</div>
+        <div class="card-top-info">
+          <span class="card-code">${esCartaFisica ? cartaId : creatura.codigo}</span>
+          <span class="card-rarity-badge" style="background: ${getRarityColor(creatura.rareza)}22; color: ${getRarityColor(creatura.rareza)};">
+            ${creatura.rareza}
+          </span>
+        </div>
+        <div class="card-caption">
+          <div class="card-creature-name" title="${creatura.nombre}">${creatura.nombre}</div>
+          <div class="card-type-tag">${creatura.tipo}</div>
+        </div>
       </div>
 
       <div class="card-stats-row">
