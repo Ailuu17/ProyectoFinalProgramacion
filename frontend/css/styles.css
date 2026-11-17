@@ -1181,7 +1181,11 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   backface-visibility: hidden;
-  transition: transform 0.85s cubic-bezier(0.2, 0.75, 0.25, 1), opacity 0.7s ease;
+  transition: transform 1.5s cubic-bezier(0.2, 0.75, 0.25, 1), opacity 1.3s ease;
+}
+
+.opening-pack.is-resetting .opening-pack-fragment {
+  transition: none;
 }
 
 .opening-pack-top {
@@ -1193,7 +1197,7 @@ body {
 }
 
 .opening-pack.is-tearing {
-  animation: pack-impact 0.38s ease-in both;
+  animation: pack-impact 0.65s ease-in both;
 }
 
 .opening-pack.is-tearing .opening-pack-top {
@@ -1219,7 +1223,7 @@ body {
 }
 
 .opening-pack.is-tearing ~ .opening-spark {
-  animation: spark-burst 0.75s ease-out both;
+  animation: spark-burst 1s ease-out both;
 }
 
 .opening-spark-one { --spark-x: -100px; --spark-y: -45px; }
