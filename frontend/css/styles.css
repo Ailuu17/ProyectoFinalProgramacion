@@ -1178,14 +1178,14 @@ body {
 .pack-graphic {
   width: 120px;
   height: 160px;
-  border-radius: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
   position: relative;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .pack-graphic.classic {
@@ -1202,6 +1202,15 @@ body {
 
 .pack-graphic.legendary {
   background: linear-gradient(135deg, #7f1d1d, #b91c1c, #fbbf24);
+}
+
+.pack-graphic.classic,
+.pack-graphic.lunar,
+.pack-graphic.special,
+.pack-graphic.legendary {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .pack-graphic img {

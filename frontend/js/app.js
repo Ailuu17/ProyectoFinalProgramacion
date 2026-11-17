@@ -623,7 +623,14 @@ function renderMarketView() {
   const packsContainer = document.getElementById("market-packs-list");
   if (!packsContainer) return;
 
-  packsContainer.innerHTML = GameState.sobres.map(sobre => {
+  const sobresOrdenados = [...GameState.sobres].sort((a, b) => {
+    const aEsEvento = a.moneda === "evento";
+    const bEsEvento = b.moneda === "evento";
+    if (aEsEvento === bEsEvento) return 0;
+    return aEsEvento ? 1 : -1;
+  });
+
+  packsContainer.innerHTML = sobresOrdenados.map(sobre => {
     const isEvent = sobre.moneda === "evento";
     const userSaldo = isEvent ? player.billetera.evento : player.billetera.comun;
     const canAfford = userSaldo >= sobre.precio;
