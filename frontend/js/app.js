@@ -64,8 +64,7 @@ const GameState = {
       cantidad_cartas: 2,
       descripcion: "Contiene 2 criaturas míticas comunes o raras del reino antiguo.",
       grafico: "classic",
-      imagen: "comun.png",
-      badge: "Estándar"
+      imagen: "comun.png"
     },
     {
       id: "sobre_exclusivo",
@@ -76,8 +75,44 @@ const GameState = {
       cantidad_cartas: 1,
       descripcion: `Disponible solo durante ${NOMBRE_EVENTO_VIGENTE}. ¡Criaturas raras y legendarias!`,
       grafico: "lunar",
-      imagen: "Especial.png",
+      imagen: "noche_eterna.png",
       badge: "Evento Especial"
+    },
+    {
+      id: "sobre_especial",
+      nombre: "Sobre Especial",
+      tipo: "estable",
+      moneda: "comun",
+      precio: 45,
+      cantidad_cartas: 6,
+      descripcion: "Contiene 6 cartas con probabilidades de rareza especiales.",
+      probabilidadesRareza: {
+        "Común": 45,
+        "Rara": 35,
+        "Súper Rara": 15,
+        "Súper Súper Rara": 4,
+        "Legendaria": 1
+      },
+      grafico: "special",
+      imagen: "Especial.png"
+    },
+    {
+      id: "sobre_legendario",
+      nombre: "Sobre Legendario",
+      tipo: "estable",
+      moneda: "comun",
+      precio: 80,
+      cantidad_cartas: 6,
+      descripcion: "Contiene 6 cartas con altas probabilidades de obtener una legendaria!",
+      probabilidadesRareza: {
+        "Común": 20,
+        "Rara": 35,
+        "Súper Rara": 30,
+        "Súper Súper Rara": 10,
+        "Legendaria": 5
+      },
+      grafico: "legendary",
+      imagen: "Legendario.png"
     }
   ],
 
@@ -543,9 +578,11 @@ function renderMarketView() {
 
     return `
       <div class="pack-card ${isEvent ? 'event-pack' : ''}">
-        <span class="hero-badge" style="position: absolute; top: 12px; right: 12px; margin: 0; font-size: 0.65rem;">
-          ${sobre.badge}
-        </span>
+        ${isEvent ? `
+          <span class="hero-badge" style="position: absolute; top: 12px; right: 12px; margin: 0; font-size: 0.65rem;">
+            ${sobre.badge}
+          </span>
+        ` : ""}
         <div class="pack-graphic ${sobre.grafico}">
           <img src="${getPackArtworkPath(sobre.imagen)}" alt="${sobre.nombre}" loading="lazy" decoding="async">
         </div>
@@ -597,9 +634,9 @@ function buyPack(sobreId) {
   // 2. Generar cartas aleatorias según la cantidad de cartas del sobre
   const cartasObtenidas = [];
   for (let i = 0; i < sobre.cantidad_cartas; i++) {
-    // Escoger una criatura aleatoria del catálogo
-    const randomIndex = Math.floor(Math.random() * window.CRIATURAS_DATA.length);
-    const plantilla = window.CRIATURAS_DATA[randomIndex];
+    const plantilla = sobre.probabilidadesRareza
+      ? elegirCriaturaPorRareza(sobre.probabilidadesRareza)
+      : elegirCriaturaAleatoria(window.CRIATURAS_DATA);
     const carta = crearCarta(plantilla.codigo);
     player.cartas.push(carta);
     cartasObtenidas.push(carta);
@@ -608,6 +645,39 @@ function buyPack(sobreId) {
   updateHUD();
   renderMarketView();
   showPackOpening(sobre, cartasObtenidas);
+}
+
+function elegirCriaturaAleatoria(criaturas) {
+  const randomIndex = Math.floor(Math.random() * criaturas.length);
+  return criaturas[randomIndex];
+}
+
+function elegirCriaturaPorRareza(probabilidadesRareza) {
+  const rarezas = Object.entries(probabilidadesRareza);
+  const pesoTotal = rarezas.reduce((total, [, peso]) => total + peso, 0);
+  let tirada = Math.random() * pesoTotal;
+  let rarezaElegida = rarezas[rarezas.length - 1][0];
+
+  for (const [rareza, peso] of rarezas) {
+    tirada -= peso;
+    if (tirada < 0) {
+      rarezaElegida = rareza;
+      break;
+    }
+  }
+
+  const rarezaNormalizada = normalizarRareza(rarezaElegida);
+  const candidatas = window.CRIATURAS_DATA.filter(
+    criatura => normalizarRareza(criatura.rareza) === rarezaNormalizada
+  );
+  if (candidatas.length === 0) {
+    throw new Error(`No hay criaturas disponibles de rareza "${rarezaElegida}".`);
+  }
+  return elegirCriaturaAleatoria(candidatas);
+}
+
+function normalizarRareza(rareza) {
+  return rareza.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
 function showPackOpening(sobre, cartasObtenidas) {

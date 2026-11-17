@@ -1139,6 +1139,14 @@ body {
   background: linear-gradient(135deg, #3b0764, #581c87, #c084fc);
 }
 
+.pack-graphic.special {
+  background: linear-gradient(135deg, #064e3b, #047857, #fbbf24);
+}
+
+.pack-graphic.legendary {
+  background: linear-gradient(135deg, #7f1d1d, #b91c1c, #fbbf24);
+}
+
 .pack-graphic img {
   width: 100%;
   height: 100%;
