@@ -34,7 +34,7 @@
         
         <!-- Contador de Monedas Comunes (comienza en 0) -->
         <div class="currency-pill">
-          <div class="currency-icon common">🪙</div>
+          <img class="currency-icon common" src="/Documentos/Imagenes/Monedas/aureos.png" alt="">
           <div class="currency-info">
             <span class="currency-amount" id="contador-comunes">0</span>
             <span class="currency-label">Aureos</span>
@@ -45,7 +45,7 @@
 
         <!-- A su derecha: Contador de Monedas de Eventos (comienza en 0) -->
         <div class="currency-pill">
-          <div class="currency-icon event">🌙</div>
+          <img class="currency-icon event" src="/Documentos/Imagenes/Monedas/Jacks.png" alt="">
           <div class="currency-info">
             <span class="currency-amount" id="contador-evento">0</span>
             <span class="currency-label">Jacks</span>
@@ -207,12 +207,12 @@
           <div class="account-balances-quick">
             <div style="text-align: center;">
               <div style="font-family: var(--font-stats); font-size: 1.2rem; font-weight: 700; color: #fbbf24;" id="account-balance-comun">0</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase;">Comunes</div>
+              <div class="account-currency-label"><img src="/Documentos/Imagenes/Monedas/aureos.png" alt="">Comunes</div>
             </div>
             <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
             <div style="text-align: center;">
               <div style="font-family: var(--font-stats); font-size: 1.2rem; font-weight: 700; color: #c084fc;" id="account-balance-evento">0</div>
-              <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase;">Evento</div>
+              <div class="account-currency-label"><img src="/Documentos/Imagenes/Monedas/Jacks.png" alt="">Evento</div>
             </div>
             <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
             <div style="text-align: center;">
@@ -383,7 +383,7 @@
           </h4>
           <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem;">
             Durante el evento activo puedes convertir tus Aureos en Jacks.
-            <strong id="exchange-rate-factor" style="color: #e6b450;">5 Aureos = 1 Jack</strong>.
+            <strong id="exchange-rate-factor" class="exchange-rate-factor">5 Aureos = 1 Jack</strong>.
           </p>
 
           <div style="display: flex; gap: 0.75rem; align-items: center; max-width: 450px;">

@@ -69,6 +69,7 @@ class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
         image_path = urlsplit(self.path).path
         artwork_routes = {
             "/Documentos/Imagenes/Personajes/": ARTWORK_DIR / "Personajes",
+            "/Documentos/Imagenes/Monedas/": ARTWORK_DIR / "Monedas",
             "/Documentos/Imagenes/Sobres/": ARTWORK_DIR / "Sobres",
         }
         for route, artwork_dir in artwork_routes.items():

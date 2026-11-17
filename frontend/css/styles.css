@@ -146,24 +146,16 @@ body {
 .currency-icon {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: 0 0 12px currentColor;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .currency-icon.common {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #fbbf24;
-  border: 1px solid #fef3c7;
+  filter: drop-shadow(0 0 7px rgba(251, 191, 36, 0.6));
 }
 
 .currency-icon.event {
-  background: linear-gradient(135deg, #9333ea, #6b21a8);
-  color: #c084fc;
-  border: 1px solid #f3e8ff;
+  filter: drop-shadow(0 0 7px rgba(192, 132, 252, 0.6));
 }
 
 .currency-info {
@@ -638,6 +630,36 @@ body {
   border: 1px solid var(--border-color);
 }
 
+.account-currency-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  color: #94a3b8;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.account-currency-label img {
+  width: 0.85rem;
+  height: 0.85rem;
+  object-fit: contain;
+}
+
+.exchange-rate-factor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: #e6b450;
+}
+
+.exchange-currency-artwork {
+  width: 1.1rem;
+  height: 1.1rem;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 .account-section-title {
   font-family: var(--font-heading);
   font-size: 0.95rem;
@@ -1037,6 +1059,23 @@ body {
   color: var(--text-main);
 }
 
+.trade-card-artwork {
+  width: 100%;
+  max-height: 4.5rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.trade-pool-artwork {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
 .trade-center-status {
   display: flex;
   flex-direction: column;
@@ -1306,6 +1345,12 @@ body {
   font-family: var(--font-stats);
   font-size: 1.2rem;
   font-weight: 700;
+}
+
+.pack-currency-artwork {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
 }
 
 .buy-pack-btn {

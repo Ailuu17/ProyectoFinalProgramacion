@@ -482,18 +482,18 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
 }
 
 const creatureArtworkFiles = [
-  "Cocatriz.png", "Diabillo.png", "Diablo de Jersey.png", "Dragón de fuego.png",
-  "Duendecillo.png", "Duendes de Hollín.png", "Espiritú errante.png",
-  "Fenix Legendario.png", "Goblin.png", "Golem De Amatista.png",
-  "Golem De Piedra.png", "Golem De Rayo.png", "Hada Del Agua.png",
-  "Hada Del Bosque.png", "Hija De Lucifer.png", "Kitsune De Tres Colas.png",
-  "Kranken Joven.png", "Leviatán.png", "Loquace (Pixie).png", "Mantícora.png",
-  "Mooncalf.png", "Niño Fauno.png", "Nixie.png", "Oni Travieso.png",
-  "Pegaso.png", "Pequeño Cíclope.png", "Pichón De Fénix.png",
-  "Reina De Las Pixies.png", "Sirena.png", "Titán Del Viento.png",
-  "Titán Niño.png", "Trío Dragónico.png", "Tritón.png",
-  "Troll De Las Cavernas.png", "Troll Hechicero.png", "Unicornio.png",
-  "Vita (Pixie).png"
+  "cocatrice.png", "diablillo.png", "diablo_de_jersey.png", "dragon_de_fuego.png",
+  "Duendecillo.png", "duendes_de_holin.png", "espiritu_errante.png",
+  "fenix_legenedario.png", "Goblin.png", "golem_de_amatista.png",
+  "golem_de_piedra.png", "golem_de_rayo.png", "hada_del_agua.png",
+  "hada_del_bosque.png", "hija_de_lucifer.png", "kitsune_de_tres_colas.png",
+  "kraken_joven.png", "leviatan.png", "loquace.png", "manticora.png",
+  "Mooncalf.png", "niño_fauno.png", "Nixie.png", "oni_travieso.png",
+  "Pegaso.png", "pequeño_ciclope.png", "pichon_de_fenix.png",
+  "reina_de_las_pixies.png", "Sirena.png", "titan_del_viento.png",
+  "titan_niño.png", "trio_dragonico.png", "triton.png",
+  "troll_de_las_cavernas.png", "troll_hechicero.png", "Unicornio.png",
+  "vita.png"
 ];
 
 const creatureArtworkByName = new Map(
@@ -504,12 +504,13 @@ const creatureArtworkByName = new Map(
 );
 
 const creatureArtworkAliases = {
-  cocatricito: "Cocatriz.png",
-  cocatrice: "Cocatriz.png",
-  diablillo: "Diabillo.png",
-  golemamatista: "Golem De Amatista.png",
-  krakenjoven: "Kranken Joven.png",
-  trolldecaverna: "Troll De Las Cavernas.png"
+  cocatricito: "cocatrice.png",
+  duendesdehollin: "duendes_de_holin.png",
+  fenixlegendario: "fenix_legenedario.png",
+  golemamatista: "golem_de_amatista.png",
+  loquacepixie: "loquace.png",
+  trolldecaverna: "troll_de_las_cavernas.png",
+  vitapixie: "vita.png"
 };
 
 function normalizeArtworkName(name) {
@@ -524,6 +525,10 @@ function getCreatureArtworkPath(name) {
 
 function getPackArtworkPath(filename) {
   return `/Documentos/Imagenes/Sobres/${encodeURIComponent(filename)}`;
+}
+
+function getCurrencyArtworkPath(currency) {
+  return `/Documentos/Imagenes/Monedas/${currency === "evento" ? "Jacks.png" : "aureos.png"}`;
 }
 
 function getRarityClass(rareza) {
@@ -606,7 +611,7 @@ function renderMarketView() {
         </div>
 
         <div class="pack-price-tag">
-          <span>${isEvent ? '🌙' : '🪙'}</span>
+          <img class="pack-currency-artwork" src="${getCurrencyArtworkPath(sobre.moneda)}" alt="" aria-hidden="true">
           <span>${sobre.precio} ${isEvent ? NOMBRE_MONEDA_EVENTO : NOMBRE_MONEDA_COMUN}</span>
         </div>
 
@@ -620,7 +625,12 @@ function renderMarketView() {
   // Casa de cambio de moneda (comunes a evento)
   const exchangeRateSpan = document.getElementById("exchange-rate-factor");
   if (exchangeRateSpan) {
-    exchangeRateSpan.textContent = `${GameState.eventoActivo.tasa_cambio} ${NOMBRE_MONEDA_COMUN} = 1 Jack`;
+    exchangeRateSpan.innerHTML = `
+      <img class="exchange-currency-artwork" src="${getCurrencyArtworkPath("comun")}" alt="" aria-hidden="true">
+      ${GameState.eventoActivo.tasa_cambio} ${NOMBRE_MONEDA_COMUN} =
+      <img class="exchange-currency-artwork" src="${getCurrencyArtworkPath("evento")}" alt="" aria-hidden="true">
+      1 ${NOMBRE_MONEDA_EVENTO}
+    `;
   }
 }
 
@@ -822,9 +832,12 @@ function renderTradeSlots() {
       const cartaId = GameState.tradeState.offeredByActive[i];
       if (cartaId) {
         const carta = active.cartas.find(c => c.id === cartaId);
+        const artworkPath = getCreatureArtworkPath(carta.plantilla.nombre);
         slotEl.className = "trade-card-slot filled";
         slotEl.innerHTML = `
-          <span style="font-size: 1.2rem;">${getTypeIcon(carta.plantilla.tipo)}</span>
+          ${artworkPath
+            ? `<img class="trade-card-artwork" src="${artworkPath}" alt="" loading="lazy" decoding="async">`
+            : `<span style="font-size: 1.2rem;">${getTypeIcon(carta.plantilla.tipo)}</span>`}
           <div style="font-weight: 700; font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%;">
             ${carta.plantilla.nombre}
           </div>
@@ -847,9 +860,12 @@ function renderTradeSlots() {
       const cartaId = GameState.tradeState.offeredByTarget[i];
       if (cartaId) {
         const carta = target.cartas.find(c => c.id === cartaId);
+        const artworkPath = getCreatureArtworkPath(carta.plantilla.nombre);
         slotEl.className = "trade-card-slot filled";
         slotEl.innerHTML = `
-          <span style="font-size: 1.2rem;">${getTypeIcon(carta.plantilla.tipo)}</span>
+          ${artworkPath
+            ? `<img class="trade-card-artwork" src="${artworkPath}" alt="" loading="lazy" decoding="async">`
+            : `<span style="font-size: 1.2rem;">${getTypeIcon(carta.plantilla.tipo)}</span>`}
           <div style="font-weight: 700; font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%;">
             ${carta.plantilla.nombre}
           </div>
@@ -894,9 +910,11 @@ function renderTradePools() {
     } else {
       poolA.innerHTML = active.cartas.map(c => {
         const isSelected = GameState.tradeState.offeredByActive.includes(c.id);
+        const artworkPath = getCreatureArtworkPath(c.plantilla.nombre);
         return `
           <button class="action-pill-btn" style="font-size: 0.75rem; padding: 0.35rem 0.6rem; ${isSelected ? 'border-color: #e6b450; background: rgba(230,180,80,0.2);' : ''}"
             onclick="toggleOfferCard('active', '${c.id}')">
+            ${artworkPath ? `<img class="trade-pool-artwork" src="${artworkPath}" alt="" loading="lazy" decoding="async">` : ""}
             ${isSelected ? '✓ ' : '+ '} ${c.plantilla.nombre} (${c.id})
           </button>
         `;
@@ -910,9 +928,11 @@ function renderTradePools() {
     } else {
       poolB.innerHTML = target.cartas.map(c => {
         const isSelected = GameState.tradeState.offeredByTarget.includes(c.id);
+        const artworkPath = getCreatureArtworkPath(c.plantilla.nombre);
         return `
           <button class="action-pill-btn" style="font-size: 0.75rem; padding: 0.35rem 0.6rem; ${isSelected ? 'border-color: #a855f7; background: rgba(168,85,247,0.2);' : ''}"
             onclick="toggleOfferCard('target', '${c.id}')">
+            ${artworkPath ? `<img class="trade-pool-artwork" src="${artworkPath}" alt="" loading="lazy" decoding="async">` : ""}
             ${isSelected ? '✓ ' : '+ '} ${c.plantilla.nombre} (${c.id})
           </button>
         `;
