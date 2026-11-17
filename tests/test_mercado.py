@@ -329,10 +329,16 @@ class TestMercadoCartasUML(unittest.TestCase):
         """Regla: Solo se puede convertir moneda si hay un evento vigente."""
         self.jugador_1.billetera.depositar(self.moneda_comun, 20)
 
-        # Conversión exitosa durante evento (tasa_cambio = 5)
-        self.juego.convertir_moneda("j1", 10, date(2026, 11, 15))
-        self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_comun), 10)
-        self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_evento), 50)
+        # Cinco Aureos se convierten en un Jack.
+        self.juego.convertir_moneda("j1", 5, date(2026, 11, 15))
+        self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_comun), 15)
+        self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_evento), 1)
+
+        # No se deben consumir Aureos si no alcanzan para un Jack completo.
+        with self.assertRaises(ValueError):
+            self.juego.convertir_moneda("j1", 4, date(2026, 11, 15))
+        self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_comun), 15)
+        self.assertEqual(self.jugador_1.billetera.saldo(self.moneda_evento), 1)
 
         # Fuera de evento falla
         with self.assertRaises(ValueError):

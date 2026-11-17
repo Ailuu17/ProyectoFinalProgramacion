@@ -50,14 +50,14 @@ const GameState = {
     fecha_inicio: "2026-11-01",
     fecha_fin: "2026-11-30",
     moneda: NOMBRE_MONEDA_EVENTO,
-    tasa_cambio: 5 // 1 común = 5 de evento
+    tasa_cambio: 5 // 5 Aureos = 1 Jack
   },
 
   // Sobres disponibles en el mercado
   sobres: [
     {
       id: "sobre_clasico",
-      nombre: "Sobre Clásico",
+      nombre: "Sobre Común",
       tipo: "estable",
       moneda: "comun",
       precio: 50,
@@ -570,7 +570,7 @@ function renderMarketView() {
   // Casa de cambio de moneda (comunes a evento)
   const exchangeRateSpan = document.getElementById("exchange-rate-factor");
   if (exchangeRateSpan) {
-    exchangeRateSpan.textContent = `1 ${NOMBRE_MONEDA_COMUN} = ${GameState.eventoActivo.tasa_cambio} ${NOMBRE_MONEDA_EVENTO}`;
+    exchangeRateSpan.textContent = `${GameState.eventoActivo.tasa_cambio} ${NOMBRE_MONEDA_COMUN} = 1 Jack`;
   }
 }
 
@@ -651,13 +651,20 @@ function convertCurrency() {
     return;
   }
 
-  const converted = inputAmount * GameState.eventoActivo.tasa_cambio;
+  const exchangeRate = GameState.eventoActivo.tasa_cambio;
+  if (inputAmount % exchangeRate !== 0) {
+    showToast(`La cantidad debe ser múltiplo de ${exchangeRate} ${NOMBRE_MONEDA_COMUN}.`);
+    return;
+  }
+
+  const converted = inputAmount / exchangeRate;
   player.billetera.comun -= inputAmount;
   player.billetera.evento += converted;
 
   updateHUD();
   renderMarketView();
-  showToast(`✨ Convertiste ${inputAmount} ${NOMBRE_MONEDA_COMUN} a ${converted} ${NOMBRE_MONEDA_EVENTO}.`);
+  const convertedCurrencyName = converted === 1 ? "Jack" : NOMBRE_MONEDA_EVENTO;
+  showToast(`✨ Convertiste ${inputAmount} ${NOMBRE_MONEDA_COMUN} a ${converted} ${convertedCurrencyName}.`);
 }
 
 // ============================================================================

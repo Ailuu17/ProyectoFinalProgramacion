@@ -48,7 +48,11 @@ class Mercado:
     def cambiar_moneda(self, cantidad_comunes: int) -> int:
         if cantidad_comunes < 0:
             raise ValueError("La cantidad no puede ser negativa.")
-        return int(cantidad_comunes * self.tasa_cambio)
+        if cantidad_comunes % self.tasa_cambio != 0:
+            raise ValueError(
+                f"La cantidad debe ser múltiplo de {self.tasa_cambio} monedas comunes."
+            )
+        return cantidad_comunes // self.tasa_cambio
 
     def evento_vigente(
         self,

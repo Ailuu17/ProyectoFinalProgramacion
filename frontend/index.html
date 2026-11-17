@@ -398,11 +398,11 @@
           </h4>
           <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem;">
             Durante el evento activo puedes convertir tus Aureos en Jacks.
-            <strong id="exchange-rate-factor" style="color: #e6b450;">1 Aureos = 5 Jacks</strong>.
+            <strong id="exchange-rate-factor" style="color: #e6b450;">5 Aureos = 1 Jack</strong>.
           </p>
 
           <div style="display: flex; gap: 0.75rem; align-items: center; max-width: 450px;">
-            <input type="number" id="convert-amount-input" class="search-input" placeholder="Cantidad de monedas comunes" min="1" value="5">
+            <input type="number" id="convert-amount-input" class="search-input" placeholder="Cantidad de monedas comunes" min="5" step="5" value="5">
             <button class="action-pill-btn" onclick="convertCurrency()" style="border-color: #a855f7; color: #c084fc;">
               <span>Convertir</span>
             </button>

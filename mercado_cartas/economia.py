@@ -60,7 +60,7 @@ PRECIO_CARTA_RARA = 25
 PRECIO_CARTA_SUPER_RARA = 40
 
 # ----------------------------------------------------------------------
-# Tasa de cambio de monedas (5 normales por 1 de evento)
+# Tasa de cambio de monedas (5 Aureos por 1 Jack)
 # ----------------------------------------------------------------------
 TASA_CAMBIO_NORMAL_A_EVENTO = 5
 
@@ -238,7 +238,7 @@ def crear_mercado_estandar(
     catalogo: Optional[Catalogo] = None,
     moneda_comun: Optional[Moneda] = None,
 ) -> Mercado:
-    """Crea el mercado estándar con los 3 sobres oficiales, ofertas de cartas y cambio 5 a 1."""
+    """Crea el mercado estándar con los 3 sobres oficiales, ofertas y cambio de 5 Aureos por Jack."""
     sobres = crear_sobres_estandar(moneda_comun=moneda_comun)
     ofertas = crear_ofertas_mercado(catalogo=catalogo)
     return Mercado(
