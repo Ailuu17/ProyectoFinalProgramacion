@@ -677,15 +677,15 @@ class TestMercadoCartasUML(unittest.TestCase):
         evento = crear_evento_noche_eterna()
         self.assertEqual(evento.pesos_cartas.get("CCHU"), 6.0)
         self.assertEqual(evento.pesos_cartas.get("CESO"), 6.0)
-        self.assertEqual(evento.pesos_cartas.get("RDJE"), 3.0)
+        self.assertEqual(evento.pesos_cartas.get("RWEN"), 3.0)
         self.assertEqual(sum(evento.pesos_cartas.values()), 15.0)
 
     def test_cartas_exclusivas_no_obtenibles_en_sobres_regulares(self):
-        """Regla: Chupacabritas, Espíritu oscuro y Diablo de Jersey no se pueden conseguir en ningún sobre regular."""
+        """Regla: Chupacabritas, Espíritu oscuro y Wendigo no se pueden conseguir en ningún sobre regular."""
         sobres_regulares = crear_sobres_estandar()
         catalogo = crear_catalogo_completo()
 
-        # Abrir repetidamente sobres comunes y especiales: nunca debe salir CCHU, CESO ni RDJE
+        # Abrir repetidamente sobres comunes y especiales: nunca debe salir CCHU, CESO ni RWEN
         for sobre in sobres_regulares:
             cartas = sobre.abrir(catalogo=catalogo)
             for carta in cartas:
@@ -694,6 +694,16 @@ class TestMercadoCartasUML(unittest.TestCase):
                     CODIGOS_CARTAS_EVENTO_EXCLUSIVAS,
                     f"La carta exclusiva {carta.plantilla.nombre} ({carta.plantilla.codigo}) apareció en {sobre.nombre}."
                 )
+
+    def test_mercado_ofertas_oficiales_25_cartas(self):
+        """Regla: El mercado ofrece exactamente 25 cartas oficiales (15 Comunes, 7 Raras, 3 Super Raras)."""
+        mercado = crear_mercado_estandar()
+        self.assertEqual(len(mercado.ofertas), 25)
+        # Diablo de Jersey aparece en el mercado
+        self.assertIn("RDJE", mercado.ofertas)
+        self.assertEqual(mercado.ofertas["RDJE"], PRECIO_CARTA_RARA)
+        # Wendigo es exclusiva del evento, no está en ofertas directas del mercado
+        self.assertNotIn("RWEN", mercado.ofertas)
 
 
 if __name__ == "__main__":

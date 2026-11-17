@@ -12,16 +12,51 @@ const NOMBRE_SOBRE_EVENTO = "Noche Eterna";
 const NOMBRE_EVENTO_VIGENTE = "Noche Eterna";
 
 // Cartas exclusivas del evento Noche Eterna
-// Chupacabritas (Comun), Espíritu oscuro (Comun) y Diablo de Jersey (Rara)
+// Chupacabritas (Comun), Espíritu oscuro (Comun) y Wendigo (Rara)
 // No se pueden conseguir en ningún sobre que no sea el de evento
-const CODIGOS_CARTAS_EVENTO_EXCLUSIVAS = ["CCHU", "CESO", "RDJE"];
+const CODIGOS_CARTAS_EVENTO_EXCLUSIVAS = ["CCHU", "CESO", "RWEN"];
 
 // Distribución del 15% de cartas exclusivas según rareza (Comun 2x, Rara 1x):
-// Chupacabritas: 6.0%, Espíritu oscuro: 6.0%, Diablo de Jersey: 3.0%
+// Chupacabritas: 6.0%, Espíritu oscuro: 6.0%, Wendigo: 3.0%
 const PESOS_CARTAS_EVENTO = {
   "CCHU": 6.0,
   "CESO": 6.0,
-  "RDJE": 3.0
+  "RWEN": 3.0
+};
+
+// 25 cartas oficiales disponibles directamente en el mercado
+const CODIGOS_CARTAS_MERCADO = [
+  "CNIX", // Nixie (Comun)
+  "COTR", // Oni travieso (Comun)
+  "CSIR", // Sirena (Comun)
+  "CDIA", // Diablillo (Comun)
+  "CHBO", // Hada del bosque (Comun)
+  "CHAG", // Hada del agua (Comun)
+  "CLOQ", // Loquace (Pixie) (Comun)
+  "CDUE", // Duendecillo (Comun)
+  "CGPI", // Golem de piedra (Comun)
+  "CTCA", // Troll de caverna (Comun)
+  "CTIN", // Titán niño (Comun)
+  "CPCI", // Pequeño cíclope (Comun)
+  "CNFA", // Niño fauno (Comun)
+  "CDHO", // Duendes de hollín (Comun)
+  "CESE", // Espíritu errante (Comun)
+  "RDFU", // Dragón de Fuego (Rara)
+  "RTDR", // Trio dragónico (Rara)
+  "RCOC", // Cocatrice (Rara)
+  "RTRI", // Tritón (Rara)
+  "RGOB", // Goblin (Rara)
+  "RDJE", // Diablo de Jersey (Rara)
+  "RGRA", // Golem de rayo (Rara)
+  "STHE", // Troll hechicero (Super Rara)
+  "SKJO", // Kraken Joven (Super Rara)
+  "SMAN"  // Mantícora (Super Rara)
+];
+
+const PRECIOS_POR_RAREZA = {
+  "comun": 10,
+  "rara": 25,
+  "super rara": 40
 };
 
 const GameState = {
@@ -631,6 +666,59 @@ function renderMarketView() {
       1 ${NOMBRE_MONEDA_EVENTO}
     `;
   }
+
+  // Cartas individuales del mercado (25 cartas oficiales)
+  const cardsContainer = document.getElementById("market-cards-list");
+  if (cardsContainer && window.CRIATURAS_DATA) {
+    const marketCards = CODIGOS_CARTAS_MERCADO
+      .map(cod => window.CRIATURAS_DATA.find(c => c.codigo === cod))
+      .filter(Boolean);
+
+    cardsContainer.innerHTML = marketCards.map(creatura => {
+      const rarezaNorm = normalizarRareza(creatura.rareza);
+      const precio = PRECIOS_POR_RAREZA[rarezaNorm] || 10;
+      const canAfford = player.billetera.comun >= precio;
+
+      return `
+        <div class="market-card-wrapper" style="display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem;">
+          ${renderCreatureCardHTML(creatura, false)}
+          <button class="buy-pack-btn" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"
+                  ${!canAfford ? 'disabled' : ''} onclick="buyMarketCard('${creatura.codigo}')">
+            <img class="pack-currency-artwork" src="${getCurrencyArtworkPath('comun')}" alt="" aria-hidden="true" style="width: 16px; height: 16px;">
+            <span>${canAfford ? `Comprar (${precio} ${NOMBRE_MONEDA_COMUN})` : `Sin saldo (${precio} ${NOMBRE_MONEDA_COMUN})`}</span>
+          </button>
+        </div>
+      `;
+    }).join("");
+  }
+}
+
+function buyMarketCard(codigo) {
+  const player = getActivePlayer();
+  const creatura = window.CRIATURAS_DATA.find(c => c.codigo === codigo);
+  if (!creatura) return;
+
+  const rarezaNorm = normalizarRareza(creatura.rareza);
+  const precio = PRECIOS_POR_RAREZA[rarezaNorm] || 10;
+
+  if (player.billetera.comun < precio) {
+    showToast(`❌ Saldo insuficiente (${player.billetera.comun}/${precio} ${NOMBRE_MONEDA_COMUN}).`);
+    return;
+  }
+
+  // Cobrar
+  player.billetera.comun -= precio;
+
+  // Entregar carta con ID único
+  const nuevaCarta = {
+    id: `${creatura.codigo}-${Date.now().toString().slice(-4)}`,
+    plantilla: creatura
+  };
+  player.cartas.push(nuevaCarta);
+
+  updatePlayerHUD();
+  renderMarketView();
+  showToast(`✅ ¡Has adquirido a ${creatura.nombre} por ${precio} ${NOMBRE_MONEDA_COMUN}!`);
 }
 
 function buyPack(sobreId) {
@@ -691,7 +779,7 @@ function elegirCriaturaPorRareza(probabilidadesRareza) {
   }
 
   // Si la categoría elegida es "Cartas del evento":
-  // Distribución exclusiva entre Chupacabritas (6%), Espíritu oscuro (6%) y Diablo de Jersey (3%)
+  // Distribución exclusiva entre Chupacabritas (6%), Espíritu oscuro (6%) y Wendigo (3%)
   if (rarezaElegida.toLowerCase().includes("evento")) {
     const opcionesEvento = Object.entries(PESOS_CARTAS_EVENTO);
     const totalPesosEvento = opcionesEvento.reduce((tot, [, p]) => tot + p, 0);

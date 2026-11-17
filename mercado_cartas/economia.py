@@ -20,6 +20,7 @@ try:
         chupacabritas,
         espiritu_oscuro,
         diablo_de_jersey,
+        wendigo,
     )
 except (ImportError, ValueError):
     from principales import (
@@ -40,6 +41,7 @@ except (ImportError, ValueError):
         chupacabritas,
         espiritu_oscuro,
         diablo_de_jersey,
+        wendigo,
     )
 
 # ----------------------------------------------------------------------
@@ -117,11 +119,11 @@ PROBABILIDADES_SOBRE_EVENTO: Dict[str, float] = {
 }
 
 # Cartas oficiales exclusivas del evento Noche Eterna
-# Chupacabritas (Comun), Espíritu oscuro (Comun) y Diablo de Jersey (Rara)
+# Chupacabritas (Comun), Espíritu oscuro (Comun) y Wendigo (Rara)
 CARTAS_EVENTO_NOCHE_ETERNA: Tuple[PlantillaCriatura, ...] = (
     chupacabritas,
     espiritu_oscuro,
-    diablo_de_jersey,
+    wendigo,
 )
 
 
@@ -243,19 +245,50 @@ def crear_evento_noche_eterna(
 # Alias de compatibilidad hacia atrás
 crear_evento_halloween = crear_evento_noche_eterna
 
+# ----------------------------------------------------------------------
+# Cartas oficiales que aparecen en el mercado (25 cartas)
+# ----------------------------------------------------------------------
+CODIGOS_CARTAS_MERCADO: Tuple[str, ...] = (
+    "CNIX",  # Nixie (Comun)
+    "COTR",  # Oni travieso (Comun)
+    "CSIR",  # Sirena (Comun)
+    "CDIA",  # Diablillo (Comun)
+    "CHBO",  # Hada del bosque (Comun)
+    "CHAG",  # Hada del agua (Comun)
+    "CLOQ",  # Loquace (Pixie) (Comun)
+    "CDUE",  # Duendecillo (Comun)
+    "CGPI",  # Golem de piedra (Comun)
+    "CTCA",  # Troll de caverna (Comun)
+    "CTIN",  # Titán niño (Comun)
+    "CPCI",  # Pequeño cíclope (Comun)
+    "CNFA",  # Niño fauno (Comun)
+    "CDHO",  # Duendes de hollín (Comun)
+    "CESE",  # Espíritu errante (Comun)
+    "RDFU",  # Dragón de Fuego (Rara)
+    "RTDR",  # Trio dragónico (Rara)
+    "RCOC",  # Cocatrice (Rara)
+    "RTRI",  # Tritón (Rara)
+    "RGOB",  # Goblin (Rara)
+    "RDJE",  # Diablo de Jersey (Rara)
+    "RGRA",  # Golem de rayo (Rara)
+    "STHE",  # Troll hechicero (Super Rara)
+    "SKJO",  # Kraken Joven (Super Rara)
+    "SMAN",  # Mantícora (Super Rara)
+)
+
 
 def crear_ofertas_mercado(catalogo: Optional[Catalogo] = None) -> Dict[str, int]:
-    """Genera las ofertas de mercado asignando precios por rareza:
-    - Comun: 10 monedas
-    - Rara: 25 monedas
-    - Super Rara: 40 monedas
-    (SSR y Legendarias no se venden directamente en el mercado.
-     Las cartas exclusivas de evento tampoco se venden directamente en el mercado).
+    """Genera las 25 ofertas oficiales de cartas en el mercado asignando precios por rareza:
+    - Comun: 10 monedas (15 cartas)
+    - Rara: 25 monedas (7 cartas)
+    - Super Rara: 40 monedas (3 cartas)
+    Total: 25 cartas oficiales.
     """
-    plantillas = catalogo.plantillas.values() if catalogo else CRIATURAS
+    mapa_plantillas = catalogo.plantillas if catalogo else {c.codigo: c for c in CRIATURAS}
     ofertas: Dict[str, int] = {}
-    for p in plantillas:
-        if p.codigo in CODIGOS_CARTAS_EVENTO_EXCLUSIVAS:
+    for codigo in CODIGOS_CARTAS_MERCADO:
+        p = mapa_plantillas.get(codigo)
+        if not p or p.codigo in CODIGOS_CARTAS_EVENTO_EXCLUSIVAS:
             continue
         r = p.rareza.strip().lower().replace("ú", "u")
         if r in ("comun", "c"):

@@ -42,9 +42,9 @@ class Moneda:
 
 
 # Cartas exclusivas del evento Noche Eterna
-# Chupacabritas (Comun), Espíritu oscuro (Comun) y Diablo de Jersey (Rara)
+# Chupacabritas (Comun), Espíritu oscuro (Comun) y Wendigo (Rara)
 # No se pueden conseguir en ningún sobre que no sea el de evento
-CODIGOS_CARTAS_EVENTO_EXCLUSIVAS: Set[str] = {"CCHU", "CESO", "RDJE"}
+CODIGOS_CARTAS_EVENTO_EXCLUSIVAS: Set[str] = {"CCHU", "CESO", "RWEN"}
 
 
 @dataclass
@@ -254,7 +254,7 @@ class TipoSobre:
                 elegido = _tirar_opcion(tirar, list(CODIGOS_CARTAS_EVENTO_EXCLUSIVAS))
         else:
             plantillas = catalogo.de_rareza(rareza_str)
-            # Regla: Las cartas exclusivas de evento (Chupacabritas, Espíritu oscuro, Diablo de Jersey)
+            # Regla: Las cartas exclusivas de evento (Chupacabritas, Espíritu oscuro, Wendigo)
             # NO se pueden conseguir en ningún sobre que no sea el de evento
             plantillas = [
                 p for p in plantillas
