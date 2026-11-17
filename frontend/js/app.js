@@ -64,7 +64,7 @@ const GameState = {
       cantidad_cartas: 2,
       descripcion: "Contiene 2 criaturas míticas comunes o raras del reino antiguo.",
       grafico: "classic",
-      imagen: "Común.png",
+      imagen: "comun.png",
       badge: "Estándar"
     },
     {
@@ -617,7 +617,9 @@ function showPackOpening(sobre, cartasObtenidas) {
   if (!pack || !cards || !subtitle) return;
 
   pack.style.setProperty("--pack-image", `url("${getPackArtworkPath(sobre.imagen)}")`);
+  pack.classList.add("is-resetting");
   pack.classList.remove("is-tearing");
+  void pack.offsetWidth;
   cards.classList.remove("is-revealed");
   cards.innerHTML = cartasObtenidas.map((carta, index) => `
     <div class="opening-reward-card" style="--card-index: ${index}">
@@ -627,14 +629,16 @@ function showPackOpening(sobre, cartasObtenidas) {
   subtitle.textContent = `¡Abriendo ${sobre.nombre}!`;
   openModal("modal-apertura-sobre");
 
-  window.requestAnimationFrame(() => {
+  window.setTimeout(() => {
+    pack.classList.remove("is-resetting");
+    void pack.offsetWidth;
     pack.classList.add("is-tearing");
-    const revealDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 1050;
+    const revealDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 2400;
     window.setTimeout(() => {
       cards.classList.add("is-revealed");
       subtitle.textContent = "¡Estas son las cartas que obtuviste!";
     }, revealDelay);
-  });
+  }, 50);
 }
 
 function convertCurrency() {
