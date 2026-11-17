@@ -36,7 +36,7 @@ except (ImportError, ValueError):
 NOMBRE_MONEDA_COMUN = "Aureos"
 NOMBRE_MONEDA_EVENTO = "Jacks"
 NOMBRE_SOBRE_EVENTO = "Noche Eterna"
-NOMBRE_EVENTO_VIGENTE = "Halloween"
+NOMBRE_EVENTO_VIGENTE = "Noche Eterna"
 
 # ----------------------------------------------------------------------
 # Monedas estándar
@@ -60,7 +60,7 @@ PRECIO_CARTA_RARA = 25
 PRECIO_CARTA_SUPER_RARA = 40
 
 # ----------------------------------------------------------------------
-# Tasa de cambio de monedas (5 Aureos por 1 Jack)
+# Tasa de cambio de monedas (5 normales por 1 de evento)
 # ----------------------------------------------------------------------
 TASA_CAMBIO_NORMAL_A_EVENTO = 5
 
@@ -238,7 +238,7 @@ def crear_mercado_estandar(
     catalogo: Optional[Catalogo] = None,
     moneda_comun: Optional[Moneda] = None,
 ) -> Mercado:
-    """Crea el mercado estándar con los 3 sobres oficiales, ofertas y cambio de 5 Aureos por Jack."""
+    """Crea el mercado estándar con los 3 sobres oficiales, ofertas de cartas y cambio 5 a 1."""
     sobres = crear_sobres_estandar(moneda_comun=moneda_comun)
     ofertas = crear_ofertas_mercado(catalogo=catalogo)
     return Mercado(
