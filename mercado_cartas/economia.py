@@ -5,9 +5,7 @@ try:
     from .principales import (
         Actividad,
         CODIGOS_CARTAS_EVENTO_EXCLUSIVAS,
-        Desafio,
         Evento,
-        Mision,
         Moneda,
         PlantillaCriatura,
         SobreEstable,
@@ -26,9 +24,7 @@ except (ImportError, ValueError):
     from principales import (
         Actividad,
         CODIGOS_CARTAS_EVENTO_EXCLUSIVAS,
-        Desafio,
         Evento,
-        Mision,
         Moneda,
         PlantillaCriatura,
         SobreEstable,
@@ -317,10 +313,10 @@ def crear_mercado_estandar(
 # ----------------------------------------------------------------------
 # Actividades oficiales (Documentos/Actividades.docx)
 # ----------------------------------------------------------------------
-def crear_misiones() -> List[Mision]:
+def crear_misiones() -> List[Actividad]:
     """Crea las 7 misiones oficiales del documento Actividades."""
     return [
-        Mision(
+        Actividad(
             nombre="Conseguir al Leviatán",
             recompensa=100,
             tipo="Misión",
@@ -329,37 +325,37 @@ def crear_misiones() -> List[Mision]:
                 for c in cartas
             ),
         ),
-        Mision(
+        Actividad(
             nombre="Abrir 2 sobres",
             recompensa=50,
             tipo="Misión",
             condicion=lambda j, cartas: sum(j.sobres_comprados.values()) >= 2,
         ),
-        Mision(
+        Actividad(
             nombre="Comprar 3 cartas del mercado",
             recompensa=50,
             tipo="Misión",
             condicion=lambda j, cartas: j.cartas_compradas_mercado >= 3,
         ),
-        Mision(
+        Actividad(
             nombre="Completar 1 intercambio",
             recompensa=50,
             tipo="Misión",
             condicion=lambda j, cartas: j.intercambios_completados >= 1,
         ),
-        Mision(
+        Actividad(
             nombre="Tener 15 cartas",
             recompensa=50,
             tipo="Misión",
             condicion=lambda j, cartas: len(j.cartas) >= 15,
         ),
-        Mision(
+        Actividad(
             nombre="Conseguir 10 sobres especiales",
             recompensa=45,
             tipo="Misión",
             condicion=lambda j, cartas: j.sobres_comprados.get("Sobre especial", 0) >= 10,
         ),
-        Mision(
+        Actividad(
             nombre="Conseguir 10 sobres legendarios",
             recompensa=80,
             tipo="Misión",
@@ -368,34 +364,34 @@ def crear_misiones() -> List[Mision]:
     ]
 
 
-def crear_desafios() -> List[Desafio]:
+def crear_desafios() -> List[Actividad]:
     """Crea los 5 desafíos oficiales del documento Actividades."""
     return [
-        Desafio(
+        Actividad(
             nombre="Ganar 5 combates en un día",
             recompensa=20,
             tipo="Desafío",
             condicion=lambda j, cartas: any(v >= 5 for v in j.victorias_por_dia.values()),
         ),
-        Desafio(
+        Actividad(
             nombre="Ganar 10 combates en un día",
             recompensa=40,
             tipo="Desafío",
             condicion=lambda j, cartas: any(v >= 10 for v in j.victorias_por_dia.values()),
         ),
-        Desafio(
+        Actividad(
             nombre="Ganar 3 combates consecutivos",
             recompensa=10,
             tipo="Desafío",
             condicion=lambda j, cartas: j.victorias_consecutivas >= 3,
         ),
-        Desafio(
+        Actividad(
             nombre="Ganar 6 combates consecutivos",
             recompensa=20,
             tipo="Desafío",
             condicion=lambda j, cartas: j.victorias_consecutivas >= 6,
         ),
-        Desafio(
+        Actividad(
             nombre="Ganar 9 combates consecutivos",
             recompensa=30,
             tipo="Desafío",

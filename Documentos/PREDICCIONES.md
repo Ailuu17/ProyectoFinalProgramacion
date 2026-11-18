@@ -171,7 +171,7 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 - **Función Clave:** `crear_actividades()`, `crear_misiones()`, `crear_desafios()`.
 - **Precondición / Entrada:** Generación de las actividades del documento oficial.
 - **Predicción Previa:** Esperábamos exactamente 12 actividades en total, subdivididas en 7 misiones y 5 desafíos, todas con recompensas positivas (`recompensa > 0`).
-- **Resultado Real Obtenido:** 12 actividades creadas (7 instancias de `Mision` y 5 de `Desafio`), todas con recompensa numérica mayor a cero.
+- **Resultado Real Obtenido:** 12 actividades creadas (7 con `tipo="Misión"` y 5 con `tipo="Desafío"`, todas instancias directas de la clase `Actividad` según el diagrama UML), todas con recompensa numérica mayor a cero.
 - **Comparación:** **Cumple con lo esperado.**
 - **Test que lo valida:** `TestMercadoCartasUML.test_economia_crear_actividades_cantidad_y_tipos` (Regla 16).
 

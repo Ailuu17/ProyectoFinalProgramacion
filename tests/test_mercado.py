@@ -13,12 +13,10 @@ from mercado_cartas import (
     Carta,
     Catalogo,
     CRIATURAS,
-    Desafio,
     Evento,
     Juego,
     Jugador,
     Mercado,
-    Mision,
     Moneda,
     PlantillaCriatura,
     PLANTILLAS_CRIATURAS,
@@ -350,8 +348,9 @@ class TestMercadoCartasUML(unittest.TestCase):
 
     def test_actividad_mision_recompensa_unica(self):
         """Regla: Una actividad solo se recompensa si se cumple y no puede cobrarse dos veces."""
-        mision = Mision(
+        mision = Actividad(
             nombre="Tener Dragón",
+            tipo="Misión",
             recompensa=30,
             condicion=lambda j, cartas: any(c.plantilla.tipo == "Dragónico" for c in cartas),
         )
@@ -485,13 +484,13 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(len(misiones), 7)
         self.assertEqual(len(desafios), 5)
 
-        # Verificar que todos son instancias del tipo correcto
+        # Verificar que todos son instancias de Actividad y tienen el tipo correcto según el UML
         for m in misiones:
-            self.assertIsInstance(m, Mision)
             self.assertIsInstance(m, Actividad)
+            self.assertEqual(m.tipo, "Misión")
         for d in desafios:
-            self.assertIsInstance(d, Desafio)
             self.assertIsInstance(d, Actividad)
+            self.assertEqual(d.tipo, "Desafío")
 
         # Verificar que las recompensas son positivas
         for act in actividades:

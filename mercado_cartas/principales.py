@@ -371,7 +371,7 @@ class Actividad:
             if isinstance(args[0], (int, float)):
                 self.recompensa = int(args[0])
                 self.condicion = args[1]
-                self.tipo = tipo or self.__class__.__name__
+                self.tipo = tipo or "Actividad"
             else:
                 self.tipo = str(args[0])
                 self.recompensa = int(args[1])
@@ -379,31 +379,21 @@ class Actividad:
         elif len(args) == 1:
             if isinstance(args[0], (int, float)):
                 self.recompensa = int(args[0])
-                self.tipo = tipo or self.__class__.__name__
+                self.tipo = tipo or "Actividad"
                 self.condicion = condicion
             else:
                 self.tipo = str(args[0])
                 self.recompensa = recompensa if recompensa is not None else 0
                 self.condicion = condicion
         else:
-            self.tipo = tipo or self.__class__.__name__
+            self.tipo = tipo or "Actividad"
             self.recompensa = recompensa if recompensa is not None else 0
             self.condicion = condicion
 
-    def esta_cumplida(self, jugador: "Jugador", cartas: Sequence[Carta]) -> bool:
+    def esta_cumplida(self, jugador: "Jugador", cartas: Sequence["Carta"]) -> bool:
         if callable(self.condicion):
             return bool(self.condicion(jugador, cartas))
         return False
-
-
-@dataclass
-class Mision(Actividad):
-    pass
-
-
-@dataclass
-class Desafio(Actividad):
-    pass
 
 
 @dataclass
