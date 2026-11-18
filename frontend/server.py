@@ -58,7 +58,11 @@ juego_global.agregar_jugador(jugador_ash)
 juego_global.agregar_jugador(jugador_misty)
 
 FRONTEND_DIR = Path(__file__).resolve().parent
-ARTWORK_DIR = ROOT_DIR / "Documentos" / "Imagenes"
+ARTWORK_DIR = (
+    ROOT_DIR / "documentos" / "Imagenes"
+    if (ROOT_DIR / "documentos" / "Imagenes").exists()
+    else ROOT_DIR / "Documentos" / "Imagenes"
+)
 
 
 class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
@@ -71,6 +75,9 @@ class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
             "/Documentos/Imagenes/Personajes/": ARTWORK_DIR / "Personajes",
             "/Documentos/Imagenes/Monedas/": ARTWORK_DIR / "Monedas",
             "/Documentos/Imagenes/Sobres/": ARTWORK_DIR / "Sobres",
+            "/documentos/Imagenes/Personajes/": ARTWORK_DIR / "Personajes",
+            "/documentos/Imagenes/Monedas/": ARTWORK_DIR / "Monedas",
+            "/documentos/Imagenes/Sobres/": ARTWORK_DIR / "Sobres",
         }
         for route, artwork_dir in artwork_routes.items():
             if image_path.startswith(route):

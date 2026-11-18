@@ -309,7 +309,14 @@ class SobreEstable(TipoSobre):
 
 @dataclass
 class SobreVariable(TipoSobre):
-    pass
+    def __post_init__(self) -> None:
+        if self.azar_rareza:
+            for k in self.azar_rareza.keys():
+                k_norm = str(k).strip().lower().replace("ú", "u")
+                if k_norm in ("ssr", "super super rara", "super_super_rara", "l", "legendaria", "legendario"):
+                    raise ValueError(
+                        f"El sobre de evento no maneja cartas SSR o Legendarias: {k}"
+                    )
 
 
 @dataclass

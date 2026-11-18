@@ -2,7 +2,7 @@
   {
     "codigo": "CDRA",
     "nombre": "Dragonzuelo",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Dragónico",
     "vida": 50,
     "ataque": 12,
@@ -14,7 +14,7 @@
   {
     "codigo": "CHDR",
     "nombre": "Hidra bebé",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Dragónico",
     "vida": 60,
     "ataque": 12,
@@ -26,7 +26,7 @@
   {
     "codigo": "CCOC",
     "nombre": "Cocatricito",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Dragónico",
     "vida": 50,
     "ataque": 10,
@@ -38,7 +38,7 @@
   {
     "codigo": "CSIR",
     "nombre": "Sirena",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Marino",
     "vida": 65,
     "ataque": 11,
@@ -50,7 +50,7 @@
   {
     "codigo": "CSPA",
     "nombre": "Sirena del pacífico",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Marino",
     "vida": 65,
     "ataque": 11,
@@ -62,7 +62,7 @@
   {
     "codigo": "CSCO",
     "nombre": "Sirena de coral",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Marino",
     "vida": 65,
     "ataque": 11,
@@ -74,7 +74,7 @@
   {
     "codigo": "CSCU",
     "nombre": "Sirena curiosa",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Marino",
     "vida": 65,
     "ataque": 11,
@@ -86,7 +86,7 @@
   {
     "codigo": "CNIX",
     "nombre": "Nixie",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Marino",
     "vida": 65,
     "ataque": 9,
@@ -98,7 +98,7 @@
   {
     "codigo": "CTAP",
     "nombre": "Tritón aprendiz",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Marino",
     "vida": 70,
     "ataque": 11,
@@ -110,7 +110,7 @@
   {
     "codigo": "CAME",
     "nombre": "Ángel mensajero",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Celestial",
     "vida": 75,
     "ataque": 5,
@@ -122,7 +122,7 @@
   {
     "codigo": "CACO",
     "nombre": "Ángel compasivo",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Celestial",
     "vida": 75,
     "ataque": 5,
@@ -134,7 +134,7 @@
   {
     "codigo": "CAGU",
     "nombre": "Ángel guardián",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Celestial",
     "vida": 80,
     "ataque": 9,
@@ -146,7 +146,7 @@
   {
     "codigo": "CAJU",
     "nombre": "Ángel justiciero",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Celestial",
     "vida": 75,
     "ataque": 6,
@@ -158,7 +158,7 @@
   {
     "codigo": "CASE",
     "nombre": "Ángel servicial",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Celestial",
     "vida": 70,
     "ataque": 5,
@@ -170,7 +170,7 @@
   {
     "codigo": "COTR",
     "nombre": "Oni travieso",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Infernal",
     "vida": 75,
     "ataque": 8,
@@ -182,7 +182,7 @@
   {
     "codigo": "COCA",
     "nombre": "Oni castigador",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Infernal",
     "vida": 75,
     "ataque": 5,
@@ -194,7 +194,7 @@
   {
     "codigo": "CDIA",
     "nombre": "Diablillo",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Infernal",
     "vida": 60,
     "ataque": 11,
@@ -206,7 +206,7 @@
   {
     "codigo": "CDSO",
     "nombre": "Demonio solitario",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Infernal",
     "vida": 65,
     "ataque": 12,
@@ -218,7 +218,7 @@
   {
     "codigo": "CDIN",
     "nombre": "Demonio infeliz",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Infernal",
     "vida": 60,
     "ataque": 5,
@@ -230,7 +230,7 @@
   {
     "codigo": "CPFE",
     "nombre": "Pichón de Fénix",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Ave Mística",
     "vida": 70,
     "ataque": 12,
@@ -242,7 +242,7 @@
   {
     "codigo": "CHBO",
     "nombre": "Hada del bosque",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -254,7 +254,7 @@
   {
     "codigo": "CHIN",
     "nombre": "Hada de los insectos",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 10,
@@ -266,7 +266,7 @@
   {
     "codigo": "CHAR",
     "nombre": "Hada artesana",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 70,
     "ataque": 7,
@@ -278,7 +278,7 @@
   {
     "codigo": "CHAG",
     "nombre": "Hada del agua",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 9,
@@ -290,7 +290,7 @@
   {
     "codigo": "CHNI",
     "nombre": "Hada de la nieve",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 9,
@@ -302,7 +302,7 @@
   {
     "codigo": "CHSA",
     "nombre": "Hada sanadora",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -314,7 +314,7 @@
   {
     "codigo": "CHMU",
     "nombre": "Hada de la música",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 70,
     "ataque": 7,
@@ -326,7 +326,7 @@
   {
     "codigo": "CHBI",
     "nombre": "Hada bibliotecaria",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 65,
     "ataque": 12,
@@ -338,7 +338,7 @@
   {
     "codigo": "CFLA",
     "nombre": "Flash (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 50,
     "ataque": 10,
@@ -350,7 +350,7 @@
   {
     "codigo": "CAMO",
     "nombre": "Amore (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 55,
     "ataque": 7,
@@ -362,7 +362,7 @@
   {
     "codigo": "CLOQ",
     "nombre": "Loquace (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 50,
     "ataque": 7,
@@ -374,7 +374,7 @@
   {
     "codigo": "CVIT",
     "nombre": "Vita (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -386,7 +386,7 @@
   {
     "codigo": "CSON",
     "nombre": "Sonno (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 50,
     "ataque": 5,
@@ -398,7 +398,7 @@
   {
     "codigo": "CCOL",
     "nombre": "Colpo (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 65,
     "ataque": 5,
@@ -410,7 +410,7 @@
   {
     "codigo": "COMB",
     "nombre": "Ombra (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -422,7 +422,7 @@
   {
     "codigo": "CFUL",
     "nombre": "Fulmine (Pixie)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -434,7 +434,7 @@
   {
     "codigo": "CDUE",
     "nombre": "Duendecillo",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 60,
     "ataque": 9,
@@ -446,7 +446,7 @@
   {
     "codigo": "CTRA",
     "nombre": "Trasgos (Duende)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 65,
     "ataque": 5,
@@ -458,7 +458,7 @@
   {
     "codigo": "CDOM",
     "nombre": "Domovoi (Duende)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 70,
     "ataque": 10,
@@ -470,7 +470,7 @@
   {
     "codigo": "CMUS",
     "nombre": "Musgoso (Duende)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 70,
     "ataque": 7,
@@ -482,7 +482,7 @@
   {
     "codigo": "CBRO",
     "nombre": "Brownie (Duende)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 70,
     "ataque": 5,
@@ -494,7 +494,7 @@
   {
     "codigo": "CBOG",
     "nombre": "Boggart (Duende)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 60,
     "ataque": 8,
@@ -506,7 +506,7 @@
   {
     "codigo": "CNAY",
     "nombre": "Náyades (Ninfa)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 80,
     "ataque": 7,
@@ -518,7 +518,7 @@
   {
     "codigo": "CNAP",
     "nombre": "Napea (Ninfa)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 80,
     "ataque": 7,
@@ -530,7 +530,7 @@
   {
     "codigo": "CAUR",
     "nombre": "Aurai (Ninfa)",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 80,
     "ataque": 7,
@@ -542,7 +542,7 @@
   {
     "codigo": "CTMO",
     "nombre": "Troll de montaña",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -554,7 +554,7 @@
   {
     "codigo": "CTCA",
     "nombre": "Troll de caverna",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -566,7 +566,7 @@
   {
     "codigo": "CTNI",
     "nombre": "Troll de las nieves",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 5,
@@ -578,7 +578,7 @@
   {
     "codigo": "CELU",
     "nombre": "Elfo de la luz",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 70,
     "ataque": 5,
@@ -590,7 +590,7 @@
   {
     "codigo": "CEOS",
     "nombre": "Elfo de la oscuridad",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 70,
     "ataque": 5,
@@ -602,7 +602,7 @@
   {
     "codigo": "CEBO",
     "nombre": "Elfo del bosque",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 65,
     "ataque": 12,
@@ -614,7 +614,7 @@
   {
     "codigo": "CEAR",
     "nombre": "Elfa arquera",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 65,
     "ataque": 12,
@@ -626,7 +626,7 @@
   {
     "codigo": "CGPI",
     "nombre": "Golem de piedra",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Gigante",
     "vida": 80,
     "ataque": 5,
@@ -638,7 +638,7 @@
   {
     "codigo": "CTIN",
     "nombre": "Titán niño",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Gigante",
     "vida": 70,
     "ataque": 10,
@@ -650,7 +650,7 @@
   {
     "codigo": "CPCI",
     "nombre": "Pequeño cíclope",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Gigante",
     "vida": 50,
     "ataque": 6,
@@ -662,7 +662,7 @@
   {
     "codigo": "CNFA",
     "nombre": "Niño fauno",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 60,
     "ataque": 8,
@@ -674,7 +674,7 @@
   {
     "codigo": "CECA",
     "nombre": "Esfinge cachorro",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 70,
     "ataque": 11,
@@ -686,7 +686,7 @@
   {
     "codigo": "CGCA",
     "nombre": "Grifo cachorro",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 70,
     "ataque": 12,
@@ -698,7 +698,7 @@
   {
     "codigo": "CHCA",
     "nombre": "Hipogrifo cachorro",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 70,
     "ataque": 12,
@@ -710,7 +710,7 @@
   {
     "codigo": "CNCE",
     "nombre": "Niño centauro",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 70,
     "ataque": 10,
@@ -722,7 +722,7 @@
   {
     "codigo": "CESB",
     "nombre": "Espíritu del bosque",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 60,
     "ataque": 7,
@@ -734,7 +734,7 @@
   {
     "codigo": "CESE",
     "nombre": "Espíritu errante",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 60,
     "ataque": 5,
@@ -746,7 +746,7 @@
   {
     "codigo": "CESD",
     "nombre": "Espíritu dolido",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 60,
     "ataque": 9,
@@ -758,7 +758,7 @@
   {
     "codigo": "CESO",
     "nombre": "Espíritu oscuro",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 60,
     "ataque": 7,
@@ -770,7 +770,7 @@
   {
     "codigo": "CKIJ",
     "nombre": "Kitsune Joven",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 75,
     "ataque": 12,
@@ -782,7 +782,7 @@
   {
     "codigo": "CBAK",
     "nombre": "Bakenko",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 65,
     "ataque": 14,
@@ -794,7 +794,7 @@
   {
     "codigo": "CDHO",
     "nombre": "Duendes de hollín",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 55,
     "ataque": 5,
@@ -806,7 +806,7 @@
   {
     "codigo": "CBYE",
     "nombre": "Bebé Yeti",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Bestia",
     "vida": 70,
     "ataque": 9,
@@ -818,7 +818,7 @@
   {
     "codigo": "CCHU",
     "nombre": "Chupacabritas",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Bestia",
     "vida": 55,
     "ataque": 12,
@@ -830,7 +830,7 @@
   {
     "codigo": "CMOO",
     "nombre": "Mooncalf",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Bestia",
     "vida": 75,
     "ataque": 5,
@@ -842,7 +842,7 @@
   {
     "codigo": "CKOB",
     "nombre": "Kobold",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 60,
     "ataque": 9,
@@ -854,7 +854,7 @@
   {
     "codigo": "CALU",
     "nombre": "Alux",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 65,
     "ataque": 7,
@@ -866,7 +866,7 @@
   {
     "codigo": "CCHE",
     "nombre": "Cheneque",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 65,
     "ataque": 8,
@@ -878,7 +878,7 @@
   {
     "codigo": "CNIS",
     "nombre": "Nisse",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 70,
     "ataque": 6,
@@ -890,7 +890,7 @@
   {
     "codigo": "CLEP",
     "nombre": "Leprechaun",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 60,
     "ataque": 8,
@@ -902,7 +902,7 @@
   {
     "codigo": "CPUC",
     "nombre": "Puckwudgie",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 65,
     "ataque": 11,
@@ -914,7 +914,7 @@
   {
     "codigo": "CPIX",
     "nombre": "Pixiu",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 75,
     "ataque": 12,
@@ -926,7 +926,7 @@
   {
     "codigo": "CKOD",
     "nombre": "Kodama",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Espíritu",
     "vida": 70,
     "ataque": 5,
@@ -938,7 +938,7 @@
   {
     "codigo": "CIMP",
     "nombre": "Imp",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Infernal",
     "vida": 55,
     "ataque": 11,
@@ -950,7 +950,7 @@
   {
     "codigo": "CBPE",
     "nombre": "Baku pequeño",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Infernal",
     "vida": 65,
     "ataque": 7,
@@ -962,7 +962,7 @@
   {
     "codigo": "CCAR",
     "nombre": "Carbunclo",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 65,
     "ataque": 8,
@@ -974,7 +974,7 @@
   {
     "codigo": "CTPE",
     "nombre": "Tatzelwurm pequeño",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 70,
     "ataque": 12,
@@ -986,7 +986,7 @@
   {
     "codigo": "CCAL",
     "nombre": "Caladrius",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Ave Mística",
     "vida": 70,
     "ataque": 5,
@@ -998,7 +998,7 @@
   {
     "codigo": "CSCA",
     "nombre": "Simargl cachorro",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 75,
     "ataque": 11,
@@ -1010,7 +1010,7 @@
   {
     "codigo": "CWOL",
     "nombre": "Wolpertinger",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 60,
     "ataque": 10,
@@ -1022,7 +1022,7 @@
   {
     "codigo": "CJAC",
     "nombre": "Jackalope",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Híbrido",
     "vida": 55,
     "ataque": 12,
@@ -1034,7 +1034,7 @@
   {
     "codigo": "CRAT",
     "nombre": "Ratatoskr",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 60,
     "ataque": 8,
@@ -1046,7 +1046,7 @@
   {
     "codigo": "CFPO",
     "nombre": "Fenghuang polluelo",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Ave Mística",
     "vida": 70,
     "ataque": 10,
@@ -1058,7 +1058,7 @@
   {
     "codigo": "CQBE",
     "nombre": "Qilin bebé",
-    "rareza": "Común",
+    "rareza": "Comun",
     "tipo": "Feérico",
     "vida": 75,
     "ataque": 9,

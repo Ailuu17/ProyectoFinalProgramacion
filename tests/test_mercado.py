@@ -69,7 +69,7 @@ class TestMercadoCartasUML(unittest.TestCase):
         sirena.contador = 0
         apep.contador = 0
 
-        self.moneda_comun = Moneda("Común")
+        self.moneda_comun = Moneda("Comun")
         self.moneda_evento = Moneda("Evento Lunar", "Festival de Luna")
 
         self.catalogo = crear_catalogo_completo()
@@ -79,7 +79,7 @@ class TestMercadoCartasUML(unittest.TestCase):
             cantidad_cartas=2,
             precio=50,
             moneda=self.moneda_comun,
-            azar_rareza={"Común": 80, "Rara": 20},
+            azar_rareza={"Comun": 80, "Rara": 20},
             azar_criatura_c={"CDRA": 100},
             azar_criatura_r={"RDFU": 100},
         )
@@ -439,7 +439,7 @@ class TestMercadoCartasUML(unittest.TestCase):
     def test_economia_mercado_estandar_precios_y_sobres(self):
         """Regla: El mercado estándar tiene exactamente 3 sobres con los precios oficiales."""
         catalogo = crear_catalogo_completo()
-        moneda = Moneda("Común")
+        moneda = Moneda("Comun")
         mercado = crear_mercado_estandar(catalogo=catalogo, moneda_comun=moneda)
 
         self.assertIsInstance(mercado, Mercado)
@@ -447,7 +447,7 @@ class TestMercadoCartasUML(unittest.TestCase):
 
         # Comprobar precios y cantidad de cartas de los sobres (6 cartas por sobre estándar)
         precios = {s.nombre: s.precio for s in mercado.sobres}
-        self.assertEqual(precios["Sobre común"], PRECIO_SOBRE_COMUN)          # 20
+        self.assertEqual(precios["Sobre Comun"], PRECIO_SOBRE_COMUN)          # 20
         self.assertEqual(precios["Sobre especial"], PRECIO_SOBRE_ESPECIAL)    # 45
         self.assertEqual(precios["Sobre legendario"], PRECIO_SOBRE_LEGENDARIO)  # 80
         for s in mercado.sobres:
@@ -506,11 +506,11 @@ class TestMercadoCartasUML(unittest.TestCase):
         # Caso 2 Comunes + 1 Rara → según la fórmula: peso C=2, R=1; total_rel = 5
         # C1: 15*(2/5) = 6.0, C2: 15*(2/5) = 6.0, R: 15*(1/5) = 3.0
         comun1 = PlantillaCriatura(
-            codigo="TC01", nombre="TestComun1", rareza="Común", tipo="Prueba",
+            codigo="TC01", nombre="TestComun1", rareza="Comun", tipo="Prueba",
             vida=10, ataque=1, defensa=1, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
         )
         comun2 = PlantillaCriatura(
-            codigo="TC02", nombre="TestComun2", rareza="Común", tipo="Prueba",
+            codigo="TC02", nombre="TestComun2", rareza="Comun", tipo="Prueba",
             vida=10, ataque=1, defensa=1, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
         )
         rara1 = PlantillaCriatura(
@@ -525,7 +525,7 @@ class TestMercadoCartasUML(unittest.TestCase):
 
         # Regla: El sobre de evento no maneja cartas SSR o Legendarias
         ssr1 = PlantillaCriatura(
-            codigo="TSSR", nombre="TestSSR", rareza="Súper Súper Rara", tipo="Prueba",
+            codigo="TSSR", nombre="TestSSR", rareza="Super Super Rara", tipo="Prueba",
             vida=30, ataque=10, defensa=8, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
         )
         leg1 = PlantillaCriatura(
@@ -557,7 +557,7 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertEqual(sobre_evento.cantidad_cartas, 3)
 
         # El sobre de evento no tiene SSR ni Legendaria en sus probabilidades
-        self.assertNotIn("Súper Súper Rara", sobre_evento.azar_rareza)
+        self.assertNotIn("Super Super Rara", sobre_evento.azar_rareza)
         self.assertNotIn("SSR", sobre_evento.azar_rareza)
         self.assertNotIn("Legendaria", sobre_evento.azar_rareza)
         self.assertNotIn("L", sobre_evento.azar_rareza)
@@ -571,9 +571,18 @@ class TestMercadoCartasUML(unittest.TestCase):
         with self.assertRaises(ValueError):
             crear_sobre_evento(cartas_evento=[leg])
 
+        with self.assertRaises(ValueError):
+            SobreVariable(
+                nombre="Sobre Invalido",
+                cantidad_cartas=3,
+                precio=20,
+                moneda=MONEDA_EVENTO,
+                azar_rareza={"Comun": 50, "Super Super Rara": 50},
+            )
+
         # Evento oficial Noche Eterna
         c1 = PlantillaCriatura(
-            codigo="TH01", nombre="Jackalope", rareza="Común", tipo="Híbrido",
+            codigo="TH01", nombre="Jackalope", rareza="Comun", tipo="Híbrido",
             vida=15, ataque=3, defensa=2, habilidad="h", descripcion_habilidad="d", usos_habilidad=1,
         )
         evento_ne = crear_evento_noche_eterna(cartas_evento=[c1])
@@ -587,7 +596,7 @@ class TestMercadoCartasUML(unittest.TestCase):
         """Regla: La misión 'Comprar 5 cartas del mercado' se cumple tras 5 compras."""
         mision = next(m for m in crear_misiones() if "5 cartas del mercado" in m.nombre)
 
-        moneda = Moneda("Común")
+        moneda = Moneda("Comun")
         jugador = Jugador(id="jtest", nombre="Tester")
         jugador.billetera.depositar(moneda, 500)
         self.juego.agregar_jugador(jugador)
@@ -662,7 +671,7 @@ class TestMercadoCartasUML(unittest.TestCase):
     def test_sobre_evento_probabilidades_y_cartas_exclusivas(self):
         """Regla: Sobre de evento tiene 40% Comun, 30% Rara, 15% Super Rara, 15% Cartas de evento.
         Sin SSR ni Legendarias. Las 3 exclusivas son Chupacabritas (Comun), Espíritu oscuro (Comun)
-        y Diablo de Jersey (Rara), con pesos proporcionales (6%, 6%, 3%).
+        y Wendigo (Rara), con pesos proporcionales (6%, 6%, 3%).
         """
         sobre = crear_sobre_evento()
         self.assertEqual(sobre.azar_rareza.get("Comun"), 40.0)
@@ -699,11 +708,13 @@ class TestMercadoCartasUML(unittest.TestCase):
         """Regla: El mercado ofrece exactamente 25 cartas oficiales (15 Comunes, 7 Raras, 3 Super Raras)."""
         mercado = crear_mercado_estandar()
         self.assertEqual(len(mercado.ofertas), 25)
-        # Diablo de Jersey aparece en el mercado
+        # Diablo de Jersey aparece en el mercado (Rara)
         self.assertIn("RDJE", mercado.ofertas)
         self.assertEqual(mercado.ofertas["RDJE"], PRECIO_CARTA_RARA)
-        # Wendigo es exclusiva del evento, no está en ofertas directas del mercado
+        # Las 3 exclusivas del evento no están en ofertas directas del mercado
         self.assertNotIn("RWEN", mercado.ofertas)
+        self.assertNotIn("CCHU", mercado.ofertas)
+        self.assertNotIn("CESO", mercado.ofertas)
 
 
 if __name__ == "__main__":

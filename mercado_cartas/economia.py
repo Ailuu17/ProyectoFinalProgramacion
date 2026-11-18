@@ -166,7 +166,7 @@ def crear_sobres_estandar(
     """Crea los tres sobres estables oficiales del juego (cada uno contiene 6 cartas)."""
     moneda = moneda_comun or MONEDA_COMUN
     sobre_comun = SobreEstable(
-        nombre="Sobre común",
+        nombre="Sobre Comun",
         cantidad_cartas=cantidad_cartas,
         precio=PRECIO_SOBRE_COMUN,
         moneda=moneda,
@@ -333,7 +333,11 @@ def crear_misiones() -> List[Mision]:
             nombre="Comprar 10 sobres comunes",
             recompensa=20,
             tipo="Misión",
-            condicion=lambda j, cartas: j.sobres_comprados.get("Sobre común", 0) >= 10,
+            condicion=lambda j, cartas: (
+                j.sobres_comprados.get("Sobre Comun", 0)
+                + j.sobres_comprados.get("Sobre común", 0)
+                + j.sobres_comprados.get("Sobre comun", 0)
+            ) >= 10,
         ),
         Mision(
             nombre="Comprar 5 cartas del mercado",
