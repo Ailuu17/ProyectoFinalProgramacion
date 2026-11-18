@@ -694,6 +694,28 @@ function renderMissionsView() {
   }).join("");
 }
 
+function togglePackProbabilities(sobreId, event) {
+  if (event) event.stopPropagation();
+
+  const panel = document.getElementById(`probabilidades-${sobreId}`);
+  const button = document.querySelector(`[aria-controls="probabilidades-${sobreId}"]`);
+  if (!panel || !button) return;
+
+  const abrir = panel.hidden;
+
+  document.querySelectorAll(".pack-probabilities").forEach(probabilidades => {
+    probabilidades.hidden = true;
+  });
+  document.querySelectorAll(".pack-info-btn").forEach(infoButton => {
+    infoButton.setAttribute("aria-expanded", "false");
+  });
+
+  if (abrir) {
+    panel.hidden = false;
+    button.setAttribute("aria-expanded", "true");
+  }
+}
+
 function claimMission(missionId) {
   const player = getActivePlayer();
   const mision = MISIONES.find(item => item.id === missionId);
@@ -740,9 +762,28 @@ function renderMarketView() {
     const isEvent = sobre.moneda === "evento";
     const userSaldo = isEvent ? player.billetera.evento : player.billetera.comun;
     const canAfford = userSaldo >= sobre.precio;
+    const probabilidades = Object.entries(sobre.probabilidadesRareza)
+      .map(([rareza, porcentaje]) => `
+        <div class="pack-probability-row">
+          <span>${rareza}</span>
+          <strong>${porcentaje}%</strong>
+        </div>
+      `).join("");
 
     return `
       <div class="pack-card ${isEvent ? 'event-pack' : ''}">
+        <button
+          class="pack-info-btn"
+          type="button"
+          aria-label="Ver probabilidades de ${sobre.nombre}"
+          aria-expanded="false"
+          aria-controls="probabilidades-${sobre.id}"
+          onclick="togglePackProbabilities('${sobre.id}', event)"
+        >i</button>
+        <div class="pack-probabilities" id="probabilidades-${sobre.id}" role="tooltip" hidden>
+          <h5>Probabilidades</h5>
+          ${probabilidades}
+        </div>
         ${isEvent ? `
           <span class="hero-badge" style="position: absolute; top: 12px; right: 12px; margin: 0; font-size: 0.65rem;">
             ${sobre.badge}
