@@ -42,6 +42,7 @@ class Jugador:
     _sobres_comprados: Dict[str, int] = field(default_factory=dict)
     _victorias_por_dia: Dict[date, int] = field(default_factory=dict)
     _cartas_compradas_mercado: int = 0
+    _intercambios_completados: int = 0
     _victorias_consecutivas: int = 0
 
     @property
@@ -63,6 +64,10 @@ class Jugador:
     @property
     def cartas_compradas_mercado(self) -> int:
         return self._cartas_compradas_mercado
+
+    @property
+    def intercambios_completados(self) -> int:
+        return self._intercambios_completados
 
     @property
     def victorias_consecutivas(self) -> int:
