@@ -164,7 +164,7 @@ const GameState = {
         "Legendaria": 1
       },
       grafico: "special",
-      imagen: "Especial.png"
+      imagen: "especial.png"
     },
     {
       id: "sobre_legendario",
@@ -182,7 +182,7 @@ const GameState = {
         "Legendaria": 5
       },
       grafico: "legendary",
-      imagen: "Legendario.png"
+      imagen: "legendario.png"
     }
   ],
 
@@ -560,16 +560,16 @@ function renderCreatureCardHTML(creatura, esCartaFisica = false, cartaId = null)
 
 const creatureArtworkFiles = [
   "cocatrice.png", "diablillo.png", "diablo_de_jersey.png", "dragon_de_fuego.png",
-  "Duendecillo.png", "duendes_de_holin.png", "espiritu_errante.png",
-  "fenix_legenedario.png", "Goblin.png", "golem_de_amatista.png",
+  "duendecillo.png", "duendes_de_holin.png", "espiritu_errante.png",
+  "fenix_legenedario.png", "goblin.png", "golem_de_amatista.png",
   "golem_de_piedra.png", "golem_de_rayo.png", "hada_del_agua.png",
   "hada_del_bosque.png", "hija_de_lucifer.png", "kitsune_de_tres_colas.png",
   "kraken_joven.png", "leviatan.png", "loquace.png", "manticora.png",
-  "Mooncalf.png", "niño_fauno.png", "Nixie.png", "oni_travieso.png",
-  "Pegaso.png", "pequeño_ciclope.png", "pichon_de_fenix.png",
-  "reina_de_las_pixies.png", "Sirena.png", "titan_del_viento.png",
+  "mooncalf.png", "niño_fauno.png", "nixie.png", "oni_travieso.png",
+  "pegaso.png", "pequeño_ciclope.png", "pichon_de_fenix.png",
+  "reina_de_las_pixies.png", "sirena.png", "titan_del_viento.png",
   "titan_niño.png", "trio_dragonico.png", "triton.png",
-  "troll_de_las_cavernas.png", "troll_hechicero.png", "Unicornio.png",
+  "troll_de_las_cavernas.png", "troll_hechicero.png", "unicornio.png",
   "vita.png"
 ];
 
@@ -596,15 +596,15 @@ function normalizeArtworkName(name) {
 function getCreatureArtworkPath(name) {
   const normalizedName = normalizeArtworkName(name);
   const filename = creatureArtworkAliases[normalizedName] || creatureArtworkByName.get(normalizedName);
-  return filename ? `/Documentos/Imagenes/Personajes/${encodeURIComponent(filename)}` : null;
+  return filename ? `/documentos/Imagenes/Personajes/${encodeURIComponent(filename)}` : null;
 }
 
 function getPackArtworkPath(filename) {
-  return `/Documentos/Imagenes/Sobres/${encodeURIComponent(filename)}`;
+  return `/documentos/Imagenes/Sobres/${encodeURIComponent(filename)}`;
 }
 
 function getCurrencyArtworkPath(currency) {
-  return `/Documentos/Imagenes/Monedas/${currency === "evento" ? "Jacks.png" : "aureos.png"}`;
+  return `/documentos/Imagenes/Monedas/${currency === "evento" ? "Jacks.png" : "aureos.png"}`;
 }
 
 function getRarityClass(rareza) {

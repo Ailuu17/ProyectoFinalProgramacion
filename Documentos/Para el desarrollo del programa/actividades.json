@@ -1,7 +1,7 @@
 {
   "juego": "Mercado de Cartas Mitológicas",
   "moneda_recompensa": "Aureos",
-  "descripcion": "Actividades oficiales del juego: misiones de coleccionismo y desafíos de combate",
+  "descripcion": "Actividades oficiales del juego: misiones de mercado, colección e intercambio, y desafíos de combate",
   "misiones": [
     {
       "id": "mis-01",
@@ -17,50 +17,50 @@
     },
     {
       "id": "mis-02",
-      "nombre": "Comprar 10 sobres comunes",
+      "nombre": "Abrir 2 sobres",
       "tipo": "Misión",
-      "recompensa": 20,
+      "recompensa": 50,
       "moneda": "Aureos",
-      "descripcion": "Comprar un total de 10 sobres comunes en el mercado.",
+      "descripcion": "Comprar y abrir un total de 2 sobres del mercado.",
       "objetivo": {
-        "sobre": "Sobre Comun",
-        "cantidad": 10
+        "tipo_accion": "abrir_sobre",
+        "cantidad": 2
       }
     },
     {
       "id": "mis-03",
-      "nombre": "Comprar 5 cartas del mercado",
+      "nombre": "Comprar 3 cartas del mercado",
       "tipo": "Misión",
-      "recompensa": 5,
+      "recompensa": 50,
       "moneda": "Aureos",
-      "descripcion": "Comprar 5 cartas individuales de la selección del mercado.",
+      "descripcion": "Comprar 3 cartas individuales de la selección del mercado.",
       "objetivo": {
         "tipo_accion": "compra_carta_mercado",
-        "cantidad": 5
+        "cantidad": 3
       }
     },
     {
       "id": "mis-04",
-      "nombre": "Comprar 15 cartas del mercado",
+      "nombre": "Completar 1 intercambio",
       "tipo": "Misión",
-      "recompensa": 15,
+      "recompensa": 50,
       "moneda": "Aureos",
-      "descripcion": "Comprar 15 cartas individuales de la selección del mercado.",
+      "descripcion": "Completar 1 intercambio como jugador activo.",
       "objetivo": {
-        "tipo_accion": "compra_carta_mercado",
-        "cantidad": 15
+        "tipo_accion": "intercambio_completado",
+        "cantidad": 1
       }
     },
     {
       "id": "mis-05",
-      "nombre": "Comprar 25 cartas del mercado",
+      "nombre": "Tener 15 cartas",
       "tipo": "Misión",
-      "recompensa": 25,
+      "recompensa": 50,
       "moneda": "Aureos",
-      "descripcion": "Comprar 25 cartas individuales de la selección del mercado.",
+      "descripcion": "Tener al menos 15 cartas en el inventario.",
       "objetivo": {
-        "tipo_accion": "compra_carta_mercado",
-        "cantidad": 25
+        "tipo_accion": "cartas_en_inventario",
+        "cantidad": 15
       }
     },
     {

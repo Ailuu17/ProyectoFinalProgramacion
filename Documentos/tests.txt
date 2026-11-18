@@ -294,7 +294,7 @@ REGLA 11: FIDELIDAD ARQUITECTÓNICA Y COHERENCIA ESTRICTA CON EL DIAGRAMA UML
 
 - Enunciado de la regla / Invariante:
   La estructura de clases, métodos, visibilidad de atributos y relaciones del código
-  debe coincidir con absoluta fidelidad con el diagrama UML del sistema (`Documentos/UML_imagen.png`).
+  debe coincidir con absoluta fidelidad con el diagrama UML del sistema (`documentos/UML_imagen.png`).
   Específicamente:
   - Moneda: únicamente contiene `nombre: str` y `evento: str` (sin color ni diseno).
   - Carta: contiene `id: str` y `plantilla: PlantillaCriatura`.
