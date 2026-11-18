@@ -1,9 +1,9 @@
 # Documento de Ética, Legislación y Responsabilidad del Sistema
 
 **Proyecto:** Mercado de Cartas Mitológicas (Proyecto B)  
-**Asignatura:** Programación Científica y Técnica — 2026  
-**Equipo:** Estudiantes del Proyecto Final  
-**Fecha:** Noviembre de 2026  
+**Asignatura:** Programación Científica y Técnica 2026
+**Fecha de Entrega:** Jueves 19 de Noviembre de 2026  
+**Integrantes:**  Lara Canío, Julieta Fernández, Sabrina Pereira y Aileen Waller
 
 ---
 
@@ -16,13 +16,13 @@ El sistema gestiona de forma intencional y exclusiva un conjunto mínimo de dato
 3. **Inventario e instancias de cartas:** Registro de cartas físicas coleccionadas vinculadas a identificadores únicos inmutables y secuenciales (`{codigo}-{contador}`, ej. `CDRA-1`), junto con su estado de posesión.
 4. **Métricas de actividad lúdica:** Registros no sensibles de interacción dentro del juego: sobres comprados, cartas adquiridas en el mercado, actividades y misiones reclamadas, y rachas de victorias/derrotas de combate.
 
-**Privacidad absoluta:** La aplicación **no recolecta, no almacena ni transmite** datos personales sensibles: no solicita nombres reales, correos electrónicos, contraseñas, documentos de identidad, números de tarjetas de crédito ni datos de geolocalización o telemetría. Toda la información vive en memoria volátil de ejecución o en el navegador local, garantizando privacidad total por diseño.
+**Privacidad absoluta:** La aplicación **no recolecta, no almacena ni transmite** datos personales sensibles: no solicita nombres reales, correos electrónicos, contraseñas, documentos de identidad, números de tarjetas de crédito ni datos de geolocalización o telemetría. Toda la información vive en memoria volátil de ejecución o en el navegador local, garantizando privacidad total por diseño. En una implementación futura probablemente requiera alguna cuenta de email para asociar al jugador y una contraseña para que cada usuario esté protegido, pero en esta implementación inicial no sucede.
 
 ---
 
 ## 2. Riesgo Ético Concreto y Cambio de Diseño que lo Mitiga
 
-### Riesgo Ético Identificado: Mecánicas de Azar Depredadoras (*Loot Boxes*) y Vulnerabilidad de Menores de Edad
+### Riesgo Ético Identificado: Vulnerabilidad de Menores de Edad por métricas del azar
 La industria de los videojuegos ha incorporado de forma recurrente sistemas de cajas de recompensa aleatoria (*loot boxes*) monetizadas con dinero real. Diversos estudios de psicología del comportamiento y bioética demuestran que estas mecánicas activan respuestas neurológicas idénticas a los juegos de azar tradicionales (ludopatía). Cuando tales dinámicas se dirigen o están al alcance de menores de edad (un público clave en juegos de criaturas coleccionables), el riesgo de inducir patrones de consumo compulsivo, adicción conductual y distorsión del valor del dinero es crítico.
 
 ### Decisiones de Diseño Implementadas para su Mitigación:
@@ -37,29 +37,30 @@ La industria de los videojuegos ha incorporado de forma recurrente sistemas de c
    - No existen algoritmos de probabilidad adaptativa oculta ni "manipulación de retención" (técnicas de *dark patterns* o *pity mechanics* opacas).
 3. **Acceso Directo y Precios Justos en el Mercado:**
    - Para evitar la frustración y la dependencia exclusiva del azar, el mercado ofrece una selección fija de 25 cartas con precios estables por rareza (10 Aureos Comun, 25 Aureos Rara, 40 Aureos Super Rara), permitiendo a los jugadores obtener criaturas específicas sin recurrir al azar.
-4. **Diseño Équitable del Sobre de Evento:**
-   - El sobre estacional "Noche Eterna" mitiga la explotación por escasez artificial: excluye intencionalmente rarezas extremas inalcanzables (0% SSR y 0% Legendaria) y distribuye un 15% garantizado entre las tres criaturas icónicas del evento (Chupacabritas 6%, Espíritu oscuro 6%, Wendigo 3%).
 
 ---
 
 ## 3. Marco Legal y Licencias Citados Tras su Lectura
 
 1. **Protección de Datos Personales — Ley Nº 18.331 (República Oriental del Uruguay):**
-   - *Artículo 7 (Principio de Finalidad y Proporcionalidad):* Establece que los datos no pueden ser usados para fines distintos de aquellos para los que fueron recabados y deben limitarse a lo estrictamente necesario. El diseño del juego cumple a cabalidad al prescindir de datos personales identificables.
+   - *Artículo 7 (Principio de Finalidad y Proporcionalidad):* Establece que los datos no pueden ser usados para fines distintos de aquellos para los que fueron recabados y deben limitarse a lo estrictamente necesario. El diseño del juego cumple con lo solicitado al prescindir de datos personales identificables.
    - *Artículo 8 (Seguridad de Datos):* Se garantiza la integridad de los datos en memoria mediante encapsulamiento estricto de clases, imposibilitando la alteración no autorizada de saldos o transferencias sin consentimiento mutuo.
 2. **Regulación de Loterías y Juegos de Azar — Ley Nº 19.535 y Marco de la Dirección Nacional de Loterías y Quinielas (DNLQ):**
    - El ordenamiento jurídico uruguayo reserva la explotación de juegos de azar con apuestas en dinero al Estado. Al mantener una economía 100% ficticia, sin costo económico real de entrada ni posibilidad de redención económica de los activos digitales, el sistema se cataloga formalmente como software de entretenimiento lúdico, quedando fuera de la figura de juego de azar ilegal o apuesta clandestina.
-3. **Propiedad Intelectual y Licencias de Contenido:**
-   - **Dominio Público Cultural:** Los conceptos mitológicos, nombres y leyendas populares tradicionales (Sirena, Dragón, Kraken, Basilisco, Diablo de Jersey, etc.) pertenecen al patrimonio cultural colectivo universal y son de libre uso.
-   - **Ilustraciones Propias:** Los recursos artísticos digitales incluidos en `documentos/Imagenes/` han sido elaborados por el equipo y se licencian bajo la licencia **Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)**, permitiendo su estudio y reutilización académica sin fines comerciales.
+3. **Propiedad Intelectual, Obras Derivadas y Licencias de Arte:**
+   - **Dominio Público Cultural:** Los conceptos mitológicos, nombres y leyendas tradicionales (Sirena, Dragón, Kraken, Basilisco, etc.) pertenecen al patrimonio cultural universal y son de libre aprovechamiento lúdico.
+   - **Autoría Humana Original (Ley Nº 9.739 y Ley Nº 17.616 de Derechos de Autor de Uruguay):** La concepción creativa, diseño visual y composición de los personajes nacieron del trabajo manual de las estudiantes, quienes dibujaron a lápiz sobre papel los bocetos originales de todas las criaturas, monedas y sobres.
+   - **Digitalización Asistida por IA y Términos de Servicio (ToS):** Los dibujos físicos fueron digitalizados y renderizados a color mediante herramientas de IA generativa (*sketch-to-image* / procesamiento gráfico), actuando la IA como herramienta técnica de acabado y texturizado sobre el insumo humano. De acuerdo con los Términos de Servicio de las herramientas empleadas y la doctrina de propiedad intelectual, el creador del input original retiene la titularidad sobre la obra derivada resultante.
+   - **Licencia Pública de Distribución:** El catálogo gráfico resultante se comparte bajo licencia **Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)**, transparentando la autoría humana del arte base y su renderizado tecnológico sin fines comerciales.
 
 ---
 
 ## 4. Registro y Gobernanza del Uso de Inteligencia Artificial
 
-De conformidad con los criterios de evaluación del curso, el uso de Inteligencia Artificial (asistente Antigravity / Gemini) se rigió bajo supervisión y validación humana continua:
+De conformidad con los criterios de evaluación del curso, el uso de Inteligencia Artificial (asistente Antigravity / Claude) se rigió bajo supervisión y validación humana continua:
 
 - **Tareas en las que se utilizó la IA:**
+  - Digitalización y renderizado de arte analógico: Procesamiento, colorizado y texturizado digital asistido a partir de las ilustraciones originales dibujadas a lápiz sobre papel por las estudiantes.
   - Estructuración inicial y normalización de las 227 plantillas de criaturas desde el documento de diseño base (`Personajes_mitologicos_juego.docx`).
   - Asistencia en la formulación algebraica de probabilidades proporcionales para el sobre de evento.
   - Generación de la batería exhaustiva de pruebas unitarias (`unittest`) para verificar invariantes transaccionales.

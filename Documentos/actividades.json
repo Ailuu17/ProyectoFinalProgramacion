@@ -1,0 +1,150 @@
+{
+  "juego": "Mercado de Cartas Mitológicas",
+  "moneda_recompensa": "Aureos",
+  "descripcion": "Actividades oficiales del juego: misiones de coleccionismo y desafíos de combate",
+  "misiones": [
+    {
+      "id": "mis-01",
+      "nombre": "Conseguir al Leviatán",
+      "tipo": "Misión",
+      "recompensa": 100,
+      "moneda": "Aureos",
+      "descripcion": "Obtener y conservar en tu inventario la carta legendaria del Leviatán (LLEV).",
+      "objetivo": {
+        "codigo_carta": "LLEV",
+        "cantidad": 1
+      }
+    },
+    {
+      "id": "mis-02",
+      "nombre": "Comprar 10 sobres comunes",
+      "tipo": "Misión",
+      "recompensa": 20,
+      "moneda": "Aureos",
+      "descripcion": "Comprar un total de 10 sobres comunes en el mercado.",
+      "objetivo": {
+        "sobre": "Sobre Comun",
+        "cantidad": 10
+      }
+    },
+    {
+      "id": "mis-03",
+      "nombre": "Comprar 5 cartas del mercado",
+      "tipo": "Misión",
+      "recompensa": 5,
+      "moneda": "Aureos",
+      "descripcion": "Comprar 5 cartas individuales de la selección del mercado.",
+      "objetivo": {
+        "tipo_accion": "compra_carta_mercado",
+        "cantidad": 5
+      }
+    },
+    {
+      "id": "mis-04",
+      "nombre": "Comprar 15 cartas del mercado",
+      "tipo": "Misión",
+      "recompensa": 15,
+      "moneda": "Aureos",
+      "descripcion": "Comprar 15 cartas individuales de la selección del mercado.",
+      "objetivo": {
+        "tipo_accion": "compra_carta_mercado",
+        "cantidad": 15
+      }
+    },
+    {
+      "id": "mis-05",
+      "nombre": "Comprar 25 cartas del mercado",
+      "tipo": "Misión",
+      "recompensa": 25,
+      "moneda": "Aureos",
+      "descripcion": "Comprar 25 cartas individuales de la selección del mercado.",
+      "objetivo": {
+        "tipo_accion": "compra_carta_mercado",
+        "cantidad": 25
+      }
+    },
+    {
+      "id": "mis-06",
+      "nombre": "Conseguir 10 sobres especiales",
+      "tipo": "Misión",
+      "recompensa": 45,
+      "moneda": "Aureos",
+      "descripcion": "Comprar y conseguir 10 sobres especiales en el mercado.",
+      "objetivo": {
+        "sobre": "Sobre Especial",
+        "cantidad": 10
+      }
+    },
+    {
+      "id": "mis-07",
+      "nombre": "Conseguir 10 sobres legendarios",
+      "tipo": "Misión",
+      "recompensa": 80,
+      "moneda": "Aureos",
+      "descripcion": "Comprar y conseguir 10 sobres legendarios en el mercado.",
+      "objetivo": {
+        "sobre": "Sobre Legendario",
+        "cantidad": 10
+      }
+    }
+  ],
+  "desafios": [
+    {
+      "id": "des-01",
+      "nombre": "Ganar 5 combates en un día",
+      "tipo": "Desafío",
+      "recompensa": 20,
+      "moneda": "Aureos",
+      "descripcion": "Acumular un total de 5 victorias en combates durante una misma fecha.",
+      "objetivo": {
+        "victorias": 5,
+        "periodo": "dia"
+      }
+    },
+    {
+      "id": "des-02",
+      "nombre": "Ganar 10 combates en un día",
+      "tipo": "Desafío",
+      "recompensa": 40,
+      "moneda": "Aureos",
+      "descripcion": "Acumular un total de 10 victorias en combates durante una misma fecha.",
+      "objetivo": {
+        "victorias": 10,
+        "periodo": "dia"
+      }
+    },
+    {
+      "id": "des-03",
+      "nombre": "Ganar 3 combates consecutivos",
+      "tipo": "Desafío",
+      "recompensa": 10,
+      "moneda": "Aureos",
+      "descripcion": "Encadenar una racha de 3 victorias seguidas sin registrar derrotas.",
+      "objetivo": {
+        "victorias_consecutivas": 3
+      }
+    },
+    {
+      "id": "des-04",
+      "nombre": "Ganar 6 combates consecutivos",
+      "tipo": "Desafío",
+      "recompensa": 20,
+      "moneda": "Aureos",
+      "descripcion": "Encadenar una racha de 6 victorias seguidas sin registrar derrotas.",
+      "objetivo": {
+        "victorias_consecutivas": 6
+      }
+    },
+    {
+      "id": "des-05",
+      "nombre": "Ganar 9 combates consecutivos",
+      "tipo": "Desafío",
+      "recompensa": 30,
+      "moneda": "Aureos",
+      "descripcion": "Encadenar una racha de 9 victorias seguidas sin registrar derrotas.",
+      "objetivo": {
+        "victorias_consecutivas": 9
+      }
+    }
+  ]
+}
