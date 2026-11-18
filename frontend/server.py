@@ -34,6 +34,7 @@ from mercado_cartas import (
     crear_catalogo_completo,
     crear_mercado_estandar,
     crear_evento_noche_eterna,
+    crear_misiones,
     MONEDA_COMUN,
     MONEDA_EVENTO,
 )
@@ -50,6 +51,8 @@ juego_global = Juego(
     mercado=mercado_global,
     eventos=[evento_global],
 )
+misiones_globales = crear_misiones()
+juego_global.actividades = misiones_globales
 
 # Jugadores iniciales
 jugador_ash = Jugador(id="j1", nombre="Ash")
@@ -116,6 +119,23 @@ class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
                     "tasa_cambio": mercado_global.tasa_cambio,
                 },
                 "total_criaturas_catalogo": len(catalogo_global.plantillas),
+                "misiones": {
+                    jugador_id: [
+                        {
+                            "nombre": mision.nombre,
+                            "recompensa": mision.recompensa,
+                            "reclamada": mision.nombre in juego_global._obtener_jugador(
+                                jugador_id
+                            ).actividades_completadas,
+                            "cumplida": mision.esta_cumplida(
+                                juego_global._obtener_jugador(jugador_id),
+                                juego_global.cartas_de(jugador_id),
+                            ),
+                        }
+                        for mision in misiones_globales
+                    ]
+                    for jugador_id in juego_global.jugadores
+                },
             }
             self.wfile.write(json.dumps(resumen, ensure_ascii=False).encode("utf-8"))
             return
@@ -152,6 +172,26 @@ class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
                     aceptado_b=data.get("aceptado_b", True),
                 )
                 self.responder_json(200, {"ok": True, "mensaje": "Intercambio realizado exitosamente"})
+            except Exception as e:
+                self.responder_json(400, {"ok": False, "error": str(e)})
+            return
+
+        if self.path == "/api/misiones/reclamar":
+            try:
+                jugador_id = data["jugador_id"]
+                nombre = data["nombre"]
+                mision = next(
+                    (item for item in misiones_globales if item.nombre == nombre),
+                    None,
+                )
+                if mision is None:
+                    raise ValueError("La misión no existe.")
+                juego_global.completar_actividad(jugador_id, mision)
+                self.responder_json(200, {
+                    "ok": True,
+                    "mensaje": "Misión completada.",
+                    "jugador": juego_global.resumen_jugador(jugador_id),
+                })
             except Exception as e:
                 self.responder_json(400, {"ok": False, "error": str(e)})
             return

@@ -584,8 +584,8 @@ class TestMercadoCartasUML(unittest.TestCase):
         self.assertIn("TH01", evento_ne.pesos_cartas)
 
     def test_economia_mision_comprar_cartas_mercado(self):
-        """Regla: La misión 'Comprar 5 cartas del mercado' se cumple tras 5 compras."""
-        mision = next(m for m in crear_misiones() if "5 cartas del mercado" in m.nombre)
+        """Regla: La misión 'Comprar 3 cartas del mercado' se cumple tras 3 compras."""
+        mision = next(m for m in crear_misiones() if "3 cartas del mercado" in m.nombre)
 
         moneda = Moneda("Común")
         jugador = Jugador(id="jtest", nombre="Tester")
@@ -595,12 +595,40 @@ class TestMercadoCartasUML(unittest.TestCase):
         # Sin compras, la condición no se cumple
         self.assertFalse(mision.esta_cumplida(jugador, []))
 
-        # Comprar 5 cartas del mercado (CDRA cuesta 25 en el mercado de test)
-        for _ in range(5):
+        # Comprar 3 cartas del mercado (CDRA cuesta 25 en el mercado de test)
+        for _ in range(3):
             self.juego.comprar_carta("jtest", "CDRA")
 
         self.assertTrue(mision.esta_cumplida(jugador, []))
-        self.assertEqual(jugador.cartas_compradas_mercado, 5)
+        self.assertEqual(jugador.cartas_compradas_mercado, 3)
+        self.assertEqual(mision.recompensa, 50)
+
+    def test_economia_misiones_abrir_sobres_intercambio_y_coleccion(self):
+        """Las misiones nuevas cuentan sobres, intercambios y cartas en posesión."""
+        misiones = {m.nombre: m for m in crear_misiones()}
+
+        abrir_sobres = misiones["Abrir 2 sobres"]
+        intercambio = misiones["Completar 1 intercambio"]
+        coleccion = misiones["Tener 15 cartas"]
+
+        self.jugador_1._sobres_comprados = {"Sobre común": 2}
+        self.assertTrue(abrir_sobres.esta_cumplida(self.jugador_1, []))
+
+        c1 = dragonzuelo.crear_carta()
+        c2 = sirena.crear_carta()
+        self.juego.cartas[c1.id] = c1
+        self.juego.cartas[c2.id] = c2
+        self.jugador_1.agregar_carta(c1.id)
+        self.jugador_2.agregar_carta(c2.id)
+        self.juego.intercambiar("j1", [c1.id], "j2", [c2.id])
+        self.assertEqual(self.jugador_1.intercambios_completados, 1)
+        self.assertTrue(intercambio.esta_cumplida(self.jugador_1, []))
+
+        for i in range(15):
+            carta = dragonzuelo.crear_carta()
+            self.juego.cartas[carta.id] = carta
+            self.jugador_1.agregar_carta(carta.id)
+        self.assertTrue(coleccion.esta_cumplida(self.jugador_1, []))
 
     def test_economia_mision_conseguir_leviatan(self):
         """Regla: La misión 'Conseguir al Leviatán' se cumple al tener la carta LLEV."""

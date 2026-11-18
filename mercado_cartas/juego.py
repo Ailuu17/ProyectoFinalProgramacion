@@ -232,6 +232,7 @@ class Juego:
         for carta_id in cartas_b_ids:
             jugador_b.quitar_carta(carta_id)
             jugador_a.agregar_carta(carta_id)
+        jugador_a._intercambios_completados += 1
         self._historial.append({
             "tipo": "intercambiar",
             "jugador_a": jugador_a_id,
@@ -324,5 +325,7 @@ class Juego:
             "coleccion": self.coleccion_de(jugador_id),
             "actividades_completadas": list(jugador.actividades_completadas),
             "sobres_comprados": dict(jugador.sobres_comprados),
+            "cartas_compradas_mercado": jugador.cartas_compradas_mercado,
+            "intercambios_completados": jugador.intercambios_completados,
             "victorias_por_dia": {str(k): v for k, v in jugador._victorias_por_dia.items()},
         }
