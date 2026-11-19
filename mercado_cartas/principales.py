@@ -20,6 +20,11 @@ def _tirar_opcion(
     if tirar is not None:
         return tirar(opciones, pesos)
 
+    import random
+    if pesos is not None:
+        return random.choices(list(opciones), weights=list(pesos), k=1)[0]
+    return random.choice(list(opciones))
+
 
 
 class Moneda:
@@ -89,19 +94,13 @@ class PlantillaCriatura:
 
     @property
     def contador(self) -> int:
-        try:
-            from .juego import Juego
-        except (ImportError, ValueError):
-            from juego import Juego
-        return Juego.contador_global_de(self.codigo)
+        from .juego import Juego
+        return Juego.contador_de(self.codigo)
 
     @contador.setter
     def contador(self, valor: int) -> None:
-        try:
-            from .juego import Juego
-        except (ImportError, ValueError):
-            from juego import Juego
-        Juego.establecer_contador_global(self.codigo, valor)
+        from .juego import Juego
+        Juego.establecer_contador(self.codigo, valor)
 
     @property
     def _contador(self) -> int:
@@ -111,15 +110,12 @@ class PlantillaCriatura:
     def _contador(self, valor: int) -> None:
         self.contador = valor
 
-    def crear_carta(self, juego: Optional[Any] = None) -> 'Carta':
+    def crear_carta(self, juego: Any = None) -> 'Carta':
+        from .juego import Juego
         if juego is not None and hasattr(juego, "obtener_siguiente_contador"):
             num = juego.obtener_siguiente_contador(self.codigo)
         else:
-            try:
-                from .juego import Juego
-            except (ImportError, ValueError):
-                from juego import Juego
-            num = Juego.obtener_siguiente_contador_global(self.codigo)
+            num = Juego.obtener_siguiente_contador(self.codigo)
         carta_id = f"{self.codigo}-{num}"
         return Carta(id=carta_id, plantilla=self)
 
@@ -176,11 +172,8 @@ class Carta:
             if c_val is not None and c_val > 0:
                 self.id = f"{self.plantilla.codigo}-{c_val}"
             else:
-                try:
-                    from .juego import Juego
-                except (ImportError, ValueError):
-                    from juego import Juego
-                num = Juego.obtener_siguiente_contador_global(self.plantilla.codigo)
+                from .juego import Juego
+                num = Juego.obtener_siguiente_contador(self.plantilla.codigo)
                 self.id = f"{self.plantilla.codigo}-{num}"
 
     @property
@@ -189,14 +182,6 @@ class Carta:
             return int(self.id.split("-")[-1])
         except (ValueError, IndexError):
             return 0
-
-    @classmethod
-    def limpiar_registro(cls) -> None:
-        try:
-            from .juego import Juego
-        except (ImportError, ValueError):
-            from juego import Juego
-        Juego.reiniciar_contadores_globales()
 
     def __hash__(self) -> int:
         return hash(self.id)
@@ -224,19 +209,19 @@ class TipoSobre:
         cantidad_cartas: int,
         precio: int,
         moneda: Moneda,
-        azar_rareza: Optional[Dict[str, float]] = None,
-        azar_criatura_c: Optional[Dict[Any, float]] = None,
-        azar_criatura_r: Optional[Dict[Any, float]] = None,
-        azar_criatura_sr: Optional[Dict[Any, float]] = None,
+        azar_rareza: Dict[str, float] = None,
+        azar_criatura_c: Dict[Any, float] = None,
+        azar_criatura_r: Dict[Any, float] = None,
+        azar_criatura_sr: Dict[Any, float] = None,
     ) -> None:
-        self.nombre = nombre
-        self.cantidad_cartas = cantidad_cartas
-        self.precio = precio
-        self.moneda = moneda
-        self.azar_rareza = dict(azar_rareza) if azar_rareza is not None else {}
-        self.azar_criatura_c = dict(azar_criatura_c) if azar_criatura_c is not None else {}
-        self.azar_criatura_r = dict(azar_criatura_r) if azar_criatura_r is not None else {}
-        self.azar_criatura_sr = dict(azar_criatura_sr) if azar_criatura_sr is not None else {}
+        self.nombre: str = nombre
+        self.cantidad_cartas: int = cantidad_cartas
+        self.precio: int = precio
+        self.moneda: Moneda = moneda
+        self.azar_rareza: Dict[str, float] = dict(azar_rareza) if azar_rareza is not None else {}
+        self.azar_criatura_c: Dict[Any, float] = dict(azar_criatura_c) if azar_criatura_c is not None else {}
+        self.azar_criatura_r: Dict[Any, float] = dict(azar_criatura_r) if azar_criatura_r is not None else {}
+        self.azar_criatura_sr: Dict[Any, float] = dict(azar_criatura_sr) if azar_criatura_sr is not None else {}
 
     def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
         r = rareza.strip().lower().replace("ú", "u")
@@ -323,12 +308,12 @@ class SobreEstable(TipoSobre):
         cantidad_cartas: int,
         precio: int,
         moneda: Moneda,
-        azar_rareza: Optional[Dict[str, float]] = None,
-        azar_criatura_c: Optional[Dict[Any, float]] = None,
-        azar_criatura_r: Optional[Dict[Any, float]] = None,
-        azar_criatura_sr: Optional[Dict[Any, float]] = None,
-        azar_criatura_ssr: Optional[Dict[Any, float]] = None,
-        azar_criatura_l: Optional[Dict[Any, float]] = None,
+        azar_rareza: Dict[str, float] = None,
+        azar_criatura_c: Dict[Any, float] = None,
+        azar_criatura_r: Dict[Any, float] = None,
+        azar_criatura_sr: Dict[Any, float] = None,
+        azar_criatura_ssr: Dict[Any, float] = None,
+        azar_criatura_l: Dict[Any, float] = None,
     ) -> None:
         super().__init__(
             nombre=nombre,
@@ -340,8 +325,8 @@ class SobreEstable(TipoSobre):
             azar_criatura_r=azar_criatura_r,
             azar_criatura_sr=azar_criatura_sr,
         )
-        self.azar_criatura_ssr = dict(azar_criatura_ssr) if azar_criatura_ssr is not None else {}
-        self.azar_criatura_l = dict(azar_criatura_l) if azar_criatura_l is not None else {}
+        self.azar_criatura_ssr: Dict[Any, float] = dict(azar_criatura_ssr) if azar_criatura_ssr is not None else {}
+        self.azar_criatura_l: Dict[Any, float] = dict(azar_criatura_l) if azar_criatura_l is not None else {}
 
     def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
         r = rareza.strip().lower().replace("ú", "u")
@@ -359,10 +344,10 @@ class SobreVariable(TipoSobre):
         cantidad_cartas: int,
         precio: int,
         moneda: Moneda,
-        azar_rareza: Optional[Dict[str, float]] = None,
-        azar_criatura_c: Optional[Dict[Any, float]] = None,
-        azar_criatura_r: Optional[Dict[Any, float]] = None,
-        azar_criatura_sr: Optional[Dict[Any, float]] = None,
+        azar_rareza: Dict[str, float] = None,
+        azar_criatura_c: Dict[Any, float] = None,
+        azar_criatura_r: Dict[Any, float] = None,
+        azar_criatura_sr: Dict[Any, float] = None,
     ) -> None:
         super().__init__(
             nombre=nombre,
@@ -390,15 +375,15 @@ class Evento:
         fecha_inicio: date,
         fecha_fin: date,
         moneda: Moneda,
-        sobre: Optional[SobreVariable] = None,
-        pesos_cartas: Optional[Dict[Any, float]] = None,
+        sobre: SobreVariable,
+        pesos_cartas: Dict[Any, float] = None,
     ) -> None:
-        self.nombre = nombre
-        self.fecha_inicio = fecha_inicio
-        self.fecha_fin = fecha_fin
-        self.moneda = moneda
-        self.sobre = sobre
-        self.pesos_cartas = dict(pesos_cartas) if pesos_cartas is not None else {}
+        self.nombre: str = nombre
+        self.fecha_inicio: date = fecha_inicio
+        self.fecha_fin: date = fecha_fin
+        self.moneda: Moneda = moneda
+        self.sobre: SobreVariable = sobre
+        self.pesos_cartas: Dict[Any, float] = dict(pesos_cartas) if pesos_cartas is not None else {}
 
     def carta_para(self, numero: int) -> Any:
         if not self.pesos_cartas:
@@ -417,44 +402,14 @@ class Actividad:
     def __init__(
         self,
         nombre: str,
-        *args: Any,
-        tipo: Optional[str] = None,
-        recompensa: Optional[int] = None,
-        condicion: Any = None,
-        **kwargs: Any,
+        tipo: str = "Actividad",
+        recompensa: int = 0,
+        condicion: Any = "",
     ) -> None:
-        self.nombre = nombre
-        if len(args) == 3:
-            if isinstance(args[0], str) and not isinstance(args[1], str):
-                self.tipo = args[0]
-                self.recompensa = int(args[1])
-                self.condicion = args[2]
-            else:
-                self.recompensa = int(args[0])
-                self.condicion = args[1]
-                self.tipo = str(args[2])
-        elif len(args) == 2:
-            if isinstance(args[0], (int, float)):
-                self.recompensa = int(args[0])
-                self.condicion = args[1]
-                self.tipo = tipo or "Actividad"
-            else:
-                self.tipo = str(args[0])
-                self.recompensa = int(args[1])
-                self.condicion = condicion
-        elif len(args) == 1:
-            if isinstance(args[0], (int, float)):
-                self.recompensa = int(args[0])
-                self.tipo = tipo or "Actividad"
-                self.condicion = condicion
-            else:
-                self.tipo = str(args[0])
-                self.recompensa = recompensa if recompensa is not None else 0
-                self.condicion = condicion
-        else:
-            self.tipo = tipo or "Actividad"
-            self.recompensa = recompensa if recompensa is not None else 0
-            self.condicion = condicion
+        self.nombre: str = nombre
+        self.tipo: str = tipo
+        self.recompensa: int = int(recompensa)
+        self.condicion: Any = condicion
 
     def esta_cumplida(self, jugador: "Jugador", cartas: Sequence["Carta"]) -> bool:
         if callable(self.condicion):

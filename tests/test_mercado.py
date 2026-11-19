@@ -60,8 +60,6 @@ from mercado_cartas.criaturas import (
 
 class TestMercadoCartasUML(unittest.TestCase):
     def setUp(self):
-        Carta.limpiar_registro()
-        Juego.reiniciar_contadores_globales()
         dragonzuelo.contador = 0
         sirena.contador = 0
         apep.contador = 0

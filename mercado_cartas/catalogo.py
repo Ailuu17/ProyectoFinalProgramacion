@@ -8,8 +8,8 @@ except (ImportError, ValueError):
 
 
 class Catalogo:
-    def __init__(self, plantillas: Optional[Dict[str, PlantillaCriatura]] = None) -> None:
-        self.plantillas = dict(plantillas) if plantillas is not None else {}
+    def __init__(self, plantillas: Dict[str, PlantillaCriatura] = None) -> None:
+        self.plantillas: Dict[str, PlantillaCriatura] = dict(plantillas) if plantillas is not None else {}
 
     def buscar(self, codigo: str) -> PlantillaCriatura:
         if codigo not in self.plantillas:
@@ -48,13 +48,13 @@ class Catalogo:
 class Mercado:
     def __init__(
         self,
-        ofertas: Optional[Dict[str, int]] = None,
-        sobres: Optional[List[SobreEstable]] = None,
+        ofertas: Dict[str, int] = None,
+        sobres: List[SobreEstable] = None,
         tasa_cambio: int = 1,
     ) -> None:
-        self.ofertas = dict(ofertas) if ofertas is not None else {}
-        self.sobres = list(sobres) if sobres is not None else []
-        self.tasa_cambio = tasa_cambio
+        self.ofertas: Dict[str, int] = dict(ofertas) if ofertas is not None else {}
+        self.sobres: List[SobreEstable] = list(sobres) if sobres is not None else []
+        self.tasa_cambio: int = tasa_cambio
 
     def precio_de(self, codigo: str) -> int:
         if codigo not in self.ofertas:

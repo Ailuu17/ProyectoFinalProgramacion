@@ -19,96 +19,60 @@ class Juego:
         self,
         catalogo: Catalogo,
         mercado: Mercado,
-        actividades: Optional[List[Actividad]] = None,
-        eventos: Optional[List[Evento]] = None,
-        jugadores: Optional[Dict[str, Jugador]] = None,
-        cartas: Optional[Dict[str, Carta]] = None,
-        historial: Optional[List[dict]] = None,
-        contadores: Optional[List[Dict[str, Any]]] = None,
+        actividades: List[Actividad] = None,
+        eventos: List[Evento] = None,
+        jugadores: Dict[str, Jugador] = None,
+        cartas: Dict[str, Carta] = None,
+        historial: List[dict] = None,
+        contadores: List[Dict[str, Any]] = None,
     ) -> None:
-        self.catalogo = catalogo
-        self.mercado = mercado
-        self.actividades = list(actividades) if actividades is not None else []
-        self.eventos = list(eventos) if eventos is not None else []
-        self._jugadores = dict(jugadores) if jugadores is not None else {}
-        self._cartas = dict(cartas) if cartas is not None else {}
-        self._historial = list(historial) if historial is not None else []
-        self._contadores = list(contadores) if contadores is not None else []
+        self.catalogo: Catalogo = catalogo
+        self.mercado: Mercado = mercado
+        self.actividades: List[Actividad] = list(actividades) if actividades is not None else []
+        self.eventos: List[Evento] = list(eventos) if eventos is not None else []
+        self._jugadores: Dict[str, Jugador] = dict(jugadores) if jugadores is not None else {}
+        self._cartas: Dict[str, Carta] = dict(cartas) if cartas is not None else {}
+        self._historial: List[dict] = list(historial) if historial is not None else []
+        self._contadores: List[Dict[str, Any]] = list(contadores) if contadores is not None else []
         Juego._instancia_actual = self
 
     @property
     def contadores(self) -> List[Dict[str, Any]]:
         return self._contadores
 
-    def obtener_siguiente_contador(self, codigo: str) -> int:
-        for item in self._contadores:
+    @classmethod
+    def _contadores_activos(cls) -> List[Dict[str, Any]]:
+        if cls._instancia_actual is not None:
+            return cls._instancia_actual._contadores
+        return cls._contadores_defecto
+
+    @classmethod
+    def obtener_siguiente_contador(cls, codigo: str) -> int:
+        lista = cls._contadores_activos()
+        for item in lista:
             if item.get("codigo") == codigo:
                 item["cantidad"] = item.get("cantidad", 0) + 1
                 return item["cantidad"]
         nuevo = {"codigo": codigo, "cantidad": 1}
-        self._contadores.append(nuevo)
-        return 1
-
-    def contador_de(self, codigo: str) -> int:
-        for item in self._contadores:
-            if item.get("codigo") == codigo:
-                return item.get("cantidad", 0)
-        return 0
-
-    def establecer_contador(self, codigo: str, valor: int) -> None:
-        for item in self._contadores:
-            if item.get("codigo") == codigo:
-                if valor == 0:
-                    self._contadores.remove(item)
-                else:
-                    item["cantidad"] = valor
-                return
-        if valor > 0:
-            self._contadores.append({"codigo": codigo, "cantidad": valor})
-
-    def reiniciar_contadores(self) -> None:
-        self._contadores.clear()
-
-    @classmethod
-    def obtener_siguiente_contador_global(cls, codigo: str) -> int:
-        if cls._instancia_actual is not None:
-            return cls._instancia_actual.obtener_siguiente_contador(codigo)
-        for item in cls._contadores_defecto:
-            if item.get("codigo") == codigo:
-                item["cantidad"] = item.get("cantidad", 0) + 1
-                return item["cantidad"]
-        nuevo = {"codigo": codigo, "cantidad": 1}
-        cls._contadores_defecto.append(nuevo)
+        lista.append(nuevo)
         return 1
 
     @classmethod
-    def contador_global_de(cls, codigo: str) -> int:
-        if cls._instancia_actual is not None:
-            return cls._instancia_actual.contador_de(codigo)
-        for item in cls._contadores_defecto:
+    def contador_de(cls, codigo: str) -> int:
+        lista = cls._contadores_activos()
+        for item in lista:
             if item.get("codigo") == codigo:
                 return item.get("cantidad", 0)
         return 0
 
     @classmethod
-    def establecer_contador_global(cls, codigo: str, valor: int) -> None:
-        if cls._instancia_actual is not None:
-            cls._instancia_actual.establecer_contador(codigo, valor)
-        for item in cls._contadores_defecto:
+    def establecer_contador(cls, codigo: str, valor: int) -> None:
+        lista = cls._contadores_activos()
+        for item in lista:
             if item.get("codigo") == codigo:
-                if valor == 0:
-                    cls._contadores_defecto.remove(item)
-                else:
-                    item["cantidad"] = valor
+                item["cantidad"] = valor
                 return
-        if valor > 0:
-            cls._contadores_defecto.append({"codigo": codigo, "cantidad": valor})
-
-    @classmethod
-    def reiniciar_contadores_globales(cls) -> None:
-        if cls._instancia_actual is not None:
-            cls._instancia_actual.reiniciar_contadores()
-        cls._contadores_defecto.clear()
+        lista.append({"codigo": codigo, "cantidad": valor})
 
     @property
     def jugadores(self) -> Dict[str, Jugador]:
