@@ -529,10 +529,46 @@ body {
   background: var(--bg-surface);
 }
 
+.modal-title-with-back {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
 .modal-title-group {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.return-profile-btn {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.return-profile-btn:hover {
+  border-color: var(--gold-primary);
+  color: var(--gold-hover);
 }
 
 .modal-title-icon {
