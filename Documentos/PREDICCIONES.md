@@ -9,9 +9,9 @@
 
 ## 1. Introducción y Metodología de Validación
 
-Para dar estricto cumplimiento a la consigna oficial, el equipo definió una metodología de **predicción previa** antes de disparar la ejecución de cada función clave del sistema. Esta práctica garantiza que los desarrolladores comprendan a cabalidad las precondiciones, postcondiciones, tipos de retorno y efectos colaterales esperados, evitando la programación por ensayo y error.
+Para dar cumplimiento a la consigna del proyecto, definimos una metodología de **predicción previa** antes de disparar la ejecución de cada función clave del sistema. Esta práctica garantiza que los desarrolladores comprendan a fondo las precondiciones, postcondiciones, tipos de retorno y efectos colaterales esperados, evitando la programación por ensayo y error.
 
-A continuación se detallan las **25 funciones y operaciones clave** del sistema (asociadas a las 25 pruebas unitarias implementadas en `tests/test_mercado.py` y descriptas en `documentos/tests.txt`), documentando la predicción previa formulada por el grupo, el resultado real obtenido en la ejecución y la comparación que convalida que el comportamiento cumple con lo esperado.
+A continuación se detallan las **25 funciones y operaciones clave** del sistema (asociadas a las 25 pruebas unitarias implementadas en `tests/test_mercado.py` y descriptas en `documentos/tests.txt`), documentando la predicción previa formulada por el grupo, el resultado real obtenido en la ejecución y la comparación que demuestra que el comportamiento cumple con lo esperado.
 
 ---
 
@@ -20,7 +20,7 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 ### Predicción 01: Integridad y Carga del Catálogo
 - **Función Clave:** `crear_catalogo_completo()` y consultas al catálogo `Catalogo.buscar(codigo)`.
 - **Precondición / Entrada:** Catálogo inicializado con todas las plantillas del archivo de criaturas mitológicas.
-- **Predicción Previa:** Esperábamos que la función instanciara exactamente 227 plantillas de criaturas únicas, sin colisiones de códigos alfanuméricos (`len(codigos) == 227`), y que todos los tipos estuvieran normalizados con inicial mayúscula (`tipo[0].isupper()`).
+- **Predicción Previa:** Esperábamos que la función instanciara exactamente 227 plantillas de criaturas únicas, sin colisiones de códigos (`len(codigos) == 227`), y que todos los tipos estuvieran normalizados con inicial mayúscula (`tipo[0].isupper()`).
 - **Resultado Real Obtenido:** Se crearon exactamente 227 objetos `PlantillaCriatura`. Códigos iniciales como `CDRA` y legendarios como `LAPE` se recuperaron con atributos correctos. Cero duplicados.
 - **Comparación:** **Cumple con lo esperado.**
 - **Test que lo valida:** `TestMercadoCartasUML.test_criaturas_cargadas_correctamente` (Regla 1).
@@ -30,7 +30,7 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 ### Predicción 02: Invariante Financiero de No Negatividad
 - **Función Clave:** `Billetera.retirar(moneda, monto)` y `Billetera.depositar(moneda, monto)`.
 - **Precondición / Entrada:** Billetera con saldo inicial de 100 Aureos. Se intenta retirar 150 Aureos; luego se intenta depositar -10 Aureos.
-- **Predicción Previa:** Esperábamos que el intento de sobregiro (retirar 150 teniendo 100) lanzara inmediatamente una excepción `ValueError` y que el saldo se mantuviera intacto en 100. Asimismo, esperábamos que el depósito negativo fuera rechazado con `ValueError`.
+- **Predicción Previa:** Esperábamos que el intento de sobregiro (retirar 150 teniendo 100) lanzara inmediatamente una excepción `ValueError` y que el saldo se mantuviera intacto en 100. A su vez, esperábamos que el depósito negativo fuera rechazado con `ValueError`.
 - **Resultado Real Obtenido:** Ambas operaciones fallaron lanzando `ValueError("Saldo insuficiente")` y `ValueError("Monto inválido")`. El saldo final verificado en la billetera fue exactamente 100.
 - **Comparación:** **Cumple con lo esperado.**
 - **Test que lo valida:** `TestMercadoCartasUML.test_invariante_saldo_no_negativo` (Regla 2).
@@ -39,7 +39,7 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 
 ### Predicción 03: Generación Secuencial de Identificadores de Cartas
 - **Función Clave:** `PlantillaCriatura.crear_carta(juego=juego)` coordinado por `Juego._contadores`.
-- **Precondición / Entrada:** Instancia de `Juego` limpia. Se invocan consecutivamente dos creaciones de cartas físicas para la plantilla Dragonzuelo (`CDRA`).
+- **Precondición / Entrada:** Instancia de `Juego` limpia. Se invocan consecutivamente dos creaciones de cartas para la plantilla Dragonzuelo (`CDRA`).
 - **Predicción Previa:** Esperábamos que la primera carta recibiera el identificador `"CDRA-1"` con contador 1, y la segunda `"CDRA-2"` con contador 2, quedando registrado en la lista de contadores del juego el total de 2 cartas emitidas de esa especie.
 - **Resultado Real Obtenido:** `c1.id` devolvió `"CDRA-1"`, `c2.id` devolvió `"CDRA-2"`, y `juego.contadores` reflejó `{"codigo": "CDRA", "cantidad": 2}`.
 - **Comparación:** **Cumple con lo esperado.**
@@ -47,10 +47,11 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 
 ---
 
+--REVISAR   
 ### Predicción 04: Azar Determinista en Apertura de Sobres
 - **Función Clave:** `TipoSobre.abrir(catalogo, tirar=funcion_azar_pura)`.
-- **Precondición / Entrada:** Un sobre con distribución de probabilidades y una función determinista inyectada `tirar_secuencial` que devuelve valores predefinidos sin recurrir al reloj del sistema ni a generadores aleatorios no controlados.
-- **Predicción Previa:** Esperábamos que al ejecutar la apertura dos veces con la misma función determinista inyectada, ambas llamadas produjeran exactamente las mismas cartas, en el mismo orden y con las mismas rarezas.
+- **Precondición / Entrada:** Un sobre con distribución de probabilidades y una función inyectada `tirar_secuencial` que devuelve valores predefinidos sin recurrir al reloj del sistema ni a generadores aleatorios no controlados.
+- **Predicción Previa:** Esperábamos que al ejecutar la apertura dos veces con la misma función, ambas llamadas produjeran exactamente las mismas cartas, en el mismo orden y con las mismas rarezas.
 - **Resultado Real Obtenido:** Las listas de cartas resultantes de ambas aperturas fueron idénticas en plantillas y rarezas resultantes.
 - **Comparación:** **Cumple con lo esperado.**
 - **Test que lo valida:** `TestMercadoCartasUML.test_azar_determinista_apertura_sobre` (Regla 4).
@@ -121,7 +122,7 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 - **Función Clave:** Inspección reflexiva de clases (`Moneda`, `Billetera`, `Carta`, `TipoSobre`, `SobreEstable`, `SobreVariable`, `Juego`).
 - **Precondición / Entrada:** Clases instanciadas según el diagrama `UML_imagen.png`.
 - **Predicción Previa:** Esperábamos que `Moneda` careciera de atributos visuales superfluos (`color`, `diseno`), que `SobreVariable` no contuviera diccionarios de SSR ni Legendaria, y que `Juego.contadores` fuera una lista de diccionarios (`list<dict>`).
-- **Resultado Real Obtenido:** Todas las aserciones de introspección pasaron exitosamente. La estructura del código coincide con fidelidad absoluta con el UML.
+- **Resultado Real Obtenido:** Todas las pruebas pasaron exitosamente. La estructura del código coincide con con lo que definimos en el UML.
 - **Comparación:** **Cumple con lo esperado.**
 - **Test que lo valida:** `TestMercadoCartasUML.test_coincidencia_con_uml` (Regla 11).
 
@@ -129,8 +130,8 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 
 ### Predicción 12: Propagación Transparente de Errores en Azar Inyectado
 - **Función Clave:** `TipoSobre._tirar_opcion(tirar, opciones, pesos)` invocada con una función `tirar` defectuosa.
-- **Precondición / Entrada:** Se inyecta una función que deliberadamente arroja `TypeError("Bug simulado")`.
-- **Predicción Previa:** Esperábamos que el error NO fuera silenciado con un bloque `try/except: pass` encubierto, sino que la excepción se propagara visiblemente hacia el llamador.
+- **Precondición / Entrada:** Se inyecta una función que arroja `TypeError("Bug simulado")`.
+- **Predicción Previa:** Esperábamos que el error NO fuera silenciado con un bloque `try/except: pass`, sino que la excepción se propagara visiblemente.
 - **Resultado Real Obtenido:** La ejecución de `obtener_carta` falló visiblemente levantando `TypeError`, sin tragar el error.
 - **Comparación:** **Cumple con lo esperado.** (Corrige la segunda observación crítica de Alfonso).
 - **Test que lo valida:** `TestMercadoCartasUML.test_error_en_tirar_se_propaga_sin_ser_silenciado` (Regla 12).
@@ -150,7 +151,7 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 ### Predicción 14: Señalización Explícita de Funcionalidades Reservadas
 - **Función Clave:** Invocación a métodos del subsistema de combate no desarrollado (`Juego.iniciar_combate()`).
 - **Precondición / Entrada:** Llamada a la interfaz de combate.
-- **Predicción Previa:** Esperábamos que el sistema levantara explícitamente `NotImplementedError`, documentando que el módulo de batallas fue postergado a favor del mercado de cartas.
+- **Predicción Previa:** Esperábamos que el sistema levantara `NotImplementedError`, documentando que el módulo de batallas fue postergado a favor del mercado de cartas.
 - **Resultado Real Obtenido:** Se arrojó `NotImplementedError` con mensaje explicativo formal.
 - **Comparación:** **Cumple con lo esperado.**
 - **Test que lo valida:** `TestMercadoCartasUML.test_batalla_no_implementada_documentada` (Regla 14).
@@ -199,7 +200,7 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 
 ### Predicción 19: Condición de Misión "Conseguir al Leviatán"
 - **Función Clave:** `mision.esta_cumplida(jugador, cartas)` para la criatura legendaria `LLEV`.
-- **Precondición / Entrada:** Jugador sin la carta; luego se agrega al inventario una carta con plantilla de código `"LLEV"`.
+- **Precondición / Entrada:** Jugador sin la carta; al que luego se agrega al inventario una carta con plantilla de código `"LLEV"`.
 - **Predicción Previa:** Esperábamos que antes de poseer la carta devolviera `False`, y una vez agregada al inventario devolviera `True`.
 - **Resultado Real Obtenido:** `esta_cumplida` evaluó `False` inicialmente y `True` inmediatamente tras recibir la carta del Leviatán.
 - **Comparación:** **Cumple con lo esperado.**
