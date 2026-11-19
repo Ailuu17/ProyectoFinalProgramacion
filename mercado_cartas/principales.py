@@ -20,10 +20,6 @@ def _tirar_opcion(
     if tirar is not None:
         return tirar(opciones, pesos)
 
-    import random
-    if pesos is not None:
-        return random.choices(list(opciones), weights=list(pesos), k=1)[0]
-    return random.choice(list(opciones))
 
 
 class Moneda:
