@@ -322,6 +322,15 @@ function setupEventListeners() {
     });
   }
 
+  document.querySelectorAll(".return-profile-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const modal = btn.closest(".modal-overlay");
+      if (modal) closeModal(modal.id);
+      updateHUD();
+      openModal("modal-cuenta");
+    });
+  });
+
   // Botón "+ Monedas Demo" para poder probar compras sin romper el estado inicial de 0 monedas
   const btnDemoCoins = document.getElementById("btn-demo-coins");
   if (btnDemoCoins) {
