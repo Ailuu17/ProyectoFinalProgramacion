@@ -458,6 +458,10 @@ function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.classList.remove("active");
+    if (modalId === "modal-apertura-sobre") {
+      const body = modal.querySelector(".pack-opening-body");
+      if (body) body.scrollTop = 0;
+    }
   }
 }
 
