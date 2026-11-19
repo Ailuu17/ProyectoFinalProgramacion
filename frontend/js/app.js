@@ -104,8 +104,8 @@ const GameState = {
   // Evento Activo
   eventoActivo: {
     nombre: NOMBRE_EVENTO_VIGENTE,
-    fecha_inicio: "2026-11-01",
-    fecha_fin: "2026-11-30",
+    fecha_inicio: "2026-10-20",
+    fecha_fin: "2026-11-20",
     moneda: NOMBRE_MONEDA_EVENTO,
     tasa_cambio: 5 // 5 Aureos = 1 Jack
   },
