@@ -47,12 +47,11 @@ A continuación se detallan las **25 funciones y operaciones clave** del sistema
 
 ---
 
---REVISAR   
 ### Predicción 04: Azar Determinista en Apertura de Sobres
 - **Función Clave:** `TipoSobre.abrir(catalogo, tirar=funcion_azar_pura)`.
-- **Precondición / Entrada:** Un sobre con distribución de probabilidades y una función inyectada `tirar_secuencial` que devuelve valores predefinidos sin recurrir al reloj del sistema ni a generadores aleatorios no controlados.
-- **Predicción Previa:** Esperábamos que al ejecutar la apertura dos veces con la misma función, ambas llamadas produjeran exactamente las mismas cartas, en el mismo orden y con las mismas rarezas.
-- **Resultado Real Obtenido:** Las listas de cartas resultantes de ambas aperturas fueron idénticas en plantillas y rarezas resultantes.
+- **Precondición / Entrada:** Un sobre con distribución de probabilidades y una función inyectada que devuelve valores predefinidos sin recurrir al reloj del sistema ni a generadores aleatorios no controlados.
+- **Predicción Previa:** Esperábamos que la función produjera siempre la misma plantilla elegida y que la lista respetara la cantidad de cartas del sobre y su orden. Los identificadores individuales pueden variar, ya que deben ser únicos para cada carta creada.
+- **Resultado Real Obtenido:** La prueba ejecutó una apertura de dos cartas y confirmó que ambas eran `CDRA`, una plantilla Común. La comparación verifica el contenido reproducible de las cartas; no compara sus identificadores, que son diferentes por definición.
 - **Comparación:** **Cumple con lo esperado.**
 - **Test que lo valida:** `TestMercadoCartasUML.test_azar_determinista_apertura_sobre` (Regla 4).
 
