@@ -307,7 +307,7 @@ def crear_mercado_estandar(
 
 
 # ----------------------------------------------------------------------
-# Actividades oficiales (Documentos/Actividades.docx)
+# Actividades oficiales (documentos/Actividades.docx)
 # ----------------------------------------------------------------------
 def crear_misiones() -> List[Actividad]:
     """Crea las 7 misiones oficiales del documento Actividades."""

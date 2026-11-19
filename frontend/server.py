@@ -64,7 +64,7 @@ FRONTEND_DIR = Path(__file__).resolve().parent
 ARTWORK_DIR = (
     ROOT_DIR / "documentos" / "Imagenes"
     if (ROOT_DIR / "documentos" / "Imagenes").exists()
-    else ROOT_DIR / "Documentos" / "Imagenes"
+    else ROOT_DIR / "documentos" / "Imagenes"
 )
 
 
@@ -75,9 +75,6 @@ class GameHTTPRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         image_path = urlsplit(self.path).path
         artwork_routes = {
-            "/Documentos/Imagenes/Personajes/": ARTWORK_DIR / "Personajes",
-            "/Documentos/Imagenes/Monedas/": ARTWORK_DIR / "Monedas",
-            "/Documentos/Imagenes/Sobres/": ARTWORK_DIR / "Sobres",
             "/documentos/Imagenes/Personajes/": ARTWORK_DIR / "Personajes",
             "/documentos/Imagenes/Monedas/": ARTWORK_DIR / "Monedas",
             "/documentos/Imagenes/Sobres/": ARTWORK_DIR / "Sobres",

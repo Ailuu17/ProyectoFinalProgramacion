@@ -1248,6 +1248,76 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--lunar-glow);
 }
 
+.pack-info-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(230, 180, 80, 0.55);
+  background: rgba(15, 23, 42, 0.92);
+  color: #e6b450;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pack-info-btn:hover,
+.pack-info-btn[aria-expanded="true"] {
+  background: #e6b450;
+  color: #1a0f00;
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(230, 180, 80, 0.35);
+}
+
+.pack-probabilities {
+  position: absolute;
+  top: 48px;
+  left: 12px;
+  z-index: 4;
+  width: min(220px, calc(100% - 24px));
+  padding: 0.75rem;
+  border: 1px solid rgba(230, 180, 80, 0.45);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  text-align: left;
+  backdrop-filter: blur(8px);
+}
+
+.pack-probabilities h5 {
+  margin: 0 0 0.45rem;
+  color: #e6b450;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pack-probability-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.22rem 0;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.pack-probability-row:last-child {
+  border-bottom: 0;
+}
+
+.pack-probability-row strong {
+  color: #f8fafc;
+  font-family: var(--font-stats);
+}
+
 .pack-graphic {
   width: 120px;
   height: 160px;
