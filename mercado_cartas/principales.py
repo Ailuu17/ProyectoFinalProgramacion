@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from datetime import date
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Optional, Sequence, Set, Union
 
@@ -27,10 +26,10 @@ def _tirar_opcion(
     return random.choice(list(opciones))
 
 
-@dataclass
 class Moneda:
-    nombre: str
-    evento: str = ""
+    def __init__(self, nombre: str, evento: str = "") -> None:
+        self.nombre = nombre
+        self.evento = evento
 
     def __hash__(self) -> int:
         return hash((self.nombre, self.evento))
@@ -40,6 +39,11 @@ class Moneda:
             return False
         return (self.nombre, self.evento) == (other.nombre, other.evento)
 
+    def __repr__(self) -> str:
+        if self.evento:
+            return f"Moneda(nombre={self.nombre!r}, evento={self.evento!r})"
+        return f"Moneda(nombre={self.nombre!r})"
+
 
 # Cartas exclusivas del evento Noche Eterna
 # Chupacabritas (Comun), Espíritu oscuro (Comun) y Wendigo (Rara)
@@ -47,20 +51,30 @@ class Moneda:
 CODIGOS_CARTAS_EVENTO_EXCLUSIVAS: Set[str] = {"CCHU", "CESO", "RWEN"}
 
 
-@dataclass
 class PlantillaCriatura:
-    codigo: str
-    nombre: str
-    rareza: str
-    tipo: str
-    vida: int
-    ataque: int
-    defensa: int
-    habilidad: str
-    descripcion_habilidad: str
-    usos_habilidad: int = 1
-
-    def __post_init__(self) -> None:
+    def __init__(
+        self,
+        codigo: str,
+        nombre: str,
+        rareza: str,
+        tipo: str,
+        vida: int,
+        ataque: int,
+        defensa: int,
+        habilidad: str,
+        descripcion_habilidad: str,
+        usos_habilidad: int = 1,
+    ) -> None:
+        self.codigo = codigo
+        self.nombre = nombre
+        self.tipo = tipo
+        self.vida = vida
+        self.ataque = ataque
+        self.defensa = defensa
+        self.habilidad = habilidad
+        self.descripcion_habilidad = descripcion_habilidad
+        self.usos_habilidad = usos_habilidad
+        self.rareza = rareza
         if self.rareza:
             r = self.rareza.strip().lower().replace("ú", "u")
             if r in ("c", "comun"):
@@ -73,6 +87,9 @@ class PlantillaCriatura:
                 self.rareza = "Super Super Rara"
             elif r in ("l", "legendaria", "legendario"):
                 self.rareza = "Legendaria"
+
+    def __repr__(self) -> str:
+        return f"PlantillaCriatura(codigo={self.codigo!r}, nombre={self.nombre!r}, rareza={self.rareza!r})"
 
     @property
     def contador(self) -> int:
@@ -204,16 +221,26 @@ class Carta:
         }
 
 
-@dataclass
 class TipoSobre:
-    nombre: str
-    cantidad_cartas: int
-    precio: int
-    moneda: Moneda
-    azar_rareza: Dict[str, float] = field(default_factory=dict)
-    azar_criatura_c: Dict[Any, float] = field(default_factory=dict)
-    azar_criatura_r: Dict[Any, float] = field(default_factory=dict)
-    azar_criatura_sr: Dict[Any, float] = field(default_factory=dict)
+    def __init__(
+        self,
+        nombre: str,
+        cantidad_cartas: int,
+        precio: int,
+        moneda: Moneda,
+        azar_rareza: Optional[Dict[str, float]] = None,
+        azar_criatura_c: Optional[Dict[Any, float]] = None,
+        azar_criatura_r: Optional[Dict[Any, float]] = None,
+        azar_criatura_sr: Optional[Dict[Any, float]] = None,
+    ) -> None:
+        self.nombre = nombre
+        self.cantidad_cartas = cantidad_cartas
+        self.precio = precio
+        self.moneda = moneda
+        self.azar_rareza = dict(azar_rareza) if azar_rareza is not None else {}
+        self.azar_criatura_c = dict(azar_criatura_c) if azar_criatura_c is not None else {}
+        self.azar_criatura_r = dict(azar_criatura_r) if azar_criatura_r is not None else {}
+        self.azar_criatura_sr = dict(azar_criatura_sr) if azar_criatura_sr is not None else {}
 
     def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
         r = rareza.strip().lower().replace("ú", "u")
@@ -293,10 +320,32 @@ class TipoSobre:
         return [self.obtener_carta(catalogo, evento, tirar, juego=juego) for _ in range(self.cantidad_cartas)]
 
 
-@dataclass
 class SobreEstable(TipoSobre):
-    azar_criatura_ssr: Dict[Any, float] = field(default_factory=dict)
-    azar_criatura_l: Dict[Any, float] = field(default_factory=dict)
+    def __init__(
+        self,
+        nombre: str,
+        cantidad_cartas: int,
+        precio: int,
+        moneda: Moneda,
+        azar_rareza: Optional[Dict[str, float]] = None,
+        azar_criatura_c: Optional[Dict[Any, float]] = None,
+        azar_criatura_r: Optional[Dict[Any, float]] = None,
+        azar_criatura_sr: Optional[Dict[Any, float]] = None,
+        azar_criatura_ssr: Optional[Dict[Any, float]] = None,
+        azar_criatura_l: Optional[Dict[Any, float]] = None,
+    ) -> None:
+        super().__init__(
+            nombre=nombre,
+            cantidad_cartas=cantidad_cartas,
+            precio=precio,
+            moneda=moneda,
+            azar_rareza=azar_rareza,
+            azar_criatura_c=azar_criatura_c,
+            azar_criatura_r=azar_criatura_r,
+            azar_criatura_sr=azar_criatura_sr,
+        )
+        self.azar_criatura_ssr = dict(azar_criatura_ssr) if azar_criatura_ssr is not None else {}
+        self.azar_criatura_l = dict(azar_criatura_l) if azar_criatura_l is not None else {}
 
     def _dict_para_rareza(self, rareza: str) -> Dict[Any, float]:
         r = rareza.strip().lower().replace("ú", "u")
@@ -307,9 +356,28 @@ class SobreEstable(TipoSobre):
         return super()._dict_para_rareza(rareza)
 
 
-@dataclass
 class SobreVariable(TipoSobre):
-    def __post_init__(self) -> None:
+    def __init__(
+        self,
+        nombre: str,
+        cantidad_cartas: int,
+        precio: int,
+        moneda: Moneda,
+        azar_rareza: Optional[Dict[str, float]] = None,
+        azar_criatura_c: Optional[Dict[Any, float]] = None,
+        azar_criatura_r: Optional[Dict[Any, float]] = None,
+        azar_criatura_sr: Optional[Dict[Any, float]] = None,
+    ) -> None:
+        super().__init__(
+            nombre=nombre,
+            cantidad_cartas=cantidad_cartas,
+            precio=precio,
+            moneda=moneda,
+            azar_rareza=azar_rareza,
+            azar_criatura_c=azar_criatura_c,
+            azar_criatura_r=azar_criatura_r,
+            azar_criatura_sr=azar_criatura_sr,
+        )
         if self.azar_rareza:
             for k in self.azar_rareza.keys():
                 k_norm = str(k).strip().lower().replace("ú", "u")
@@ -319,14 +387,22 @@ class SobreVariable(TipoSobre):
                     )
 
 
-@dataclass
 class Evento:
-    nombre: str
-    fecha_inicio: date
-    fecha_fin: date
-    moneda: Moneda
-    sobre: SobreVariable
-    pesos_cartas: Dict[Any, int] = field(default_factory=dict)
+    def __init__(
+        self,
+        nombre: str,
+        fecha_inicio: date,
+        fecha_fin: date,
+        moneda: Moneda,
+        sobre: Optional[SobreVariable] = None,
+        pesos_cartas: Optional[Dict[Any, float]] = None,
+    ) -> None:
+        self.nombre = nombre
+        self.fecha_inicio = fecha_inicio
+        self.fecha_fin = fecha_fin
+        self.moneda = moneda
+        self.sobre = sobre
+        self.pesos_cartas = dict(pesos_cartas) if pesos_cartas is not None else {}
 
     def carta_para(self, numero: int) -> Any:
         if not self.pesos_cartas:
@@ -341,13 +417,7 @@ class Evento:
         return next(iter(self.pesos_cartas.keys()))
 
 
-@dataclass
 class Actividad:
-    nombre: str
-    recompensa: int = 0
-    condicion: Any = None
-    tipo: str = "Actividad"
-
     def __init__(
         self,
         nombre: str,
@@ -394,19 +464,3 @@ class Actividad:
         if callable(self.condicion):
             return bool(self.condicion(jugador, cartas))
         return False
-
-
-@dataclass
-class TasaCambio:
-    moneda_origen: Moneda
-    moneda_destino: Moneda
-    factor: float
-
-    def __post_init__(self) -> None:
-        if self.factor <= 0:
-            raise ValueError("El factor de conversión debe ser positivo.")
-
-    def convertir(self, cantidad: int) -> int:
-        if cantidad < 0:
-            raise ValueError("La cantidad no puede ser negativa.")
-        return int(cantidad * self.factor)

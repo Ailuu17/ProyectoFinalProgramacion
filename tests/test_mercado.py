@@ -46,7 +46,6 @@ from mercado_cartas import (
     crear_sobres_estandar,
     crear_sobre_evento,
     crear_evento_noche_eterna,
-    crear_evento_halloween,
     crear_mercado_estandar,
     crear_actividades,
     crear_misiones,

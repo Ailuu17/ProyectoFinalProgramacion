@@ -237,10 +237,6 @@ def crear_evento_noche_eterna(
         pesos_cartas=pesos,
     )
 
-
-# Alias de compatibilidad hacia atrás
-crear_evento_halloween = crear_evento_noche_eterna
-
 # ----------------------------------------------------------------------
 # Cartas oficiales que aparecen en el mercado (25 cartas)
 # ----------------------------------------------------------------------

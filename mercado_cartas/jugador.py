@@ -1,6 +1,5 @@
-from dataclasses import dataclass, field
 from datetime import date
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 try:
     from .principales import Moneda
@@ -8,9 +7,9 @@ except (ImportError, ValueError):
     from principales import Moneda
 
 
-@dataclass
 class Billetera:
-    _saldos: Dict[Moneda, int] = field(default_factory=dict)
+    def __init__(self, saldos: Optional[Dict[Moneda, int]] = None) -> None:
+        self._saldos = dict(saldos) if saldos is not None else {}
 
     @property
     def saldos(self) -> Dict[Moneda, int]:
@@ -32,18 +31,30 @@ class Billetera:
         self._saldos[moneda] = self.saldo(moneda) - monto
 
 
-@dataclass
 class Jugador:
-    id: str
-    nombre: str
-    billetera: Billetera = field(default_factory=Billetera)
-    _cartas: List[str] = field(default_factory=list)
-    _actividades_completadas: List[str] = field(default_factory=list)
-    _sobres_comprados: Dict[str, int] = field(default_factory=dict)
-    _victorias_por_dia: Dict[date, int] = field(default_factory=dict)
-    _cartas_compradas_mercado: int = 0
-    _intercambios_completados: int = 0
-    _victorias_consecutivas: int = 0
+    def __init__(
+        self,
+        id: str,
+        nombre: str,
+        billetera: Optional[Billetera] = None,
+        cartas: Optional[List[str]] = None,
+        actividades_completadas: Optional[List[str]] = None,
+        sobres_comprados: Optional[Dict[str, int]] = None,
+        victorias_por_dia: Optional[Dict[date, int]] = None,
+        cartas_compradas_mercado: int = 0,
+        intercambios_completados: int = 0,
+        victorias_consecutivas: int = 0,
+    ) -> None:
+        self.id = id
+        self.nombre = nombre
+        self.billetera = billetera if billetera is not None else Billetera()
+        self._cartas = list(cartas) if cartas is not None else []
+        self._actividades_completadas = list(actividades_completadas) if actividades_completadas is not None else []
+        self._sobres_comprados = dict(sobres_comprados) if sobres_comprados is not None else {}
+        self._victorias_por_dia = dict(victorias_por_dia) if victorias_por_dia is not None else {}
+        self._cartas_compradas_mercado = cartas_compradas_mercado
+        self._intercambios_completados = intercambios_completados
+        self._victorias_consecutivas = victorias_consecutivas
 
     @property
     def cartas(self) -> List[str]:

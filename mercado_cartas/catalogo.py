@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from datetime import date
 from typing import Dict, List, Optional, Sequence, Union
 
@@ -8,9 +7,9 @@ except (ImportError, ValueError):
     from principales import Evento, PlantillaCriatura, SobreEstable, TipoSobre
 
 
-@dataclass
 class Catalogo:
-    plantillas: Dict[str, PlantillaCriatura] = field(default_factory=dict)
+    def __init__(self, plantillas: Optional[Dict[str, PlantillaCriatura]] = None) -> None:
+        self.plantillas = dict(plantillas) if plantillas is not None else {}
 
     def buscar(self, codigo: str) -> PlantillaCriatura:
         if codigo not in self.plantillas:
@@ -46,11 +45,16 @@ class Catalogo:
         ]
 
 
-@dataclass
 class Mercado:
-    ofertas: Dict[str, int] = field(default_factory=dict)
-    sobres: List[SobreEstable] = field(default_factory=list)
-    tasa_cambio: int = 1
+    def __init__(
+        self,
+        ofertas: Optional[Dict[str, int]] = None,
+        sobres: Optional[List[SobreEstable]] = None,
+        tasa_cambio: int = 1,
+    ) -> None:
+        self.ofertas = dict(ofertas) if ofertas is not None else {}
+        self.sobres = list(sobres) if sobres is not None else []
+        self.tasa_cambio = tasa_cambio
 
     def precio_de(self, codigo: str) -> int:
         if codigo not in self.ofertas:

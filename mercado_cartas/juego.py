@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Sequence
 
@@ -12,21 +11,29 @@ except (ImportError, ValueError):
     from jugador import Jugador
 
 
-@dataclass
 class Juego:
-    catalogo: Catalogo
-    mercado: Mercado
-    actividades: List[Actividad] = field(default_factory=list)
-    eventos: List[Evento] = field(default_factory=list)
-    _jugadores: Dict[str, Jugador] = field(default_factory=dict)
-    _cartas: Dict[str, Carta] = field(default_factory=dict)
-    _historial: List[dict] = field(default_factory=list)
-    _contadores: List[Dict[str, Any]] = field(default_factory=list)
-
     _instancia_actual: ClassVar[Optional["Juego"]] = None
     _contadores_defecto: ClassVar[List[Dict[str, Any]]] = []
 
-    def __post_init__(self) -> None:
+    def __init__(
+        self,
+        catalogo: Catalogo,
+        mercado: Mercado,
+        actividades: Optional[List[Actividad]] = None,
+        eventos: Optional[List[Evento]] = None,
+        jugadores: Optional[Dict[str, Jugador]] = None,
+        cartas: Optional[Dict[str, Carta]] = None,
+        historial: Optional[List[dict]] = None,
+        contadores: Optional[List[Dict[str, Any]]] = None,
+    ) -> None:
+        self.catalogo = catalogo
+        self.mercado = mercado
+        self.actividades = list(actividades) if actividades is not None else []
+        self.eventos = list(eventos) if eventos is not None else []
+        self._jugadores = dict(jugadores) if jugadores is not None else {}
+        self._cartas = dict(cartas) if cartas is not None else {}
+        self._historial = list(historial) if historial is not None else []
+        self._contadores = list(contadores) if contadores is not None else []
         Juego._instancia_actual = self
 
     @property

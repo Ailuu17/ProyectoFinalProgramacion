@@ -10,7 +10,6 @@ try:
         PlantillaCriatura,
         SobreEstable,
         SobreVariable,
-        TasaCambio,
         TipoSobre,
     )
     from .criaturas import (
@@ -47,7 +46,6 @@ try:
         crear_sobres_estandar,
         crear_sobre_evento,
         crear_evento_noche_eterna,
-        crear_evento_halloween,
         crear_ofertas_mercado,
         crear_mercado_estandar,
         crear_misiones,
@@ -65,7 +63,6 @@ except (ImportError, ValueError):
         PlantillaCriatura,
         SobreEstable,
         SobreVariable,
-        TasaCambio,
         TipoSobre,
     )
     from criaturas import (
@@ -102,7 +99,6 @@ except (ImportError, ValueError):
         crear_sobres_estandar,
         crear_sobre_evento,
         crear_evento_noche_eterna,
-        crear_evento_halloween,
         crear_ofertas_mercado,
         crear_mercado_estandar,
         crear_misiones,
@@ -124,7 +120,6 @@ __all__ = [
     "PlantillaCriatura",
     "SobreEstable",
     "SobreVariable",
-    "TasaCambio",
     "TipoSobre",
     # Catálogo
     "CRIATURAS",
@@ -158,7 +153,6 @@ __all__ = [
     "crear_sobres_estandar",
     "crear_sobre_evento",
     "crear_evento_noche_eterna",
-    "crear_evento_halloween",
     "crear_ofertas_mercado",
     "crear_mercado_estandar",
     "crear_misiones",
